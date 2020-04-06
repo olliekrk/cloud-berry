@@ -1,0 +1,10 @@
+server:
+  port: 9991
+
+spring:
+  kafka:
+    consumer:
+      group-id: cloudberry-group
+      auto-offset-reset: earliest
+    bootstrap-servers: 127.0.0.1:9092
+
