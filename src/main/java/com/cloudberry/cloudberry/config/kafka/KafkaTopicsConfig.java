@@ -2,7 +2,9 @@ package com.cloudberry.cloudberry.config.kafka;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
@@ -19,13 +21,16 @@ public class KafkaTopicsConfig {
     public static final String SUMMARY_TOPIC = "summary";
     public static final String WORKPLACE_TOPIC = "workplace";
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServersConfig;
+    private final KafkaProperties kafkaProperties;
+
+    public KafkaTopicsConfig(KafkaProperties kafkaProperties) {
+        this.kafkaProperties = kafkaProperties;
+    }
 
     @Bean
     public KafkaAdmin admin() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersConfig);
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         return new KafkaAdmin(configs);
     }
 
