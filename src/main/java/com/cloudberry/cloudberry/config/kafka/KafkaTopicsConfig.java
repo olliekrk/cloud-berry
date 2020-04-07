@@ -1,17 +1,33 @@
 package com.cloudberry.cloudberry.config.kafka;
 
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.KafkaAdmin;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
-public class KafkaTopics {
+public class KafkaTopicsConfig {
 
     public static final String PROBLEM_DEFINITION_TOPIC = "problemDefinition";
     public static final String BEST_SOLUTION_TOPIC = "bestSolution";
     public static final String SUMMARY_TOPIC = "summary";
     public static final String WORKPLACE_TOPIC = "workplace";
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServersConfig;
+
+    @Bean
+    public KafkaAdmin admin() {
+        Map<String, Object> configs = new HashMap<>();
+        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServersConfig);
+        return new KafkaAdmin(configs);
+    }
 
     @Bean
     public NewTopic problemDefinitionTopic() {
@@ -34,9 +50,8 @@ public class KafkaTopics {
     }
 
     private NewTopic defaultTopic(String topic) {
-        return TopicBuilder.name(topic)
-                .replicas(2)
-                .compact()
+        return TopicBuilder
+                .name(topic)
                 .build();
     }
 
