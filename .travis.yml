@@ -1,12 +1,10 @@
 language: java
-install: true
 jdk: openjdk14
 
 services:
   - docker
 
-script:
-  - ./gradlew build --scan -s
+install: true
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -18,7 +16,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 before_install:
-  - gradle assemble
+  - ./gradlew build
   - docker build -t olliekrk/cloudberry:latest .
 
 deploy:
@@ -27,10 +25,10 @@ deploy:
   on:
     branch: master
 
-notifications:
-  email:
-    - dbiszkopter@gmail.com
-    - michalmagierra@gmail.com
+#notifications:
+#  email:
+#    - dbiszkopter@gmail.com
+#    - michalmagierra@gmail.com
 
 env:
   global:
