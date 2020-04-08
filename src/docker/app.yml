@@ -2,7 +2,8 @@ version: '2'
 
 services:
   cloudberry-app:
-    image: cloudberry
+    image: olliekrk/cloudberry:latest
+    container_name: cloudberry-app
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       #      - SPRING_PROFILES_ACTIVE=prod,swagger

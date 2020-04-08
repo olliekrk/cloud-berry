@@ -2,6 +2,8 @@ server:
   port: 9000
 
 spring:
+  application:
+    name: cloudberry
   kafka:
     consumer:
       group-id: cloudberry-group

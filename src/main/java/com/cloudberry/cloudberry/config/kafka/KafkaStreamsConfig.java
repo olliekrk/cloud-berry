@@ -1,9 +1,10 @@
 package com.cloudberry.cloudberry.config.kafka;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafkaStreams;
 
 @Configuration
-//@EnableKafkaStreams
+@EnableKafkaStreams
 public class KafkaStreamsConfig {
 //
 //    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)

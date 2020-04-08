@@ -5,8 +5,13 @@ plugins {
 }
 
 group = 'com.cloudberry'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 sourceCompatibility = '14'
+
+bootJar {
+    baseName = 'cloudberry'
+    version = '0.0.1'
+}
 
 configurations {
     compileOnly {
