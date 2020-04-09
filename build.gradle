@@ -2,6 +2,11 @@ plugins {
     id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = "0.8.5"
 }
 
 group = 'com.cloudberry'
@@ -9,8 +14,7 @@ version = '0.0.1'
 sourceCompatibility = '14'
 
 bootJar {
-    baseName = 'cloudberry'
-    version = '0.0.1'
+    archiveFileName = "${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}"
 }
 
 configurations {
