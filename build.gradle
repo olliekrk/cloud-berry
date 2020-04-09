@@ -43,6 +43,28 @@ dependencies {
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+
 test {
     useJUnitPlatform()
 }
+
+check.dependsOn(jacocoTestCoverageVerification, jacocoTestReport)
