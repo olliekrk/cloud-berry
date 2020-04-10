@@ -14,3 +14,16 @@ spring:
       host: localhost
       port: 27017
       database: cloudberry
+
+---
+
+spring:
+  profiles: prod
+  kafka:
+    bootstrap-servers: localhost:29092
+
+---
+
+spring:
+  profiles: dev
+  #... just mocks to not forget how to use those xd

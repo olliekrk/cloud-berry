@@ -1,5 +1,6 @@
 language: java
 jdk: openjdk14
+dist: bionic
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -7,7 +8,11 @@ after_success:
 services:
   - docker
 
-install: true
+env:
+  global:
+    - IMAGE_NAME=olliekrk/cloudberry
+    - secure: JHPlPJzDJY4JwPw2BNsLh8bvjj4FGV+ai+QHvqWLFiaSMricBIx78HTwKmYZVyeqKHI6EvCGDKjDzcBSBrFJiZHmGKi1iw+l14hqSU4FOsaWvL6OEgqxcVWAVt7qDHgMOxikg0bCoMEARmH+0LsIRnnMrdMq+licG2nvh2fJdJSTf+6oiNczPJ/bh4TQUksFnMy1zWpa54zGr8gSt52dhULVwOg/0dpFDXtgzSCzgmkS80Y9lTwXi4rB4bJQ7fS9xHT6JXe+CwVKwJdsHrma2R/Cq6xZ7zrTy1Ow8OdKYDPOkxrGtFqsUqxpsc8jNPN9FgW/f6WQxdLCA86MGXpuMtLv2r4EMRZQLVIZLf18OAotthhSa2Wdhw2tJR9ROiBM04vn9nNFOd/KUJelVBdbjikStep1oaDMNvYM5qJWszUk45YOEQJYFzGDFu0ArCFJ8HCoazhaCHxYVuJDxVJua+t9r76X8NIgYb4+VElxl3IQwnx+j1OvAKs6DAq+/4AI1A/RNSjS//geC+a9NWpCfZjBYmHvjhnNX+wsqQE8RUC6C7XnLXIOwCoiJyb1fLInuB1WK9pjXR/OYnvTWBSBBG9bXIkNYmvdKwO37E2VQJPAO7rNWogO897MS9bq8+neLOcqzFlLexUAp8HQrfji3gcZ1x+8HGOaWcJPA7k6yLM=
+    - secure: YpPDOmYmnGFWqNvps3LzlOPmq0fz8Axp9y+ydZjidqcQvOMnG62BVQSJZHIcDljiE3DQY0jXVhfHZgAQXWGY2fMnvKQ4BFGqK7uasYnhxB5xLIWQXfSCYnm5CLYTYQoYHPw7iZjsW6qSpkMrmvQpdQuWl0cgay1DGxVdeCZxyRqvcS7wNf2HsAkA1H9zTL+/q+QXKJ+CR6UkAjd7kUzUqRHYdMrqmFkaqKVwz3qJTO6a20ihx5Ll+ug33tenY+xXs+bMwaUaQSZJMPs+6b5ECt3u3XXjCTZQSEn2QETG7vSu7ksd+EMbYZXvkW9mz3osHClM6RJQjtxj9yp24WFg6nkhQ+Og7uHmDOgI3A5k1awOpF1syuYKt5dsjp8xXzm7XH32mMKXTPzYjL0siybm2NqR3VRRXVqPE8+uMMJoNsZtGB3eSK7FE3p4OjduFzl+tm3sqlwdV03vU0Ho2TAqVSliF+GQHPzCcXZ6vfhaZlRQy5AwyX1VwVKozgN4QXqqly1RsdZeiquA8GOFROWEI8uZQlcZLTudPwxIYKfla7A3DyhDgMmkdETjQrrrZvpm/O6xWcjlO7/p5HEY05r4f0LLdghx7fB9rXeyrvoHmCqIFPhKHWQHZDs5cBvBXYyJHKGVys28l1zkqZCFlKbCy+J+fLD0LIvnsuJEACW+QRA=
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -18,13 +23,25 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install:
-  - ./gradlew build
-  - docker build -t olliekrk/cloudberry:latest .
+install:
+  - ./gradlew assemble
+
+before_script:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_SECRET"
+  - docker pull "$IMAGE_NAME" || true
+
+script:
+  - docker build --pull --cache-from "$IMAGE_NAME" --tag "$IMAGE_NAME" .
+
+after_script:
+  - docker images
+
+before_deploy:
+  - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:latest"
 
 deploy:
   provider: script
-  script: bash docker_push_image.sh
+  script: docker push "${IMAGE_NAME}:latest"
   on:
     branch: master
 
@@ -33,7 +50,3 @@ deploy:
 #    - dbiszkopter@gmail.com
 #    - michalmagierra@gmail.com
 
-env:
-  global:
-    - secure: JHPlPJzDJY4JwPw2BNsLh8bvjj4FGV+ai+QHvqWLFiaSMricBIx78HTwKmYZVyeqKHI6EvCGDKjDzcBSBrFJiZHmGKi1iw+l14hqSU4FOsaWvL6OEgqxcVWAVt7qDHgMOxikg0bCoMEARmH+0LsIRnnMrdMq+licG2nvh2fJdJSTf+6oiNczPJ/bh4TQUksFnMy1zWpa54zGr8gSt52dhULVwOg/0dpFDXtgzSCzgmkS80Y9lTwXi4rB4bJQ7fS9xHT6JXe+CwVKwJdsHrma2R/Cq6xZ7zrTy1Ow8OdKYDPOkxrGtFqsUqxpsc8jNPN9FgW/f6WQxdLCA86MGXpuMtLv2r4EMRZQLVIZLf18OAotthhSa2Wdhw2tJR9ROiBM04vn9nNFOd/KUJelVBdbjikStep1oaDMNvYM5qJWszUk45YOEQJYFzGDFu0ArCFJ8HCoazhaCHxYVuJDxVJua+t9r76X8NIgYb4+VElxl3IQwnx+j1OvAKs6DAq+/4AI1A/RNSjS//geC+a9NWpCfZjBYmHvjhnNX+wsqQE8RUC6C7XnLXIOwCoiJyb1fLInuB1WK9pjXR/OYnvTWBSBBG9bXIkNYmvdKwO37E2VQJPAO7rNWogO897MS9bq8+neLOcqzFlLexUAp8HQrfji3gcZ1x+8HGOaWcJPA7k6yLM=
-    - secure: YpPDOmYmnGFWqNvps3LzlOPmq0fz8Axp9y+ydZjidqcQvOMnG62BVQSJZHIcDljiE3DQY0jXVhfHZgAQXWGY2fMnvKQ4BFGqK7uasYnhxB5xLIWQXfSCYnm5CLYTYQoYHPw7iZjsW6qSpkMrmvQpdQuWl0cgay1DGxVdeCZxyRqvcS7wNf2HsAkA1H9zTL+/q+QXKJ+CR6UkAjd7kUzUqRHYdMrqmFkaqKVwz3qJTO6a20ihx5Ll+ug33tenY+xXs+bMwaUaQSZJMPs+6b5ECt3u3XXjCTZQSEn2QETG7vSu7ksd+EMbYZXvkW9mz3osHClM6RJQjtxj9yp24WFg6nkhQ+Og7uHmDOgI3A5k1awOpF1syuYKt5dsjp8xXzm7XH32mMKXTPzYjL0siybm2NqR3VRRXVqPE8+uMMJoNsZtGB3eSK7FE3p4OjduFzl+tm3sqlwdV03vU0Ho2TAqVSliF+GQHPzCcXZ6vfhaZlRQy5AwyX1VwVKozgN4QXqqly1RsdZeiquA8GOFROWEI8uZQlcZLTudPwxIYKfla7A3DyhDgMmkdETjQrrrZvpm/O6xWcjlO7/p5HEY05r4f0LLdghx7fB9rXeyrvoHmCqIFPhKHWQHZDs5cBvBXYyJHKGVys28l1zkqZCFlKbCy+J+fLD0LIvnsuJEACW+QRA=

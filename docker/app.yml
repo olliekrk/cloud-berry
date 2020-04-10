@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  cloudberry-cb:
+    container_name: cloudberry-cb
+    build: ../
+    ports:
+      - 9000:9000
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - kafka-cb
+  kafka-cb:
+    extends:
+      file: kafka.yml
+      service: kafka-cb
+    depends_on:
+      - zookeeper-cb
+  zookeeper-cb:
+    extends:
+      file: kafka.yml
+      service: zookeeper-cb
+  mongodb-cb:
+    extends:
+      file: mongodb.yml
+      service: mongodb-cb
