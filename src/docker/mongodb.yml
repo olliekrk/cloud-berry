@@ -1,9 +1,9 @@
 version: '2'
 
 services:
-  mongodb:
+  mongodb-server:
     image: mongo:latest
-    container_name: "mongodb"
+    container_name: mongodb-server
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null

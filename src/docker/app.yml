@@ -1,27 +1,31 @@
 version: '2'
 
 services:
-  cloudberry-app:
-    image: olliekrk/cloudberry:latest
-    container_name: cloudberry-app
+  springboot-webapp:
+    build: ../../
+    ports:
+      - 9000:9000
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       #      - SPRING_PROFILES_ACTIVE=prod,swagger
-      - SPRING_DATA_MONGODB_URI=mongodb://cloudberry-mongodb:27017
-      - SPRING_DATA_MONGODB_DATABASE=cloudberry
-      - KAFKA_BOOTSTRAPSERVERS=kafka:9092
-  cloudberry-mongodb:
+      - SPRING_DATA_MONGODB_HOST=mongodb-server
+      - SPRING_KAFKA_BOOTSTRAPSERVERS=kafka-server:9092
+    depends_on:
+      - kafka-server
+  kafka-server:
+    extends:
+      file: kafka.yml
+      service: kafka-server
+#    environment:  TODO nie wiem czemu nie nadpisuje
+#      KAFKA_ADVERTISED_HOST_NAME: kafka-server
+#      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER://kafka-server:29092,LISTENER_OUT://kafka-server:9092
+    depends_on:
+      - zookeeper-server
+  zookeeper-server:
+    extends:
+      file: kafka.yml
+      service: zookeeper-server
+  mongodb-server:
     extends:
       file: mongodb.yml
-      service: mongodb
-  kafka:
-    extends:
-      file: kafka.yml
-      service: kafka
-    environment:
-      - KAFKA_ADVERTISED_HOST_NAME=kafka
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-  zookeeper:
-    extends:
-      file: kafka.yml
-      service: zookeeper
+      service: mongodb-server
