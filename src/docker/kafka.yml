@@ -7,6 +7,7 @@ networks:
 services:
   zookeeper-server:
     image: bitnami/zookeeper:latest
+    container_name: zk-cb
     hostname: zookeeper-server
     ports:
       - 2181:2181
@@ -16,6 +17,7 @@ services:
       ALLOW_ANONYMOUS_LOGIN: 'yes'
   kafka-server:
     image: bitnami/kafka:latest
+    container_name: kafka-cb
     hostname: kafka-server
     ports:
       - 9092:9092
