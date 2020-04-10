@@ -1,17 +1,13 @@
 package com.cloudberry.cloudberry.model.logs;
 
+import lombok.Data;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-
-@Document(value = "logs")
+@Data
+@Document(collection = "logs")
 public abstract class Log {
     @Id
-    String id;
-    public final Instant eventTime;
-
-    protected Log(Instant eventTime) {
-        this.eventTime = eventTime;
-    }
+    protected ObjectId id;
 }

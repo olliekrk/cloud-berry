@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry;
 
 
-import com.cloudberry.cloudberry.model.logs.FitnessLog;
+import com.cloudberry.cloudberry.model.logs.WorkplaceLog;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -13,7 +13,7 @@ public class Test1 {
     @Test
     public void test()
     {
-        FitnessLog fitnessLog = new FitnessLog(Instant.EPOCH, 2.3);
+        WorkplaceLog fitnessLog = new WorkplaceLog();
         assertTrue(true);
     }
 }
