@@ -24,7 +24,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 install:
-  - ./gradlew assemble
+  - ./gradlew build --scan
 
 before_script:
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_SECRET"
