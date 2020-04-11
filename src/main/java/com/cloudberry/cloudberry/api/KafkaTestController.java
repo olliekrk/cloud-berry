@@ -25,7 +25,7 @@ public class KafkaTestController {
 
     @GetMapping("ping")
     public String ping() throws InterruptedException {
-        this.kafkaTemplate.send(topicName, new ProblemDefinitionEvent(UUID.randomUUID(), "PING", Map.of()));
+        this.kafkaTemplate.send(topicName, new ProblemDefinitionEvent(UUID.randomUUID(), "PING", Map.of(), Map.of()));
         return "All messages received";
     }
 }

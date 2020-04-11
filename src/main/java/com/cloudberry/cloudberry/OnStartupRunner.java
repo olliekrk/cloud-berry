@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Component
 public class OnStartupRunner implements ApplicationRunner {
@@ -28,7 +29,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void sendSampleEvents() {
-        var event1 = new ProblemDefinitionEvent(UUID.randomUUID(), "Tranquillo", Map.of());
-        kafkaTemplate.send(KafkaTopics.PROBLEM_DEFINITION_TOPIC, event1);
+        var event1 = new ProblemDefinitionEvent(UUID.randomUUID(), "Tranquillo", Map.of(), Map.of());
+        IntStream.range(0, 1).forEach(__ -> kafkaTemplate.send(KafkaTopics.PROBLEM_DEFINITION_TOPIC, event1));
     }
 }

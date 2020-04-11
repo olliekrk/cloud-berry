@@ -3,6 +3,7 @@ version: '2'
 services:
   mongodb-cb:
     image: mongo:latest
+    hostname: mongodb-cb
     container_name: mongodb-cb
     environment:
       - MONGO_DATA_DIR=/data/db

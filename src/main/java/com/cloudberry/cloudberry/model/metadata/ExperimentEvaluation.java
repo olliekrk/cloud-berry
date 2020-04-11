@@ -24,4 +24,10 @@ public class ExperimentEvaluation implements Timed {
     public Instant getTime() {
         return evaluationTime;
     }
+
+    public ExperimentEvaluation(UUID id, ObjectId configurationId, Instant evaluationTime) {
+        this.id = id;
+        this.configurationId = configurationId;
+        this.evaluationTime = evaluationTime;
+    }
 }
