@@ -1,20 +1,22 @@
 package com.cloudberry.cloudberry.model.logs;
 
+import com.cloudberry.cloudberry.model.solution.Solution;
+import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * BH from AgE
+ * B from AgE
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Document(collection = "best_solution_log")
 public class BestSolutionLog extends Log {
-    //SOLUTION_STRING;SOLUTION_WORKPLACE_ID;SOLUTION_WORKPLACE_STEP_NUMBER;SOLUTION_OCCURRENCE_COUNT
-    private String solutionString;
+    private Solution solution;
     @Indexed
-    private ObjectId workplaceId;
-    private long solutionWorkplaceStepNumber;
-    private long solutionOccurrenceCount;
+    private long workplaceId;
+    private long stepNumber;
+    private long occurrencesCount;
 }

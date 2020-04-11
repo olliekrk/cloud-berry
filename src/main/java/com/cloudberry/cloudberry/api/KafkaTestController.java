@@ -2,18 +2,19 @@ package com.cloudberry.cloudberry.api;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopicsConfig;
 import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("kafka")
+@Slf4j
 public class KafkaTestController {
 
-    public static final Logger logger = LoggerFactory.getLogger(KafkaTestController.class);
     private static final String topicName = KafkaTopicsConfig.PROBLEM_DEFINITION_TOPIC;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -23,8 +24,7 @@ public class KafkaTestController {
 
     @GetMapping("ping")
     public String ping() throws InterruptedException {
-        this.kafkaTemplate.send(topicName, new ProblemDefinitionEvent("This is problem"));
-        logger.info("All messages received");
+        this.kafkaTemplate.send(topicName, new ProblemDefinitionEvent(UUID.randomUUID(), "This is problem"));
         return "All messages received";
     }
 }

@@ -1,17 +1,26 @@
 package com.cloudberry.cloudberry.model.logs;
 
+import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Map;
 
 /**
- * WH log from AgE
+ * W log from AgE
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class WorkplaceLog extends TimedLog {
-    //WORKPLACE_ID;STEP_NUMBER;POPULATION_SIZE;AVERAGE_FITNESS;ENERGY_SUM
-    private long stepNumber;
-    private int populationSize;
-    private double averageFitness;
-    private double energySum;
+@Document(collection = "workplace_log")
+public class WorkplaceLog extends Log implements Parametrized<String, Object> {
+    @Indexed
+    private long workplaceId;
+    private Map<String, Object> parameters;
+
+    @Override
+    public Map<String, Object> getParameters() {
+        return parameters;
+    }
 }

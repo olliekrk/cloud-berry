@@ -1,13 +1,22 @@
 package com.cloudberry.cloudberry.model.event;
 
+import com.cloudberry.cloudberry.model.Parametrized;
+
 import java.util.Map;
+import java.util.UUID;
 
-public class WorkplaceEvent extends TimedEvent {
-    public final Long workplaceId;
-    public final Map<Object, Object> workplaceParameters;
+public class WorkplaceEvent extends Event implements Parametrized<String, Object> {
+    public final long workplaceId;
+    private final Map<String, Object> parameters;
 
-    public WorkplaceEvent(Long workplaceId, Map<Object, Object> workplaceParameters) {
+    public WorkplaceEvent(UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
+        super(evaluationId);
         this.workplaceId = workplaceId;
-        this.workplaceParameters = workplaceParameters;
+        this.parameters = parameters;
+    }
+
+    @Override
+    public Map<String, Object> getParameters() {
+        return parameters;
     }
 }

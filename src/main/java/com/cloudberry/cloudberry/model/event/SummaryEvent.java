@@ -1,10 +1,13 @@
 package com.cloudberry.cloudberry.model.event;
 
-public class SummaryEvent extends TimedEvent {
-    public final Double bestEvaluation;
-    public final Long evaluationsCount;
+import java.util.UUID;
 
-    public SummaryEvent(Double bestEvaluation, Long evaluationsCount) {
+public class SummaryEvent extends Event {
+    public final double bestEvaluation;
+    public final long evaluationsCount;
+
+    public SummaryEvent(UUID evaluationId, double bestEvaluation, long evaluationsCount) {
+        super(evaluationId);
         this.bestEvaluation = bestEvaluation;
         this.evaluationsCount = evaluationsCount;
     }

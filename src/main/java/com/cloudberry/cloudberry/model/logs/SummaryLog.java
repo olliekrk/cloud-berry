@@ -2,14 +2,20 @@ package com.cloudberry.cloudberry.model.logs;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * SH tag from AgE
+ * S tag from AgE
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SummaryLog extends TimedLog {
-    //TIME;BEST_SOLUTION_SO_FAR;FITNESS_EVALUATIONS
-    private double bestEvaluationSoFar;
-    private long evaluationCount;
+@Document(collection = "summary_log")
+public class SummaryLog extends Log {
+    public final double bestEvaluation;
+    public final long evaluationsCount;
+
+    public SummaryLog(double bestEvaluation, long evaluationsCount) {
+        this.bestEvaluation = bestEvaluation;
+        this.evaluationsCount = evaluationsCount;
+    }
 }

@@ -1,11 +1,30 @@
 package com.cloudberry.cloudberry.model.event;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.cloudberry.cloudberry.model.Parametrized;
 
-public class ProblemDefinitionEvent extends TimedEvent {
-    public final String description;
+import java.util.Map;
+import java.util.UUID;
 
-    public ProblemDefinitionEvent(@JsonProperty("description") String description) {
-        this.description = description;
+/**
+ * An initial event, received at the beginning of each evaluation.
+ * Contains information about configuration used, problem type and other metadata.
+ */
+public class ProblemDefinitionEvent extends Event implements Parametrized<String, Object> {
+    public final String name;
+    private final Map<String, Object> parameters;
+
+    public ProblemDefinitionEvent(UUID evaluationId, String name, Map<String, Object> parameters) {
+        super(evaluationId);
+        this.name = name;
+        this.parameters = parameters;
+    }
+
+    public ProblemDefinitionEvent(UUID evaluationId, String name) {
+        this(evaluationId, name, Map.of());
+    }
+
+    @Override
+    public Map<String, Object> getParameters() {
+        return parameters;
     }
 }

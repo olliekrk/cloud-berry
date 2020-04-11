@@ -1,17 +1,18 @@
 package com.cloudberry.cloudberry.model.solution;
 
+import com.cloudberry.cloudberry.model.Parametrized;
+
 import java.util.Map;
 
-public class Solution {
-    public final Map<String, Double> parameters;
-    public final Long workplaceId;
-    public final Long stepsCount;
-    public final Long occurrences;
+public class Solution implements Parametrized<String, Object> {
+    private final Map<String, Object> parameters;
 
-    public Solution(Map<String, Double> parameters, Long workplaceId, Long stepsCount, Long occurrences) {
+    public Solution(Map<String, Object> parameters) {
         this.parameters = parameters;
-        this.workplaceId = workplaceId;
-        this.stepsCount = stepsCount;
-        this.occurrences = occurrences;
+    }
+
+    @Override
+    public Map<String, Object> getParameters() {
+        return parameters;
     }
 }
