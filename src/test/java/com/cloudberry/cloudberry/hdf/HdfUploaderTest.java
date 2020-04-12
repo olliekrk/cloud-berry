@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ComponentScan("com.cloudberry.cloudberry.hdf")
 @EmbeddedMongoTests
@@ -26,7 +25,7 @@ class HdfUploaderTest {
         var file = mockFile();
         var uploadedFile = hdfUploader.uploadFile(file);
 
-        assertEquals(file.getName(), uploadedFile.fileName);
+        Assertions.assertEquals(file.getName(), uploadedFile.fileName);
         assertArrayEquals(file.getBytes(), uploadedFile.file.getData());
     }
 

@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.model.metadata;
 
 import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.Data;
+import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -19,6 +20,7 @@ public class ExperimentConfiguration implements Parametrized<String, Object> {
     @Indexed
     private Long experimentId;
     private String configurationFileName;
+    @Getter
     private Map<String, Object> parameters;
     @CreatedDate
     private Date createdDate;
@@ -26,10 +28,5 @@ public class ExperimentConfiguration implements Parametrized<String, Object> {
     public ExperimentConfiguration(Long experimentId, Map<String, Object> parameters) {
         this.experimentId = experimentId;
         this.parameters = parameters;
-    }
-
-    @Override
-    public Map<String, Object> getParameters() {
-        return parameters;
     }
 }

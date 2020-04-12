@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.model.event;
 
+import com.cloudberry.cloudberry.model.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
@@ -7,13 +8,15 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An initial event, received at the beginning of each evaluation.
  * Contains information about configuration used, problem type and other metadata.
  */
 @ToString(callSuper = true)
-public class ProblemDefinitionEvent extends Event {
+public class ProblemDefinitionEvent extends Event implements Parametrized<String, Object> {
     public final String name;
     public final Map<String, Object> experimentParameters;
     public final Map<String, Object> configurationParameters;
@@ -40,4 +43,19 @@ public class ProblemDefinitionEvent extends Event {
         this.configurationParameters = configurationParameters;
     }
 
+    /**
+     * Merges both experiment parameters and configuration parameters.
+     * In case there are duplicated keys, the experiment parameter value is chosen.
+     * @return *new* map with combined parameters
+     */
+    @Override
+    public Map<String, Object> getParameters() {
+        return Stream.of(experimentParameters, configurationParameters)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (experimentValue, __) -> experimentValue
+                ));
+    }
 }

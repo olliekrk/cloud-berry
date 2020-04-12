@@ -1,5 +1,7 @@
 package com.cloudberry.cloudberry.model.solution;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -8,9 +10,13 @@ public class SolutionDetails {
     public final long stepNumber;
     public final long occurrencesCount;
 
-    public SolutionDetails(long workplaceId, long stepsCount, long occurrences) {
+    @JsonCreator
+    public SolutionDetails(
+            @JsonProperty("workplaceId") long workplaceId,
+            @JsonProperty("stepNumber") long stepNumber,
+            @JsonProperty("occurrencesCount") long occurrencesCount) {
         this.workplaceId = workplaceId;
-        this.stepNumber = stepsCount;
-        this.occurrencesCount = occurrences;
+        this.stepNumber = stepNumber;
+        this.occurrencesCount = occurrencesCount;
     }
 }

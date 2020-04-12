@@ -16,7 +16,7 @@ import java.util.UUID;
 @Slf4j
 public class KafkaTestController {
 
-    private static final String topicName = KafkaTopics.PROBLEM_DEFINITION_TOPIC;
+    private static final String topicName = KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public KafkaTestController(KafkaTemplate<String, Object> kafkaTemplate) {

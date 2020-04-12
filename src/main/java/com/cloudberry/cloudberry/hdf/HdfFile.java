@@ -17,9 +17,4 @@ public class HdfFile {
     private ObjectId id;
     public final String fileName;
     public final Binary file;
-
-    public HdfFile(String fileName, Binary file) {
-        this.fileName = fileName;
-        this.file = file;
-    }
 }

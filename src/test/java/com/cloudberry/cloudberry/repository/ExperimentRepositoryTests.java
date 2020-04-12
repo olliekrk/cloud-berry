@@ -21,13 +21,13 @@ public class ExperimentRepositoryTests {
     @Test
     @DisplayName("it should not change ID on experiment name modification")
     public void noIdChangeOnUpdateTest() {
-        var experiment = experimentsRepository.save(newTestExperiment()).block();
-        var id = experiment.getId();
-        experiment.setName(experiment.getName() + "_modified");
-        experiment = experimentsRepository.save(experiment).block();
+        var experiment = experimentsRepository.save(newTestExperiment())
+                .block();
+        var modifiedExperiment = experimentsRepository.save(experiment.withName(experiment.getName() + "_modified"))
+                .block();
 
-        assertNotNull(id);
-        assertEquals(id, experiment.getId());
+        assertNotNull(experiment.getId());
+        assertEquals(experiment.getId(), modifiedExperiment.getId());
     }
 
     @Test

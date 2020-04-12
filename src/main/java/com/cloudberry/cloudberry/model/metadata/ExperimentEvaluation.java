@@ -1,7 +1,9 @@
 package com.cloudberry.cloudberry.model.metadata;
 
 import com.cloudberry.cloudberry.model.Timed;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,22 +14,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
 @Document(collection = "experiment_evaluation")
 public class ExperimentEvaluation implements Timed {
     @MongoId(FieldType.STRING)
     private UUID id;
     @Indexed
     private ObjectId configurationId;
-    private Instant evaluationTime;
-
-    @Override
-    public Instant getTime() {
-        return evaluationTime;
-    }
-
-    public ExperimentEvaluation(UUID id, ObjectId configurationId, Instant evaluationTime) {
-        this.id = id;
-        this.configurationId = configurationId;
-        this.evaluationTime = evaluationTime;
-    }
+    @Getter
+    private Instant time;
 }
