@@ -2,12 +2,10 @@ package com.cloudberry.cloudberry.model.metadata;
 
 import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.Data;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 import java.util.Map;
@@ -16,7 +14,7 @@ import java.util.Map;
 @Document(collection = "experiment")
 public class Experiment implements Parametrized<String, Object> {
     @Id
-    private ObjectId id;
+    private Long id;
     @Indexed
     private String name;
     private Map<String, Object> parameters;

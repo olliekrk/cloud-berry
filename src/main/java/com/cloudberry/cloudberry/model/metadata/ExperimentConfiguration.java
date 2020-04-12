@@ -17,13 +17,13 @@ public class ExperimentConfiguration implements Parametrized<String, Object> {
     @Id
     private ObjectId id;
     @Indexed
-    private ObjectId experimentId;
+    private Long experimentId;
     private String configurationFileName;
     private Map<String, Object> parameters;
     @CreatedDate
     private Date createdDate;
 
-    public ExperimentConfiguration(ObjectId experimentId, Map<String, Object> parameters) {
+    public ExperimentConfiguration(Long experimentId, Map<String, Object> parameters) {
         this.experimentId = experimentId;
         this.parameters = parameters;
     }

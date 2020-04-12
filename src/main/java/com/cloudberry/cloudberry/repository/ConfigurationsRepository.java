@@ -8,5 +8,5 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface ConfigurationsRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
-    Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
+    Flux<ExperimentConfiguration> findAllByExperimentId(Long experimentId);
 }
