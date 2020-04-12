@@ -1,23 +1,22 @@
-package com.cloudberry.cloudberry;
+package com.cloudberry.cloudberry.repository;
 
+import com.cloudberry.cloudberry.EmbeddedMongoTests;
 import com.cloudberry.cloudberry.model.metadata.Experiment;
-import com.cloudberry.cloudberry.repository.ExperimentsRepository;
-import com.cloudberry.cloudberry.util.listener.ExperimentIdListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ComponentScan("com.cloudberry.cloudberry.util")
 @EmbeddedMongoTests
 public class ExperimentRepositoryTests {
 
     @Autowired
     ExperimentsRepository experimentsRepository;
-    @Autowired
-    ExperimentIdListener experimentIdListener;
 
     @Test
     @DisplayName("it should not change ID on experiment name modification")
@@ -26,6 +25,8 @@ public class ExperimentRepositoryTests {
         var id = experiment.getId();
         experiment.setName(experiment.getName() + "_modified");
         experiment = experimentsRepository.save(experiment).block();
+
+        assertNotNull(id);
         assertEquals(id, experiment.getId());
     }
 
@@ -34,6 +35,7 @@ public class ExperimentRepositoryTests {
     public void subsequentIdGenerationTest() {
         var experiment = experimentsRepository.save(newTestExperiment()).block();
         var experimentNext = experimentsRepository.save(newTestExperiment()).block();
+
         assertNotNull(experiment.getId());
         assertNotNull(experimentNext.getId());
         assertEquals(experiment.getId() + 1, experimentNext.getId());

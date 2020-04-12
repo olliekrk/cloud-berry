@@ -17,8 +17,8 @@ public class HdfUploader {
         this.hdfRepository = hdfRepository;
     }
 
-    public ObjectId uploadFile(String fileName, MultipartFile file) throws IOException {
-        var hdf = new HdfFile(fileName, new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-        return hdfRepository.insert(hdf).map(HdfFile::getId).block();
+    public HdfFile uploadFile(MultipartFile file) throws IOException {
+        var hdf = new HdfFile(file.getName(), new Binary(BsonBinarySubType.BINARY, file.getBytes()));
+        return hdfRepository.insert(hdf).block();
     }
 }
