@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.api;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
+import com.cloudberry.cloudberry.model.event.MetadataEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -27,7 +27,7 @@ public class KafkaTestController {
 
     @GetMapping("ping")
     public String ping() throws InterruptedException {
-        this.kafkaTemplate.send(topicName, new ProblemDefinitionEvent(UUID.randomUUID(), "PING", Map.of(), Map.of()));
+        this.kafkaTemplate.send(topicName, new MetadataEvent(UUID.randomUUID(), "PING", Map.of(), Map.of()));
         return "All messages received";
     }
 }

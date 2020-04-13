@@ -4,7 +4,6 @@ import com.cloudberry.cloudberry.model.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
@@ -34,5 +33,10 @@ public class WorkplaceEvent extends Event implements Parametrized<String, Object
     @Override
     public Map<String, Object> getParameters() {
         return parameters;
+    }
+
+    @Override
+    public final EventType getType() {
+        return EventType.WORKPLACE;
     }
 }

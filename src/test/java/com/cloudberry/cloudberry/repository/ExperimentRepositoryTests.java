@@ -2,17 +2,20 @@ package com.cloudberry.cloudberry.repository;
 
 import com.cloudberry.cloudberry.EmbeddedMongoTests;
 import com.cloudberry.cloudberry.model.metadata.Experiment;
+import com.cloudberry.cloudberry.util.IdSequenceGenerator;
+import com.cloudberry.cloudberry.util.listener.ExperimentIdListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ComponentScan("com.cloudberry.cloudberry.util")
+@Import({ExperimentIdListener.class, IdSequenceGenerator.class})
 @EmbeddedMongoTests
 public class ExperimentRepositoryTests {
 

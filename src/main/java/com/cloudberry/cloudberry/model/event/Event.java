@@ -19,4 +19,6 @@ public abstract class Event implements Timed {
         this.evaluationId = evaluationId;
         this.time = Instant.now();
     }
+
+    public abstract EventType getType();
 }

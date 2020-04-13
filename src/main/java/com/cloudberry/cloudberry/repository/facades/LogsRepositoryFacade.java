@@ -7,35 +7,24 @@ import com.cloudberry.cloudberry.model.logs.WorkplaceLog;
 import com.cloudberry.cloudberry.repository.BestSolutionLogsRepository;
 import com.cloudberry.cloudberry.repository.SummaryLogsRepository;
 import com.cloudberry.cloudberry.repository.WorkplaceLogsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public class LogsRepositoryFacade implements LogsSaver {
+@RequiredArgsConstructor
+public class LogsRepositoryFacade
+{
     private final WorkplaceLogsRepository workplaceLogsRepository;
     private final SummaryLogsRepository summaryLogsRepository;
     private final BestSolutionLogsRepository bestSolutionLogsRepository;
 
-    public LogsRepositoryFacade(WorkplaceLogsRepository workplaceLogsRepository,
-                                SummaryLogsRepository summaryLogsRepository,
-                                BestSolutionLogsRepository bestSolutionLogsRepository) {
-        this.workplaceLogsRepository = workplaceLogsRepository;
-        this.summaryLogsRepository = summaryLogsRepository;
-        this.bestSolutionLogsRepository = bestSolutionLogsRepository;
-    }
-
-    @Override
-    public Mono<? extends Log> saveLog(WorkplaceLog log) {
-        return workplaceLogsRepository.save(log);
-    }
-
-    @Override
-    public Mono<? extends Log> saveLog(SummaryLog log) {
-        return summaryLogsRepository.save(log);
-    }
-
-    @Override
-    public Mono<? extends Log> saveLog(BestSolutionLog log) {
-        return bestSolutionLogsRepository.save(log);
+    public Mono<? extends Log> save(Log log) {
+        return switch (log.getType()) {
+            case WORKPLACE -> workplaceLogsRepository.save((WorkplaceLog) log);
+            case SUMMARY -> summaryLogsRepository.save((SummaryLog) log);
+            case BEST_SOLUTION -> bestSolutionLogsRepository.save((BestSolutionLog) log);
+            default -> Mono.empty();
+        };
     }
 }

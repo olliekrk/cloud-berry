@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.processing;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
 import com.cloudberry.cloudberry.model.event.BestSolutionEvent;
-import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
+import com.cloudberry.cloudberry.model.event.MetadataEvent;
 import com.cloudberry.cloudberry.model.event.SummaryEvent;
 import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
 import com.cloudberry.cloudberry.processing.extractors.LogsExtractor;
@@ -26,8 +26,8 @@ public class EventListeners {
     }
 
     @KafkaListener(topics = KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC)
-    public void problemDefinitionListener(ConsumerRecord<String, ProblemDefinitionEvent> consumer,
-                                          @Payload ProblemDefinitionEvent event) {
+    public void problemDefinitionListener(ConsumerRecord<String, MetadataEvent> consumer,
+                                          @Payload MetadataEvent event) {
         metadataExtractor.extractAndSave(event);
     }
 

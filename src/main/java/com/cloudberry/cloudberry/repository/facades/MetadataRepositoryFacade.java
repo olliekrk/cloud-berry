@@ -1,51 +1,40 @@
 package com.cloudberry.cloudberry.repository.facades;
 
-import com.cloudberry.cloudberry.converters.ToMetadataConverter;
-import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
+import com.cloudberry.cloudberry.model.metadata.Experiment;
+import com.cloudberry.cloudberry.model.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.model.metadata.ExperimentEvaluation;
 import com.cloudberry.cloudberry.repository.ConfigurationsRepository;
 import com.cloudberry.cloudberry.repository.EvaluationsRepository;
 import com.cloudberry.cloudberry.repository.ExperimentsRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public class MetadataRepositoryFacade implements MetadataSaver {
+@RequiredArgsConstructor
+public class MetadataRepositoryFacade {
+
     private final ExperimentsRepository experimentsRepository;
     private final ConfigurationsRepository configurationsRepository;
     private final EvaluationsRepository evaluationsRepository;
 
-    private final ToMetadataConverter toMetadataConverter;
-
-    public MetadataRepositoryFacade(ExperimentsRepository experimentsRepository,
-                                    ConfigurationsRepository configurationsRepository,
-                                    EvaluationsRepository evaluationsRepository,
-                                    ToMetadataConverter toMetadataConverter) {
-        this.experimentsRepository = experimentsRepository;
-        this.configurationsRepository = configurationsRepository;
-        this.evaluationsRepository = evaluationsRepository;
-        this.toMetadataConverter = toMetadataConverter;
+    public Mono<Experiment> save(Experiment experiment) {
+        return experimentsRepository.findAllByName(experiment.getName())
+                .filter(entry -> entry.getParameters().equals(experiment.getParameters()))
+                .limitRequest(1)
+                .switchIfEmpty(experimentsRepository.save(experiment))
+                .next();
     }
 
-    @Override
-    public Mono<Void> saveMetadata(ProblemDefinitionEvent event) {
-        var experimentFlux = experimentsRepository.findAllByName(event.getName())
-                .filter(experiment -> experiment.getParameters().equals(event.getExperimentParameters()))
-                .take(1)
-                .switchIfEmpty(experimentsRepository.save(toMetadataConverter.convert(event)));
+    public Mono<ExperimentConfiguration> save(ExperimentConfiguration configuration) {
+        return configurationsRepository.findAllByExperimentId(configuration.getExperimentId())
+                .filter(entry -> entry.getParameters().equals(configuration.getParameters()))
+                .limitRequest(1)
+                .switchIfEmpty(configurationsRepository.save(configuration))
+                .next();
+    }
 
-        var configurationFlux = experimentFlux.flatMap(experiment -> configurationsRepository.findAllByExperimentId(experiment.getId())
-                .filter(configuration -> configuration.getParameters().equals(event.getConfigurationParameters()))
-                .take(1)
-                .switchIfEmpty(configurationsRepository.save(toMetadataConverter.convert(experiment, event)))
-        );
-
-        // it may override other evaluations in DB with the same id
-        var evaluationFlux = configurationFlux.flatMap(configuration -> {
-            var evaluation = new ExperimentEvaluation(event.getEvaluationId(), configuration.getId(), event.getTime());
-            return evaluationsRepository.save(evaluation);
-        });
-
-        return evaluationFlux.then();
+    public Mono<ExperimentEvaluation> save(ExperimentEvaluation evaluation) {
+        return evaluationsRepository.save(evaluation);
     }
 }

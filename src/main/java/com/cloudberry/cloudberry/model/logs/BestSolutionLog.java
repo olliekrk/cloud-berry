@@ -1,5 +1,7 @@
 package com.cloudberry.cloudberry.model.logs;
 
+import com.cloudberry.cloudberry.model.event.BestSolutionEvent;
+import com.cloudberry.cloudberry.model.event.EventType;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.EqualsAndHashCode;
@@ -32,5 +34,14 @@ public class BestSolutionLog extends Log {
         this.workplaceId = details.workplaceId;
         this.stepNumber = details.stepNumber;
         this.occurrencesCount = details.occurrencesCount;
+    }
+
+    @Override
+    public final EventType getType() {
+        return EventType.BEST_SOLUTION;
+    }
+
+    public static BestSolutionLog ofEvent(BestSolutionEvent event) {
+        return new BestSolutionLog(event.getTime(), event.getEvaluationId(), event.getSolution(), event.getDetails());
     }
 }
