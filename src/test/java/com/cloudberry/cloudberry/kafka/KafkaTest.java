@@ -44,11 +44,6 @@ public class KafkaTest {
 
     KafkaMessageListenerContainer<String, String> container;
 
-    @Test
-    void test1() {
-        assertThat("2");
-    }
-
     @BeforeAll
     void setUp() {
         Map<String, Object> configs = new HashMap<>(KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker));
