@@ -2,11 +2,12 @@ package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
 import com.cloudberry.cloudberry.model.event.BestSolutionEvent;
-import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
+import com.cloudberry.cloudberry.model.event.MetadataEvent;
 import com.cloudberry.cloudberry.model.event.SummaryEvent;
 import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -18,14 +19,10 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Component
+@RequiredArgsConstructor
 public class OnStartupRunner implements ApplicationRunner {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    @Autowired
-    public OnStartupRunner(KafkaTemplate<String, Object> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -36,7 +33,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void sendSampleProblem(UUID evaluationId) {
-        var problemEvent = new ProblemDefinitionEvent(evaluationId, "No problem at all", Map.of(), Map.of());
+        var problemEvent = new MetadataEvent(evaluationId, "No problem at all", Map.of(), Map.of());
         IntStream.range(0, 1).forEach(__ -> kafkaTemplate.send(KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC, problemEvent));
     }
 

@@ -1,8 +1,9 @@
 package com.cloudberry.cloudberry.model.logs;
 
 import com.cloudberry.cloudberry.model.Parametrized;
+import com.cloudberry.cloudberry.model.event.EventType;
+import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.Value;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,5 +27,14 @@ public class WorkplaceLog extends Log implements Parametrized<String, Object> {
         super(time, evaluationId);
         this.workplaceId = workplaceId;
         this.parameters = parameters;
+    }
+
+    @Override
+    public final EventType getType() {
+        return EventType.WORKPLACE;
+    }
+
+    public static WorkplaceLog ofEvent(WorkplaceEvent event) {
+        return new WorkplaceLog(event.getTime(), event.getEvaluationId(), event.getWorkplaceId(), event.getParameters());
     }
 }

@@ -1,5 +1,7 @@
 package com.cloudberry.cloudberry.model.logs;
 
+import com.cloudberry.cloudberry.model.event.EventType;
+import com.cloudberry.cloudberry.model.event.SummaryEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,5 +23,14 @@ public class SummaryLog extends Log {
         super(time, evaluationId);
         this.bestEvaluation = bestEvaluation;
         this.evaluationsCount = evaluationsCount;
+    }
+
+    @Override
+    public final EventType getType() {
+        return EventType.SUMMARY;
+    }
+
+    public static SummaryLog ofEvent(SummaryEvent event) {
+        return new SummaryLog(event.getTime(), event.getEvaluationId(), event.getBestEvaluation(), event.getEvaluationsCount());
     }
 }

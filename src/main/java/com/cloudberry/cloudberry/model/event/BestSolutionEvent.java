@@ -29,4 +29,9 @@ public class BestSolutionEvent extends Event {
         this.solution = solution;
         this.details = details;
     }
+
+    @Override
+    public final EventType getType() {
+        return EventType.BEST_SOLUTION;
+    }
 }

@@ -18,15 +18,15 @@ import java.util.stream.Stream;
  */
 @ToString(callSuper = true)
 @Getter
-public class ProblemDefinitionEvent extends Event implements Parametrized<String, Object> {
+public class MetadataEvent extends Event implements Parametrized<String, Object> {
     private final String name;
     private final Map<String, Object> experimentParameters;
     private final Map<String, Object> configurationParameters;
 
-    public ProblemDefinitionEvent(UUID evaluationId,
-                                  String name,
-                                  Map<String, Object> experimentParameters,
-                                  Map<String, Object> configurationParameters) {
+    public MetadataEvent(UUID evaluationId,
+                         String name,
+                         Map<String, Object> experimentParameters,
+                         Map<String, Object> configurationParameters) {
         super(evaluationId);
         this.name = name;
         this.experimentParameters = experimentParameters;
@@ -34,11 +34,11 @@ public class ProblemDefinitionEvent extends Event implements Parametrized<String
     }
 
     @JsonCreator
-    private ProblemDefinitionEvent(@JsonProperty("evaluationId") UUID evaluationId,
-                                   @JsonProperty("time") Instant time,
-                                   @JsonProperty("name") String name,
-                                   @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
-                                   @JsonProperty("configurationParameters") Map<String, Object> configurationParameters) {
+    private MetadataEvent(@JsonProperty("evaluationId") UUID evaluationId,
+                          @JsonProperty("time") Instant time,
+                          @JsonProperty("name") String name,
+                          @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
+                          @JsonProperty("configurationParameters") Map<String, Object> configurationParameters) {
         super(evaluationId, time);
         this.name = name;
         this.experimentParameters = experimentParameters;
@@ -48,6 +48,7 @@ public class ProblemDefinitionEvent extends Event implements Parametrized<String
     /**
      * Merges both experiment parameters and configuration parameters.
      * In case there are duplicated keys, the experiment parameter value is chosen.
+     *
      * @return *new* map with combined parameters
      */
     @Override
@@ -59,5 +60,10 @@ public class ProblemDefinitionEvent extends Event implements Parametrized<String
                         Map.Entry::getValue,
                         (experimentValue, __) -> experimentValue
                 ));
+    }
+
+    @Override
+    public final EventType getType() {
+        return EventType.METADATA;
     }
 }

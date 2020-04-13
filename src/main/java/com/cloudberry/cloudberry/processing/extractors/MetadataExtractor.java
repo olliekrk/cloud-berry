@@ -1,22 +1,29 @@
 package com.cloudberry.cloudberry.processing.extractors;
 
-import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
-import com.cloudberry.cloudberry.repository.facades.MetadataSaver;
+import com.cloudberry.cloudberry.converters.MetadataConverter;
+import com.cloudberry.cloudberry.model.event.MetadataEvent;
+import com.cloudberry.cloudberry.repository.facades.MetadataRepositoryFacade;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-@Service
+@Component
+@RequiredArgsConstructor
 public class MetadataExtractor {
 
-    private final MetadataSaver metadataSaver;
-
-    public MetadataExtractor(MetadataSaver metadataSaver) {
-        this.metadataSaver = metadataSaver;
-    }
+    private final MetadataRepositoryFacade repositoryFacade;
+    private final MetadataConverter converter;
 
     @Async
-    public void extractAndSave(ProblemDefinitionEvent event) {
-        metadataSaver.saveMetadata(event).subscribe();
+    public void extractAndSave(MetadataEvent event) {
+        Mono.just(converter.toExperiment(event))
+                .flatMap(repositoryFacade::save)
+                .map(experiment -> converter.toConfiguration(event, experiment))
+                .flatMap(repositoryFacade::save)
+                .map(configuration -> converter.toEvaluation(event, configuration))
+                .flatMap(repositoryFacade::save)
+                .subscribe();
     }
 
 }

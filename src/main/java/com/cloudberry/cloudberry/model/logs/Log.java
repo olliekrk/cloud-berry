@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.model.logs;
 
 import com.cloudberry.cloudberry.model.Timed;
+import com.cloudberry.cloudberry.model.event.EventType;
 import lombok.Data;
-import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -25,4 +25,6 @@ public abstract class Log implements Timed {
         this.time = time;
         this.evaluationId = evaluationId;
     }
+
+    public abstract EventType getType();
 }

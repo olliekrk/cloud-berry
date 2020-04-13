@@ -27,4 +27,9 @@ public class SummaryEvent extends Event {
         this.bestEvaluation = bestEvaluation;
         this.evaluationsCount = evaluationsCount;
     }
+
+    @Override
+    public final EventType getType() {
+        return EventType.SUMMARY;
+    }
 }
