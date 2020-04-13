@@ -24,10 +24,11 @@ repositories {
     mavenCentral()
 }
 
+def springBootVersion = "2.2.6.RELEASE"
+def springKafkaVersion = "2.4.4.RELEASE"
+def apacheKafkaVersion = "2.4.1"
+
 dependencies {
-    def springBootVersion = "2.2.6.RELEASE"
-    def springKafkaVersion = "2.4.4.RELEASE"
-    def apacheKafkaVersion = "2.4.1"
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
