@@ -6,9 +6,9 @@ import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
 import com.cloudberry.cloudberry.model.logs.BestSolutionLog;
 import com.cloudberry.cloudberry.model.logs.SummaryLog;
 import com.cloudberry.cloudberry.model.logs.WorkplaceLog;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class SimpleEventToLogConverter implements EventToLogConverter {
 
     @Override

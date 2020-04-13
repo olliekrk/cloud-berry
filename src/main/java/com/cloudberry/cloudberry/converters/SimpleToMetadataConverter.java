@@ -3,9 +3,9 @@ package com.cloudberry.cloudberry.converters;
 import com.cloudberry.cloudberry.model.event.ProblemDefinitionEvent;
 import com.cloudberry.cloudberry.model.metadata.Experiment;
 import com.cloudberry.cloudberry.model.metadata.ExperimentConfiguration;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class SimpleToMetadataConverter implements ToMetadataConverter {
     @Override
     public Experiment convert(ProblemDefinitionEvent event) {
