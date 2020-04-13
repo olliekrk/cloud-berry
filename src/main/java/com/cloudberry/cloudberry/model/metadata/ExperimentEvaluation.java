@@ -3,7 +3,6 @@ package com.cloudberry.cloudberry.model.metadata;
 import com.cloudberry.cloudberry.model.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,6 +20,5 @@ public class ExperimentEvaluation implements Timed {
     private UUID id;
     @Indexed
     private ObjectId configurationId;
-    @Getter
     private Instant time;
 }

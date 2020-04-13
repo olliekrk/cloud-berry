@@ -4,13 +4,15 @@ import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class BestSolutionEvent extends Event {
-    public final Solution solution;
-    public final SolutionDetails details;
+    private final Solution solution;
+    private final SolutionDetails details;
 
     public BestSolutionEvent(UUID evaluationId, Solution solution, SolutionDetails details) {
         super(evaluationId);

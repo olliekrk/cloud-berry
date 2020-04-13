@@ -3,14 +3,17 @@ package com.cloudberry.cloudberry.model.event;
 import com.cloudberry.cloudberry.model.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public class WorkplaceEvent extends Event implements Parametrized<String, Object> {
-    public final long workplaceId;
-    public final Map<String, Object> parameters;
+    private final long workplaceId;
+    private final Map<String, Object> parameters;
 
     public WorkplaceEvent(UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
         super(evaluationId);

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public class LogsRepositoryFacade {
+public class LogsRepositoryFacade implements LogsSaver {
     private final WorkplaceLogsRepository workplaceLogsRepository;
     private final SummaryLogsRepository summaryLogsRepository;
     private final BestSolutionLogsRepository bestSolutionLogsRepository;
@@ -24,15 +24,18 @@ public class LogsRepositoryFacade {
         this.bestSolutionLogsRepository = bestSolutionLogsRepository;
     }
 
-    public Mono<? extends Log> saveLog(Log log) {
-        if (log instanceof WorkplaceLog) {
-            return workplaceLogsRepository.save((WorkplaceLog) log);
-        } else if (log instanceof SummaryLog) {
-            return summaryLogsRepository.save((SummaryLog) log);
-        } else if (log instanceof BestSolutionLog) {
-            return bestSolutionLogsRepository.save((BestSolutionLog) log);
-        } else {
-            return Mono.empty();
-        }
+    @Override
+    public Mono<? extends Log> saveLog(WorkplaceLog log) {
+        return workplaceLogsRepository.save(log);
+    }
+
+    @Override
+    public Mono<? extends Log> saveLog(SummaryLog log) {
+        return summaryLogsRepository.save(log);
+    }
+
+    @Override
+    public Mono<? extends Log> saveLog(BestSolutionLog log) {
+        return bestSolutionLogsRepository.save(log);
     }
 }

@@ -10,10 +10,10 @@ import java.util.UUID;
 
 @ToString
 @AllArgsConstructor
-abstract class Event implements Timed {
-    public final UUID evaluationId;
-    @Getter
-    public final Instant time;
+@Getter
+public abstract class Event implements Timed {
+    private final UUID evaluationId;
+    private final Instant time;
 
     protected Event(UUID evaluationId) {
         this.evaluationId = evaluationId;

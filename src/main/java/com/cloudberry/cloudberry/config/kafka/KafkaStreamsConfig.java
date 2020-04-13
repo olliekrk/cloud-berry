@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.config.kafka;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
@@ -15,6 +16,7 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 
 import java.util.HashMap;
 
+@Slf4j
 @Configuration
 @EnableKafkaStreams
 public class KafkaStreamsConfig {
@@ -34,7 +36,7 @@ public class KafkaStreamsConfig {
     public KStream<String, Object> kStream(StreamsBuilder kStreamBuilder) {
         KStream<String, Object> stream = kStreamBuilder.stream(KafkaTopics.Logs.WORKPLACE_TOPIC);
         // how to use: provide processors implementation
-        stream.foreach((_key, value) -> System.out.println("KStream with WorkplaceEvent: " + value));
+        stream.foreach((_key, value) -> log.info("KStream with WorkplaceEvent: " + value));
         return stream;
     }
 

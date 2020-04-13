@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.time.Instant;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +43,7 @@ public class ExperimentRepositoryTests {
     }
 
     private Experiment newTestExperiment() {
-        return new Experiment("TestExperiment", Map.of());
+        return new Experiment(Instant.EPOCH, "TestExperiment", Map.of());
     }
 
 }

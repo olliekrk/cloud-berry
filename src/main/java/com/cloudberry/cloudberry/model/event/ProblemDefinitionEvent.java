@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.model.event;
 import com.cloudberry.cloudberry.model.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
@@ -16,10 +17,11 @@ import java.util.stream.Stream;
  * Contains information about configuration used, problem type and other metadata.
  */
 @ToString(callSuper = true)
+@Getter
 public class ProblemDefinitionEvent extends Event implements Parametrized<String, Object> {
-    public final String name;
-    public final Map<String, Object> experimentParameters;
-    public final Map<String, Object> configurationParameters;
+    private final String name;
+    private final Map<String, Object> experimentParameters;
+    private final Map<String, Object> configurationParameters;
 
     public ProblemDefinitionEvent(UUID evaluationId,
                                   String name,

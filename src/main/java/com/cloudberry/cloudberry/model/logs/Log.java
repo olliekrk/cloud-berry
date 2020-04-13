@@ -16,7 +16,6 @@ import java.util.UUID;
 public abstract class Log implements Timed {
     @Id
     protected ObjectId id;
-    @Getter
     protected final Instant time;
     @Indexed
     @Field(targetType = FieldType.STRING)

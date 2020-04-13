@@ -20,7 +20,6 @@ import java.util.UUID;
 public class WorkplaceLog extends Log implements Parametrized<String, Object> {
     @Indexed
     long workplaceId;
-    @Getter
     Map<String, Object> parameters;
 
     public WorkplaceLog(Instant time, UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
