@@ -27,8 +27,12 @@ repositories {
 def springBootVersion = "2.2.6.RELEASE"
 def springKafkaVersion = "2.4.4.RELEASE"
 def apacheKafkaVersion = "2.4.1"
+def influxVersion = "1.8.0"
 
 dependencies {
+    implementation "com.influxdb:influxdb-client-java:$influxVersion"
+    implementation "com.influxdb:influxdb-spring:$influxVersion"
+
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"

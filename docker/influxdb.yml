@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+  influxdb-cb:
+    image: quay.io/influxdb/influxdb:2.0.0-beta
+    hostname: influxdb-cb
+    container_name: influxdb-cb
+    ports:
+      - 9999:9999
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb # data
+      - ./influxdb/config:/etc/influxdb # configs
+    command: --reporting-disabled
+    environment:
+      INFLUXDB_DB: cloudberry
+      INFLUXDB_ADMIN_USER: root
+      INFLUXDB_ADMIN_PASSWORD: ziemniak

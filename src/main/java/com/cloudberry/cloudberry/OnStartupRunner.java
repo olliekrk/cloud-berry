@@ -1,12 +1,16 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
+import com.cloudberry.cloudberry.influx2.InfluxDBConnector;
+import com.cloudberry.cloudberry.influx2.measurement.WorkplaceLogMeasurement;
 import com.cloudberry.cloudberry.model.event.BestSolutionEvent;
 import com.cloudberry.cloudberry.model.event.MetadataEvent;
 import com.cloudberry.cloudberry.model.event.SummaryEvent;
 import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
+import com.influxdb.annotations.Measurement;
+import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -14,6 +18,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -23,13 +28,21 @@ import java.util.stream.IntStream;
 public class OnStartupRunner implements ApplicationRunner {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final InfluxDBConnector influxDBConnector;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // good place for quick dev testing
         var evaluationId = UUID.randomUUID();
+
         sendSampleProblem(evaluationId);
         sendSampleLogs(evaluationId);
+        writeSampleMeasurements(evaluationId);
+    }
+
+    private void writeSampleMeasurements(UUID evaluationId) {
+        var measurement = new WorkplaceLogMeasurement("123", evaluationId.toString(), Instant.now());
+        influxDBConnector.writeMeasurement(measurement);
     }
 
     private void sendSampleProblem(UUID evaluationId) {

@@ -23,6 +23,13 @@ spring:
       host: localhost
       port: 27017
       database: cloudberry
+  influx2:
+    url: http://localhost:9999/
+    username: root
+    password: ziemniak
+    org: 05d2d61891515000 # local value, todo
+    bucket: cloudberry
+    token: 0e-7IP88YUpOX-oIYn53ycuriV4TRekD20Kd-4uoKhXyZiBRVoEBs9YuI9XotRk6s4BL2wVIW0lwVG9tTYNj7w==  # local value, todo
 
 ---
 

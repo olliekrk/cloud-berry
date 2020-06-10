@@ -25,3 +25,7 @@ services:
     extends:
       file: mongodb.yml
       service: mongodb-cb
+  influxdb-cb:
+    extends:
+      file: influxdb.yml
+      service: influxdb-cb
