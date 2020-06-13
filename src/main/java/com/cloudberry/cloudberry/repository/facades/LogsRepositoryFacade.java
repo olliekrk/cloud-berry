@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry.repository.facades;
 
-import com.cloudberry.cloudberry.db.mongo.data.logs.BestSolutionLog;
-import com.cloudberry.cloudberry.db.mongo.data.logs.Log;
-import com.cloudberry.cloudberry.db.mongo.data.logs.SummaryLog;
-import com.cloudberry.cloudberry.db.mongo.data.logs.WorkplaceLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.MongoBestSolutionLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.MongoLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.MongoSummaryLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.MongoWorkplaceLog;
 import com.cloudberry.cloudberry.repository.BestSolutionLogsRepository;
 import com.cloudberry.cloudberry.repository.SummaryLogsRepository;
 import com.cloudberry.cloudberry.repository.WorkplaceLogsRepository;
@@ -19,11 +19,11 @@ public class LogsRepositoryFacade
     private final SummaryLogsRepository summaryLogsRepository;
     private final BestSolutionLogsRepository bestSolutionLogsRepository;
 
-    public Mono<? extends Log> save(Log log) {
+    public Mono<? extends MongoLog> save(MongoLog log) {
         return switch (log.getType()) {
-            case WORKPLACE -> workplaceLogsRepository.save((WorkplaceLog) log);
-            case SUMMARY -> summaryLogsRepository.save((SummaryLog) log);
-            case BEST_SOLUTION -> bestSolutionLogsRepository.save((BestSolutionLog) log);
+            case WORKPLACE -> workplaceLogsRepository.save((MongoWorkplaceLog) log);
+            case SUMMARY -> summaryLogsRepository.save((MongoSummaryLog) log);
+            case BEST_SOLUTION -> bestSolutionLogsRepository.save((MongoBestSolutionLog) log);
             default -> Mono.empty();
         };
     }

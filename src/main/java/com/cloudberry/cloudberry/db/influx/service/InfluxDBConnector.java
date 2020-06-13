@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.influx;
+package com.cloudberry.cloudberry.db.influx.service;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.WritePrecision;

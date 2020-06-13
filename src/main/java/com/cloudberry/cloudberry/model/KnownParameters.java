@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.common;
+package com.cloudberry.cloudberry.model;
 
 /**
  * Predefined known parameters keys to be used in more domain-specific data transformations.

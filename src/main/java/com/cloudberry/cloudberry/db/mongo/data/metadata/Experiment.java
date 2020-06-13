@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.metadata;
 
-import com.cloudberry.cloudberry.db.common.Parametrized;
+import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

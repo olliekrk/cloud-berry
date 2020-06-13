@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.db.common.solution.Solution;
-import com.cloudberry.cloudberry.db.common.solution.SolutionDetails;
-import com.cloudberry.cloudberry.db.influx.InfluxDBConnector;
+import com.cloudberry.cloudberry.model.solution.Solution;
+import com.cloudberry.cloudberry.model.solution.SolutionDetails;
+import com.cloudberry.cloudberry.db.influx.service.InfluxDBConnector;
 import com.cloudberry.cloudberry.db.influx.data.WorkplaceLogMeasurement;
 import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
 import com.cloudberry.cloudberry.kafka.event.MetadataEvent;

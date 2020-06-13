@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.kafka.event;
 
-import com.cloudberry.cloudberry.db.common.Parametrized;
+import com.cloudberry.cloudberry.model.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

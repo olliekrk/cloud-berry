@@ -2,8 +2,8 @@ package com.cloudberry.cloudberry.db.mongo.data.logs;
 
 import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
 import com.cloudberry.cloudberry.kafka.event.EventType;
-import com.cloudberry.cloudberry.db.common.solution.Solution;
-import com.cloudberry.cloudberry.db.common.solution.SolutionDetails;
+import com.cloudberry.cloudberry.model.solution.Solution;
+import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,17 +18,17 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Value
 @Document(collection = "best_solution_log")
-public class BestSolutionLog extends Log {
+public class MongoBestSolutionLog extends MongoLog {
     Solution solution;
     @Indexed
     long workplaceId;
     long stepNumber;
     long occurrencesCount;
 
-    public BestSolutionLog(Instant time,
-                           UUID evaluationId,
-                           Solution solution,
-                           SolutionDetails details) {
+    public MongoBestSolutionLog(Instant time,
+                                UUID evaluationId,
+                                Solution solution,
+                                SolutionDetails details) {
         super(time, evaluationId);
         this.solution = solution;
         this.workplaceId = details.workplaceId;
@@ -41,7 +41,7 @@ public class BestSolutionLog extends Log {
         return EventType.BEST_SOLUTION;
     }
 
-    public static BestSolutionLog ofEvent(BestSolutionEvent event) {
-        return new BestSolutionLog(event.getTime(), event.getEvaluationId(), event.getSolution(), event.getDetails());
+    public static MongoBestSolutionLog ofEvent(BestSolutionEvent event) {
+        return new MongoBestSolutionLog(event.getTime(), event.getEvaluationId(), event.getSolution(), event.getDetails());
     }
 }

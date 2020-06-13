@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.logs;
 
-import com.cloudberry.cloudberry.db.common.Parametrized;
+import com.cloudberry.cloudberry.model.Parametrized;
 import com.cloudberry.cloudberry.kafka.event.EventType;
 import com.cloudberry.cloudberry.kafka.event.WorkplaceEvent;
 import lombok.EqualsAndHashCode;
@@ -18,12 +18,12 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Value
 @Document(collection = "workplace_log")
-public class WorkplaceLog extends Log implements Parametrized<String, Object> {
+public class MongoWorkplaceLog extends MongoLog implements Parametrized<String, Object> {
     @Indexed
     long workplaceId;
     Map<String, Object> parameters;
 
-    public WorkplaceLog(Instant time, UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
+    public MongoWorkplaceLog(Instant time, UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
         super(time, evaluationId);
         this.workplaceId = workplaceId;
         this.parameters = parameters;
@@ -34,7 +34,7 @@ public class WorkplaceLog extends Log implements Parametrized<String, Object> {
         return EventType.WORKPLACE;
     }
 
-    public static WorkplaceLog ofEvent(WorkplaceEvent event) {
-        return new WorkplaceLog(event.getTime(), event.getEvaluationId(), event.getWorkplaceId(), event.getParameters());
+    public static MongoWorkplaceLog ofEvent(WorkplaceEvent event) {
+        return new MongoWorkplaceLog(event.getTime(), event.getEvaluationId(), event.getWorkplaceId(), event.getParameters());
     }
 }

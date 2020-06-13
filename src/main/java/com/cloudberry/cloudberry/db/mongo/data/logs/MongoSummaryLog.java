@@ -15,11 +15,11 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Value
 @Document(collection = "summary_log")
-public class SummaryLog extends Log {
+public class MongoSummaryLog extends MongoLog {
     double bestEvaluation;
     long evaluationsCount;
 
-    public SummaryLog(Instant time, UUID evaluationId, double bestEvaluation, long evaluationsCount) {
+    public MongoSummaryLog(Instant time, UUID evaluationId, double bestEvaluation, long evaluationsCount) {
         super(time, evaluationId);
         this.bestEvaluation = bestEvaluation;
         this.evaluationsCount = evaluationsCount;
@@ -30,7 +30,7 @@ public class SummaryLog extends Log {
         return EventType.SUMMARY;
     }
 
-    public static SummaryLog ofEvent(SummaryEvent event) {
-        return new SummaryLog(event.getTime(), event.getEvaluationId(), event.getBestEvaluation(), event.getEvaluationsCount());
+    public static MongoSummaryLog ofEvent(SummaryEvent event) {
+        return new MongoSummaryLog(event.getTime(), event.getEvaluationId(), event.getBestEvaluation(), event.getEvaluationsCount());
     }
 }

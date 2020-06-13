@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.kafka.event;
 
-import com.cloudberry.cloudberry.db.common.Timed;
+import com.cloudberry.cloudberry.model.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;

@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.metadata;
 
-import com.cloudberry.cloudberry.db.common.Timed;
+import com.cloudberry.cloudberry.model.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bson.types.ObjectId;

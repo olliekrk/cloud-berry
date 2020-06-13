@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.metadata;
 
-import com.cloudberry.cloudberry.db.common.Parametrized;
+import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
