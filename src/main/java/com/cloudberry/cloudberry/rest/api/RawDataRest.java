@@ -17,18 +17,15 @@ public class RawDataRest {
 
     private final RawDataService rawDataService;
 
-    @GetMapping("/{evaluationId}")
-    public List<WorkplaceLog> getByEvaluationId(@PathVariable UUID evaluationId) {
-        return rawDataService.getByEvaluationId(evaluationId);
-    }
-
-    @GetMapping("/{evaluationId}/{workplaceId}")
+    @GetMapping({"/workplace/{evaluationId}", "/workplace/{evaluationId}/{workplaceId}"})
     public List<WorkplaceLog> getByEvaluationIdAndWorkplaceId(@PathVariable UUID evaluationId,
-                                                              @PathVariable long workplaceId) {
-        return rawDataService.getByEvaluationIdAndWorkplaceId(evaluationId, workplaceId);
+                                                              @PathVariable(required = false) Long workplaceId) {
+        return (workplaceId == null) ?
+                rawDataService.getByEvaluationId(evaluationId) :
+                rawDataService.getByEvaluationIdAndWorkplaceId(evaluationId, workplaceId);
     }
 
-    @PostMapping("/byEvaluationIds")
+    @PostMapping("/workplace/byEvaluationIds")
     public List<WorkplaceLog> getByEvaluationIds(@RequestBody List<UUID> evaluationIds) {
         return rawDataService.getByEvaluationIds(evaluationIds);
     }
