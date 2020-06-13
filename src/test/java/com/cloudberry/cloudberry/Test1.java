@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry;
 
 
-import com.cloudberry.cloudberry.model.logs.WorkplaceLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.WorkplaceLog;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

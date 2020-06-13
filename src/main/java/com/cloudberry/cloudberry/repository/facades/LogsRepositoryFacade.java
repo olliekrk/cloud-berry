@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry.repository.facades;
 
-import com.cloudberry.cloudberry.model.logs.BestSolutionLog;
-import com.cloudberry.cloudberry.model.logs.Log;
-import com.cloudberry.cloudberry.model.logs.SummaryLog;
-import com.cloudberry.cloudberry.model.logs.WorkplaceLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.BestSolutionLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.Log;
+import com.cloudberry.cloudberry.db.mongo.data.logs.SummaryLog;
+import com.cloudberry.cloudberry.db.mongo.data.logs.WorkplaceLog;
 import com.cloudberry.cloudberry.repository.BestSolutionLogsRepository;
 import com.cloudberry.cloudberry.repository.SummaryLogsRepository;
 import com.cloudberry.cloudberry.repository.WorkplaceLogsRepository;

@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.repository.facades;
 
-import com.cloudberry.cloudberry.model.metadata.Experiment;
-import com.cloudberry.cloudberry.model.metadata.ExperimentConfiguration;
-import com.cloudberry.cloudberry.model.metadata.ExperimentEvaluation;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
 import com.cloudberry.cloudberry.repository.ConfigurationsRepository;
 import com.cloudberry.cloudberry.repository.EvaluationsRepository;
 import com.cloudberry.cloudberry.repository.ExperimentsRepository;

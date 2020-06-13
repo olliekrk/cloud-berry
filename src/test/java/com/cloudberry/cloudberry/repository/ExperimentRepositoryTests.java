@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry.repository;
 
 import com.cloudberry.cloudberry.EmbeddedMongoTests;
-import com.cloudberry.cloudberry.model.metadata.Experiment;
-import com.cloudberry.cloudberry.util.IdSequenceGenerator;
-import com.cloudberry.cloudberry.util.listener.ExperimentIdListener;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
+import com.cloudberry.cloudberry.db.mongo.util.IdSequenceGenerator;
+import com.cloudberry.cloudberry.db.mongo.util.listener.ExperimentIdListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

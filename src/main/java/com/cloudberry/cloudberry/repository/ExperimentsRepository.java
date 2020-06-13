@@ -1,8 +1,7 @@
 package com.cloudberry.cloudberry.repository;
 
-import com.cloudberry.cloudberry.model.metadata.Experiment;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
-import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 public interface ExperimentsRepository extends ReactiveSortingRepository<Experiment, Long> {

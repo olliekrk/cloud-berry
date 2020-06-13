@@ -1,18 +1,15 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.influx2.InfluxDBConnector;
-import com.cloudberry.cloudberry.influx2.measurement.WorkplaceLogMeasurement;
-import com.cloudberry.cloudberry.model.event.BestSolutionEvent;
-import com.cloudberry.cloudberry.model.event.MetadataEvent;
-import com.cloudberry.cloudberry.model.event.SummaryEvent;
-import com.cloudberry.cloudberry.model.event.WorkplaceEvent;
-import com.cloudberry.cloudberry.model.solution.Solution;
-import com.cloudberry.cloudberry.model.solution.SolutionDetails;
-import com.influxdb.annotations.Measurement;
-import com.influxdb.client.write.Point;
+import com.cloudberry.cloudberry.db.common.solution.Solution;
+import com.cloudberry.cloudberry.db.common.solution.SolutionDetails;
+import com.cloudberry.cloudberry.db.influx.InfluxDBConnector;
+import com.cloudberry.cloudberry.db.influx.data.WorkplaceLogMeasurement;
+import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
+import com.cloudberry.cloudberry.kafka.event.MetadataEvent;
+import com.cloudberry.cloudberry.kafka.event.SummaryEvent;
+import com.cloudberry.cloudberry.kafka.event.WorkplaceEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
