@@ -38,7 +38,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void writeSampleMeasurements(UUID evaluationId) {
-        var measurement = new WorkplaceLogMeasurement("123", evaluationId.toString(), Instant.now());
+        var measurement = new WorkplaceLogMeasurement();
         influxDBConnector.writeMeasurement(measurement);
     }
 

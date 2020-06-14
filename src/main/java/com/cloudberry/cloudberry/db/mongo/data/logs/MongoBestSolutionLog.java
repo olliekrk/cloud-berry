@@ -31,9 +31,9 @@ public class MongoBestSolutionLog extends MongoLog {
                                 SolutionDetails details) {
         super(time, evaluationId);
         this.solution = solution;
-        this.workplaceId = details.workplaceId;
-        this.stepNumber = details.stepNumber;
-        this.occurrencesCount = details.occurrencesCount;
+        this.workplaceId = details.getWorkplaceId();
+        this.stepNumber = details.getStepNumber();
+        this.occurrencesCount = details.getOccurrencesCount();
     }
 
     @Override

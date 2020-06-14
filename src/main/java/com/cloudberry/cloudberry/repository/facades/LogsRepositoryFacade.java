@@ -13,8 +13,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 @RequiredArgsConstructor
-public class LogsRepositoryFacade
-{
+public class LogsRepositoryFacade {
     private final WorkplaceLogsRepository workplaceLogsRepository;
     private final SummaryLogsRepository summaryLogsRepository;
     private final BestSolutionLogsRepository bestSolutionLogsRepository;

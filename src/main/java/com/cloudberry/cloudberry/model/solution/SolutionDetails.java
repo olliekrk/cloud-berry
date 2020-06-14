@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class SolutionDetails {
-    public final long workplaceId;
-    public final long stepNumber;
-    public final long occurrencesCount;
+    private final long workplaceId;
+    private final long stepNumber;
+    private final long occurrencesCount;
 
     @JsonCreator
     public SolutionDetails(
