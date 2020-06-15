@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InfluxDBConnector {
+public class InfluxMeasurementWriter {
 
     private final static WritePrecision DEFAULT_PRECISION = WritePrecision.MS;
     private final InfluxDBClient influxClient;

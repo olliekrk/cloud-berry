@@ -14,8 +14,8 @@ import java.time.Instant;
 @Measurement(name = "workplace_log")
 public class WorkplaceLogMeasurement {
 
-    @Column
-    String workplaceId;
+    @Column(tag = true)
+    long workplaceId;
 
     @Column(tag = true)
     String evaluationId;

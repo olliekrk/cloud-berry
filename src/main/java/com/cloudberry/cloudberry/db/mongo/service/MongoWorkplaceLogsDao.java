@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.model.log.WorkplaceLog;
 import com.cloudberry.cloudberry.repository.WorkplaceLogsRepository;
 import com.cloudberry.cloudberry.service.dao.WorkplaceLogsDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Profile("mongo")
 public class MongoWorkplaceLogsDao implements WorkplaceLogsDao {
 
     private final Converter<MongoWorkplaceLog, WorkplaceLog> converter;

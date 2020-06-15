@@ -27,9 +27,7 @@ spring:
     url: http://localhost:9999/
     username: root
     password: ziemniak
-    org: 05d2d61891515000 # local value, todo
-    bucket: cloudberry
-    token: 0e-7IP88YUpOX-oIYn53ycuriV4TRekD20Kd-4uoKhXyZiBRVoEBs9YuI9XotRk6s4BL2wVIW0lwVG9tTYNj7w==  # local value, todo
+    bucket: cloudberry-logs
 
 ---
 
@@ -47,3 +45,19 @@ spring:
   profiles: dev
   kafka:
     bootstrap-servers: localhost:9092
+
+---
+
+spring:
+  profiles: olgierd
+  influx2:
+    org: 05da34a331fc2000
+    token: XXdzWLu5TSeSbunFAv5ORgx8M6AnDgEYJknNRw57_vuzXy4aWK_P96_ztKTTlBDQZ2hb_ADr65C9nYtEiFLdhg==
+
+---
+
+spring:
+  profiles: michal
+  influx2:
+    org: halo # todo
+    token: policja # todo

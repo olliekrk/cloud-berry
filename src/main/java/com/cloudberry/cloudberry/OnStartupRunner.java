@@ -1,14 +1,14 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.model.solution.Solution;
-import com.cloudberry.cloudberry.model.solution.SolutionDetails;
-import com.cloudberry.cloudberry.db.influx.service.InfluxDBConnector;
 import com.cloudberry.cloudberry.db.influx.data.WorkplaceLogMeasurement;
+import com.cloudberry.cloudberry.db.influx.service.InfluxMeasurementWriter;
 import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
 import com.cloudberry.cloudberry.kafka.event.MetadataEvent;
 import com.cloudberry.cloudberry.kafka.event.SummaryEvent;
 import com.cloudberry.cloudberry.kafka.event.WorkplaceEvent;
+import com.cloudberry.cloudberry.model.solution.Solution;
+import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 public class OnStartupRunner implements ApplicationRunner {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final InfluxDBConnector influxDBConnector;
+    private final InfluxMeasurementWriter influxDBConnector;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -38,7 +38,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void writeSampleMeasurements(UUID evaluationId) {
-        var measurement = new WorkplaceLogMeasurement();
+        var measurement = new WorkplaceLogMeasurement(0L, evaluationId.toString(), Instant.now());
         influxDBConnector.writeMeasurement(measurement);
     }
 
