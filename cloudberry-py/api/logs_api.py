@@ -1,5 +1,7 @@
-from .config import CloudberryConfig
+import pandas as pd
 import requests
+
+from .config import CloudberryConfig
 
 
 class LogsApi:
@@ -34,7 +36,8 @@ class LogsApi:
         return r.json()
 
     def get_dataframe(self):
-        pass
+        raw_json = self.get_raw()
+        return pd.DataFrame(raw_json)
 
     def get_csv(self):
         pass

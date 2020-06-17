@@ -1,7 +1,8 @@
-from api import CloudberryConfig, LogsApi
+import api
 
-config = CloudberryConfig('http://localhost', 9000)
-logs_api = LogsApi(config)
+config = api.CloudberryConfig('http://localhost', 9000)
+logs_api = api.LogsApi(config)
+flux_api = api.FluxApi(config)
 
 evaluation_id = input('Evaluation ID: ')
 workplace_id = input('Workplace ID: ')
@@ -14,5 +15,12 @@ logs_query = logs_api \
 logs = logs_query.get_raw()
 logs_df = logs_query.get_dataframe()
 logs_csv = logs_query.get_csv()
+print(logs, logs_df)
 
-print(logs)
+while True:
+    raw_query = input('Provide Flux query (or type \'exit\' to quit):\n')
+    if raw_query == 'exit':
+        break
+    else:
+        result = flux_api.query(raw_query)
+        print(result)

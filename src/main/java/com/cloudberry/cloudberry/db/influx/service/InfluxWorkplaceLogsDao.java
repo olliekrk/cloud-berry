@@ -18,8 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Profile("influx")
 public class InfluxWorkplaceLogsDao implements WorkplaceLogsDao {
-
-    // todo: influx dao methods implementation
     private final InfluxDBClient influxClient;
     private final Converter<WorkplaceLogMeasurement, WorkplaceLog> converter;
 
@@ -39,6 +37,7 @@ public class InfluxWorkplaceLogsDao implements WorkplaceLogsDao {
 
     @Override
     public List<WorkplaceLog> getByEvaluationIds(List<UUID> evaluationIds) {
+        // todo: influx dao implementation
         return Collections.emptyList();
     }
 }
