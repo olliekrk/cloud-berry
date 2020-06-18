@@ -8,8 +8,8 @@ services:
     ports:
       - 9999:9999
     volumes:
-      - ./influxdb/data:/var/lib/influxdb # data
-      - ./influxdb/config:/etc/influxdb # configs
+      - /data/influxdb/cloudberry/data:/var/lib/influxdb # data
+      - /data/influxdb/cloudberry/config:/etc/influxdb # configs
     command: --reporting-disabled
     environment:
       INFLUXDB_DB: cloudberry

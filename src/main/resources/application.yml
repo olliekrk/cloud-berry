@@ -53,8 +53,8 @@ spring:
 spring:
   profiles: olgierd
   influx2:
-    org: 05dd00f46df69000
-    token: U7i6IFQ1ffaK2ObAZVZILzypvnCQus22rxjfWxpoTQd4Mmx_1BAPgguKtVqz074VRRrCJrRUPDC6mRmvRyzeFA==
+    org: 05de242421c1f000
+    token: HQhpbGyLwwquZPuSNPoI5pfh1aZ3uiVb1FP-COt1xAXlPyU5ceEEjX5ZnrqfHuq084dgE8BaATjUODJn6C8Yqw==
 
 ---
 

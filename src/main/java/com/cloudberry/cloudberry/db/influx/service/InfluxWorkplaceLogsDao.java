@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.service.dao.WorkplaceLogsDao;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.client.InfluxDBClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Profile("influx")
 public class InfluxWorkplaceLogsDao implements WorkplaceLogsDao {
+    @Value("${spring.influx2.bucket}")
+    private String influxBucket;
     private final InfluxDBClient influxClient;
     private final Converter<WorkplaceLogMeasurement, WorkplaceLog> converter;
 
     @Override
     public List<WorkplaceLog> getByEvaluationId(UUID evaluationId) {
-        var flux = String.format("from(bucket:\"cloudberry-logs\") |> range(start:0) |> filter(fn: (r) => r.evaluationId == %s)", evaluationId.toString());
+        var flux = String.format("from(bucket:\"%s\") |> range(start:0) |> filter(fn: (r) => r.evaluationId == \"%s\")", influxBucket, evaluationId.toString());
         var result = influxClient.getQueryApi().query(flux, WorkplaceLogMeasurement.class);
         return ListSyntax.mapped(result, converter::convert);
     }
 
     @Override
     public List<WorkplaceLog> getByEvaluationIdAndWorkplaceId(UUID evaluationId, long workplaceId) {
-        var flux = String.format("from(bucket:\"cloudberry-logs\") |> range(start:0) |> filter(fn: (r) => r.evaluationId == \"%s\" and r.workplaceId == %s)", evaluationId.toString(), workplaceId);
+        var flux = String.format("from(bucket:\"%s\") |> range(start:0) |> filter(fn: (r) => r.evaluationId == \"%s\" and r.workplaceId == %d)", influxBucket, evaluationId.toString(), workplaceId);
         var result = influxClient.getQueryApi().query(flux, WorkplaceLogMeasurement.class);
         return ListSyntax.mapped(result, converter::convert);
     }
