@@ -4,21 +4,17 @@ import com.cloudberry.cloudberry.db.mongo.data.logs.MongoBestSolutionLog;
 import com.cloudberry.cloudberry.db.mongo.data.logs.MongoLog;
 import com.cloudberry.cloudberry.db.mongo.data.logs.MongoSummaryLog;
 import com.cloudberry.cloudberry.db.mongo.data.logs.MongoWorkplaceLog;
+import com.cloudberry.cloudberry.kafka.event.EventType;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import com.cloudberry.cloudberry.repository.facades.LogsRepositoryFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static java.lang.Double.parseDouble;
 import static java.lang.Long.parseLong;
@@ -36,27 +32,41 @@ public class MongoLogsParser implements LogsParser {
 
     public boolean saveLogsToDatabase(String rawLogs) {
         this.evaluationId = UUID.randomUUID();
-        List<MongoLog> logs = parseLogs(rawLogs);
-        logs.stream().map(repositoryFacade::save).forEach(Mono::block);
+        Map<EventType, List<MongoLog>> logs = parseLogs(rawLogs);
+        logs.entrySet().stream().map(entry -> repositoryFacade.saveAll(entry.getValue(), entry.getKey()))
+                .forEach(Flux::blockFirst);
         return true;
     }
 
-    private List<MongoLog> parseLogs(String rawLogs) {
+    private Map<EventType, List<MongoLog>> parseLogs(String rawLogs) {
         this.workplaceParametersSaved = false;
         String[] logs = rawLogs.split("\n");
-        List<MongoLog> mongoLogs = new LinkedList<>();
+        Map<EventType, List<MongoLog>> mapReturned = new HashMap<>();
+        mapReturned.put(EventType.BEST_SOLUTION, new LinkedList<>());
+        mapReturned.put(EventType.SUMMARY, new LinkedList<>());
+        mapReturned.put(EventType.WORKPLACE, new LinkedList<>());
+
         for (String rawLog : logs) {
             String[] log = rawLog.trim().split(";");
 
             switch (log[0]) {
                 case "[WH]" -> saveWorkplaceParametersOrder(log);
-                case "[W]" -> mongoLogs.add(getMongoWorkplaceLog(log));
-                case "[S]" -> mongoLogs.add(getMongoSummaryLog(log));
-                case "[B]" -> mongoLogs.add(getMongoBestSolutionLog(log));
+                case "[W]" -> {
+                    MongoLog mongoLog = getMongoWorkplaceLog(log);
+                    mapReturned.get(mongoLog.getType()).add(mongoLog);
+                }
+                case "[S]" -> {
+                    MongoLog mongoLog = getMongoSummaryLog(log);
+                    mapReturned.get(mongoLog.getType()).add(mongoLog);
+                }
+                case "[B]" -> {
+                    MongoLog mongoLog = getMongoBestSolutionLog(log);
+                    mapReturned.get(mongoLog.getType()).add(mongoLog);
+                }
                 default -> MongoLogsParser.log.warn("Header {} not parsed", log[0]); //todo handle e.g. ExperimentConfiguration
             }
         }
-        return mongoLogs;
+        return mapReturned;
     }
 
     /**
