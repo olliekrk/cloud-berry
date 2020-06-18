@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.rest.api.upload.files;
+package com.cloudberry.cloudberry.service;
 
 public interface LogsParser {
     boolean saveLogsToDatabase(String logs);

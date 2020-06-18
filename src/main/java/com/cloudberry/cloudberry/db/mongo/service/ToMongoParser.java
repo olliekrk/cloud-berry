@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.rest.api.upload.files;
+package com.cloudberry.cloudberry.db.mongo.service;
 
 import com.cloudberry.cloudberry.db.mongo.data.logs.MongoBestSolutionLog;
 import com.cloudberry.cloudberry.db.mongo.data.logs.MongoLog;
@@ -8,8 +8,10 @@ import com.cloudberry.cloudberry.kafka.event.EventType;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import com.cloudberry.cloudberry.repository.facades.LogsRepositoryFacade;
+import com.cloudberry.cloudberry.service.LogsParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -20,10 +22,10 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Long.parseLong;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
-public class MongoLogsParser implements LogsParser {
-
+@RequiredArgsConstructor
+@Profile("mongo")
+public class ToMongoParser implements LogsParser {
     private final LogsRepositoryFacade repositoryFacade;
 
     private final Map<Integer, String> workplaceParametersPosition = new HashMap<>();
@@ -63,7 +65,7 @@ public class MongoLogsParser implements LogsParser {
                     MongoLog mongoLog = getMongoBestSolutionLog(log);
                     mapReturned.get(mongoLog.getType()).add(mongoLog);
                 }
-                default -> MongoLogsParser.log.warn("Header {} not parsed", log[0]); //todo handle e.g. ExperimentConfiguration
+                default -> ToMongoParser.log.warn("Header {} not parsed", log[0]); //todo handle e.g. ExperimentConfiguration
             }
         }
         return mapReturned;

@@ -28,6 +28,8 @@ spring:
     username: root
     password: ziemniak
     bucket: cloudberry-logs
+  profiles:
+    active: influx, michal
 
 ---
 
@@ -59,5 +61,5 @@ spring:
 spring:
   profiles: michal
   influx2:
-    org: halo # todo
-    token: policja # todo
+    org: 05dce0dac762f000
+    token: r6FvmGQ-L1yV0zrGF8raLY43RlUrvlxE-EOdmfnqGbb2ZmPHHS23UnDshzh6d7iFYV3tGL9H5X9YkT0KKhhxjw==

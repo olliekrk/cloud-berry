@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.rest.api.upload.files;
 
+import com.cloudberry.cloudberry.service.LogsParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
