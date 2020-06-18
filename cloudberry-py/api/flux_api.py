@@ -7,8 +7,11 @@ class FluxApi:
     def __init__(self, config: CloudberryConfig) -> None:
         self.config = config
 
-    def query(self, raw_query: str):
+    def query(self, raw_query: str, raw=False):
         base_url = self.config.get_base_url()
         url = f'{base_url}/flux/query'
-        r = requests.post(url, json={'rawQuery': raw_query})
-        return r.json()
+        r = requests.post(url, data=raw_query)
+        if raw:
+            return r.text
+        else:
+            return r.json()
