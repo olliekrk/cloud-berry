@@ -5,13 +5,15 @@ import com.influxdb.annotations.Measurement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.kafka.common.protocol.types.Field;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Measurement(name = "workplace_log")
+@Measurement(name = "workplace_log234")
 public class WorkplaceLogMeasurement {
 
     @Column
@@ -22,5 +24,8 @@ public class WorkplaceLogMeasurement {
 
     @Column(timestamp = true)
     Instant time;
+
+    @Column(tag = true)
+    Map<String, String> superMap;
 
 }

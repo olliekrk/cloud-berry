@@ -1,5 +1,7 @@
 package com.cloudberry.cloudberry.service;
 
-public interface LogsParser {
-    boolean saveLogsToDatabase(String logs);
+import java.util.List;
+
+public interface LogsParser<T> {
+    List<T> parseMeasurements(String rawLogs);
 }

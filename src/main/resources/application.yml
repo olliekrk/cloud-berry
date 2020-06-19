@@ -29,7 +29,7 @@ spring:
     password: ziemniak
     bucket: cloudberry-logs
   profiles:
-    active: influx, michal
+    active: influx
 
 ---
 

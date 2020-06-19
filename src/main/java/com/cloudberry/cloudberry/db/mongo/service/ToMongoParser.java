@@ -25,7 +25,7 @@ import static java.lang.Long.parseLong;
 @Service
 @RequiredArgsConstructor
 @Profile("mongo")
-public class ToMongoParser implements LogsParser {
+public class ToMongoParser implements LogsParser<MongoLog> {
     private final LogsRepositoryFacade repositoryFacade;
 
     private final Map<Integer, String> workplaceParametersPosition = new HashMap<>();
@@ -38,6 +38,11 @@ public class ToMongoParser implements LogsParser {
         logs.entrySet().stream().map(entry -> repositoryFacade.saveAll(entry.getValue(), entry.getKey()))
                 .forEach(Flux::blockFirst);
         return true;
+    }
+
+    @Override
+    public List<MongoLog> parseMeasurements(String rawLogs) {
+        return null;
     }
 
     private Map<EventType, List<MongoLog>> parseLogs(String rawLogs) {
