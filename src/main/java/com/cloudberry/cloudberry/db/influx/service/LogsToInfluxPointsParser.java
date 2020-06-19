@@ -19,7 +19,7 @@ import static java.lang.Long.parseLong;
 @RequiredArgsConstructor
 @Profile("influx")
 public class LogsToInfluxPointsParser implements LogsParser<Point> {
-    private static final String MEASUREMENT_PREFIX = "xdxdxd_";
+    private static final String MEASUREMENT_PREFIX = "measurement_";
 
     private final Map<String, String> keys = Map.of("[WH]", "[W]", "[SH]", "[S]", "[BH]", "[B]");
     private Map<String, String[]> parameters = new HashMap<>();
