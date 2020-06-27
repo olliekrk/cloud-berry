@@ -31,6 +31,12 @@ spring:
   profiles:
     active: influx
 
+influx:
+  organization-name: cloudberry
+  buckets:
+    default-logs: cloudberry-logs
+    default-logs-meta: cloudberry-logs-meta
+
 ---
 
 spring:
@@ -53,8 +59,8 @@ spring:
 spring:
   profiles: olgierd
   influx2:
-    org: 05de3ac65fc00000
-    token: dLUoc1EJETmAm-T8Ax_bbK4UiMKvoa69yruD3q5FCmXNFrpf9EANrUXhI8mSDxUGIVFM2INONL0cbMCIBeHDug==
+    org: 05e9e0b3c3a37000
+    token: W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ==
 
 ---
 

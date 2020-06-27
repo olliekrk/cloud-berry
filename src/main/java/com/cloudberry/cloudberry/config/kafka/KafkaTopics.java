@@ -18,6 +18,10 @@ public class KafkaTopics {
         String WORKPLACE_TOPIC = "workplace";
     }
 
+    public interface Generic {
+        String COMPUTATION_TOPIC = "computation"; // topic for generic computation related events
+    }
+
     @Bean
     public NewTopic problemDefinitionTopic() {
         return defaultTopic(Metadata.PROBLEM_DEFINITION_TOPIC);
@@ -36,6 +40,11 @@ public class KafkaTopics {
     @Bean
     public NewTopic workplaceTopic() {
         return defaultTopic(Logs.WORKPLACE_TOPIC);
+    }
+
+    @Bean
+    public NewTopic computationTopic() {
+        return defaultTopic(Generic.COMPUTATION_TOPIC);
     }
 
     private NewTopic defaultTopic(String topic) {

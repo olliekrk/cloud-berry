@@ -11,5 +11,4 @@ import java.util.UUID;
 @AllArgsConstructor
 public abstract class Log implements Timed {
     protected final Instant time;
-    protected final UUID evaluationId;
 }

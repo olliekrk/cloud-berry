@@ -10,6 +10,6 @@ class FileUploader:
 
     def upload_file(self, file_name):
         with open(file_name, 'rb') as file:
-            url = f'{self.config.get_base_url()}/logs/upload'
+            url = f'{self.config.get_base_url()}/raw/file'
             r = requests.post(url, files={'file': file})
             return r.json()

@@ -1,12 +1,12 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.db.influx.data.WorkplaceLogMeasurement;
-import com.cloudberry.cloudberry.db.influx.service.InfluxMeasurementWriter;
-import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
-import com.cloudberry.cloudberry.kafka.event.MetadataEvent;
-import com.cloudberry.cloudberry.kafka.event.SummaryEvent;
-import com.cloudberry.cloudberry.kafka.event.WorkplaceEvent;
+import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
+import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
+import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
+import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
+import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
+import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 public class OnStartupRunner implements ApplicationRunner {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final InfluxMeasurementWriter influxDBConnector;
+    private final InfluxDataWriter influxDBConnector;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -34,12 +34,6 @@ public class OnStartupRunner implements ApplicationRunner {
 
         sendSampleProblem(evaluationId);
         sendSampleLogs(evaluationId);
-        writeSampleMeasurements(evaluationId);
-    }
-
-    private void writeSampleMeasurements(UUID evaluationId) {
-        var measurement = new WorkplaceLogMeasurement(0L, evaluationId.toString(), Instant.now(), Map.of());
-        influxDBConnector.writeMeasurement(measurement);
     }
 
     private void sendSampleProblem(UUID evaluationId) {
@@ -55,9 +49,16 @@ public class OnStartupRunner implements ApplicationRunner {
                 new Solution(Map.of()),
                 new SolutionDetails(1L, 2137L, 1L)
         );
+        var computationEvent = new ComputationEvent(
+                Instant.now(),
+                "wild_logs",
+                Map.of("level", 10, "wildness", 9),
+                Map.of("evaluationId", evaluationId.toString())
+        );
 
         kafkaTemplate.send(KafkaTopics.Logs.WORKPLACE_TOPIC, workplaceEvent);
         kafkaTemplate.send(KafkaTopics.Logs.SUMMARY_TOPIC, summaryEvent);
         kafkaTemplate.send(KafkaTopics.Logs.BEST_SOLUTION_TOPIC, bestSolutionEvent);
+        kafkaTemplate.send(KafkaTopics.Generic.COMPUTATION_TOPIC, computationEvent);
     }
 }

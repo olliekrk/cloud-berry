@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.logs;
 
 import com.cloudberry.cloudberry.model.Timed;
-import com.cloudberry.cloudberry.kafka.event.EventType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -26,5 +25,5 @@ public abstract class MongoLog implements Timed {
         this.evaluationId = evaluationId;
     }
 
-    public abstract EventType getType();
+    public abstract MongoLogType getType();
 }

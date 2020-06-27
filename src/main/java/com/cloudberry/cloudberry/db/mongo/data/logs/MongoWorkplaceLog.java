@@ -1,8 +1,7 @@
 package com.cloudberry.cloudberry.db.mongo.data.logs;
 
 import com.cloudberry.cloudberry.model.Parametrized;
-import com.cloudberry.cloudberry.kafka.event.EventType;
-import com.cloudberry.cloudberry.kafka.event.WorkplaceEvent;
+import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -30,8 +29,8 @@ public class MongoWorkplaceLog extends MongoLog implements Parametrized<String, 
     }
 
     @Override
-    public final EventType getType() {
-        return EventType.WORKPLACE;
+    public final MongoLogType getType() {
+        return MongoLogType.WORKPLACE;
     }
 
     public static MongoWorkplaceLog ofEvent(WorkplaceEvent event) {

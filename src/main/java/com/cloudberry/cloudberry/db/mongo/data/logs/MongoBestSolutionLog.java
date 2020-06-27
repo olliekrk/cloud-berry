@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.logs;
 
-import com.cloudberry.cloudberry.kafka.event.BestSolutionEvent;
-import com.cloudberry.cloudberry.kafka.event.EventType;
+import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.EqualsAndHashCode;
@@ -37,8 +36,8 @@ public class MongoBestSolutionLog extends MongoLog {
     }
 
     @Override
-    public final EventType getType() {
-        return EventType.BEST_SOLUTION;
+    public final MongoLogType getType() {
+        return MongoLogType.BEST_SOLUTION;
     }
 
     public static MongoBestSolutionLog ofEvent(BestSolutionEvent event) {

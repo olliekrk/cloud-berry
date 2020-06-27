@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.kafka.event.MetadataEvent;
+import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

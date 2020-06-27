@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.service.api;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.Query;
+import com.influxdb.query.dsl.Flux;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -12,13 +12,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 public abstract class Event implements Timed {
-    private final UUID evaluationId;
     private final Instant time;
 
-    protected Event(UUID evaluationId) {
-        this.evaluationId = evaluationId;
+    protected Event() {
         this.time = Instant.now();
     }
 
-    public abstract EventType getType();
 }

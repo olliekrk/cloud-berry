@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.data.logs;
 
-import com.cloudberry.cloudberry.kafka.event.EventType;
-import com.cloudberry.cloudberry.kafka.event.SummaryEvent;
+import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -26,8 +25,8 @@ public class MongoSummaryLog extends MongoLog {
     }
 
     @Override
-    public final EventType getType() {
-        return EventType.SUMMARY;
+    public final MongoLogType getType() {
+        return MongoLogType.SUMMARY;
     }
 
     public static MongoSummaryLog ofEvent(SummaryEvent event) {

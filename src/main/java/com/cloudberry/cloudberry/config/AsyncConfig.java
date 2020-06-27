@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @Slf4j
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 public class AsyncConfig implements AsyncConfigurer {
 
     @Override
