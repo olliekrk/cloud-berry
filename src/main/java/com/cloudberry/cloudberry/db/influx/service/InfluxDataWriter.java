@@ -18,7 +18,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InfluxDataWriter {
     @Value("${influx.buckets.default-logs}")
-    private String defaultBucketName;
+    private String defaultLogsBucketName;
+    @Value("${influx.buckets.default-logs-meta}")
+    private String defaultLogsMetaBucketName;
     @Value("${spring.influx2.org}")
     private String defaultOrganization;
 
@@ -42,7 +44,7 @@ public class InfluxDataWriter {
 
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
         try (var writeApi = influxClient.getWriteApi()) {
-            var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
+            var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
             createBucketIfAbsent(bucket);
             writeApi.writePoints(bucket, defaultOrganization, List.copyOf(points));
         }

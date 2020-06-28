@@ -8,7 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,6 +27,7 @@ public class InfluxLogsParser implements LogsParser<Point> {
 
     private final Map<String, String> keys = Map.of("[WH]", "[W]", "[SH]", "[S]", "[BH]", "[B]");
     private Map<String, String[]> parameters = new HashMap<>();
+    Point configurationPoint;
 
     @Override
     public List<Point> parseMeasurements(String rawLogs) {
@@ -37,7 +42,8 @@ public class InfluxLogsParser implements LogsParser<Point> {
         String[] logs = rawLogs.split("\n");
         List<Point> points = new LinkedList<>();
 
-        for (String rawLog : logs) {
+        for (int i = 0; i < logs.length; i++) {
+            String rawLog = logs[i];
             String[] log = rawLog.trim().split(";");
 
             String logPrefix = log[0];
@@ -45,11 +51,36 @@ public class InfluxLogsParser implements LogsParser<Point> {
                 saveParametersOrder(logPrefix, log);
             } else if (keys.containsValue(logPrefix)) {
                 points.add(getMeasurementPoint(logPrefix, log));
+            } else if (rawLog.contains("<")) {
+                List<String> xmlLogs = new LinkedList<>();
+                String tagName = XmlUtils.getTagName(rawLog);
+                String closingTag = null;
+                while (!tagName.equals(closingTag)) {
+                    i++;
+                    rawLog = logs[i];
+                    xmlLogs.add(rawLog);
+                    closingTag = XmlUtils.getClosingTagName(rawLog);
+                }
+                xmlLogs.remove(rawLog); //remove closing tag from list
+                var map = getXmlMap(xmlLogs);
+                this.configurationPoint = Point.measurement(tagName)
+                        .addFields(map); //todo save it
             } else {
-                InfluxLogsParser.log.warn("Header {} not parsed", log[0]); //todo handle e.g. ExperimentConfiguration
+                InfluxLogsParser.log.warn("Header {} not parsed", log[0]);
             }
         }
         return points;
+    }
+
+    private Map<String, Object> getXmlMap(List<String> xmlLogs) {
+        return xmlLogs.stream()
+                .map(xmlLog -> xmlLog.split("=", 2))
+                .collect(
+                        Collectors.toMap(
+                                log -> log[0].trim(),
+                                log -> parseValue(log[1].trim())
+                        )
+                );
     }
 
     private Point getMeasurementPoint(String logType, String[] log) {
@@ -81,10 +112,10 @@ public class InfluxLogsParser implements LogsParser<Point> {
 
     private Map<String, Object> getMapFromArrays(String[] keys, String[] values) {
         return IntStream.range(0, keys.length).boxed()
-                .collect(Collectors.toMap(i -> keys[i], i -> findType(values[i])));
+                .collect(Collectors.toMap(i -> keys[i], i -> parseValue(values[i])));
     }
 
-    private Object findType(String value) {
+    private Object parseValue(String value) {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {

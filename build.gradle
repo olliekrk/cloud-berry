@@ -28,6 +28,7 @@ def springBootVersion = "2.2.6.RELEASE"
 def springKafkaVersion = "2.4.4.RELEASE"
 def apacheKafkaVersion = "2.4.1"
 def influxVersion = "1.9.0"
+def apacheCommonsVersion = "3.10"
 
 dependencies {
     implementation "com.influxdb:influxdb-client-java:$influxVersion"
@@ -42,6 +43,7 @@ dependencies {
     implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
     implementation "io.vavr:vavr:0.10.2"
     implementation "org.apache.kafka:kafka-clients:$apacheKafkaVersion"
+    implementation "org.apache.commons:commons-lang3:$apacheCommonsVersion"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {

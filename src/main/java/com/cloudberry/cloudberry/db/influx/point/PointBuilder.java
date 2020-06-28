@@ -11,9 +11,9 @@ import java.util.Map;
 public class PointBuilder {
 
     public Point buildPoint(String measurementName,
-                             Instant time,
-                             Map<String, Object> fields,
-                             Map<String, String> tags) {
+                            Instant time,
+                            Map<String, Object> fields,
+                            Map<String, String> tags) {
         return Point.measurement(measurementName)
                 .time(time, InfluxDefaults.WRITE_PRECISION)
                 .addFields(fields)
