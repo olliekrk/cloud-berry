@@ -3,6 +3,7 @@ import requests
 
 from .config import CloudberryConfig
 
+#  TODO: Python, API, test, modyfikacja tak zeby dzialalo bo sie teraz nie zadziala nic
 
 class LogsApi:
 
@@ -10,22 +11,8 @@ class LogsApi:
         self.config = config
         self.params = dict()
 
-    def workplace(self):
-        self.params['prefix'] = 'workplace'
-        return self
-
-    def by_evaluation_id(self, evaluation_id):
-        self.params['evaluation_id'] = evaluation_id
-        return self
-
-    def by_workplace_id(self, workplace_id):
-        self.params['workplace_id'] = workplace_id
-        return self
 
     def get_raw(self):
-        prefix = self.params.get('prefix')
-        evaluation_id = self.params.get('evaluation_id')
-        workplace_id = self.params.get('workplace_id')
 
         def segment(part):
             return f'/{part}' if part is not None else ''
