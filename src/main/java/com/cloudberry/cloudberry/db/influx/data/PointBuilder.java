@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.influx.point;
+package com.cloudberry.cloudberry.db.influx.data;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.write.Point;

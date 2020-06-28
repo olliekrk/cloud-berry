@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.db.influx.point.PointBuilder;
+import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;

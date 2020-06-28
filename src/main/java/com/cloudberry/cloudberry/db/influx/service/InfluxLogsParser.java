@@ -1,10 +1,12 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.data.ParsedLogs;
 import com.cloudberry.cloudberry.service.LogsParser;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -22,25 +24,32 @@ import static java.lang.Long.parseLong;
 @Service
 @RequiredArgsConstructor
 @Profile("influx")
-public class InfluxLogsParser implements LogsParser<Point> {
+public class InfluxLogsParser implements LogsParser<ParsedLogs> {
+    @Value("${influx.buckets.default-logs}")
+    private String evaluationLogsBucketName;
+    @Value("${influx.buckets.default-logs-meta}")
+    private String configurationLogsBucketName;
     private static final String MEASUREMENT_PREFIX = "measurement_";
-
     private final Map<String, String> keys = Map.of("[WH]", "[W]", "[SH]", "[S]", "[BH]", "[B]");
+    //above fields can come from e.g. rest parameter
+
     private Map<String, String[]> parameters = new HashMap<>();
-    Point configurationPoint;
 
     @Override
-    public List<Point> parseMeasurements(String rawLogs) {
+    public List<ParsedLogs> parseMeasurements(String rawLogs) {
         parameters = new HashMap<>();
         String evaluationId = UUID.randomUUID().toString();
-        return parseLogs(rawLogs).stream()
-                .map(point -> point.addTag("evaluation_id", evaluationId))
-                .collect(Collectors.toList());
+        List<ParsedLogs> parsedLogs = parseLogs(rawLogs);
+        parsedLogs.stream()
+                .map(ParsedLogs::getPoints)
+                .forEach(points -> points.forEach(point -> point.addTag("evaluation_id", evaluationId)));
+        return parsedLogs;
     }
 
-    private List<Point> parseLogs(String rawLogs) {
+    private List<ParsedLogs> parseLogs(String rawLogs) {
         String[] logs = rawLogs.split("\n");
-        List<Point> points = new LinkedList<>();
+        List<Point> evaluationLogs = new LinkedList<>();
+        List<Point> configurationLogs = new LinkedList<>();
 
         for (int i = 0; i < logs.length; i++) {
             String rawLog = logs[i];
@@ -50,8 +59,8 @@ public class InfluxLogsParser implements LogsParser<Point> {
             if (keys.containsKey(logPrefix)) {
                 saveParametersOrder(logPrefix, log);
             } else if (keys.containsValue(logPrefix)) {
-                points.add(getMeasurementPoint(logPrefix, log));
-            } else if (rawLog.contains("<")) {
+                evaluationLogs.add(getMeasurementPoint(logPrefix, log));
+            } else if (rawLog.startsWith("<")) {
                 List<String> xmlLogs = new LinkedList<>();
                 String tagName = XmlUtils.getTagName(rawLog);
                 String closingTag = null;
@@ -62,14 +71,18 @@ public class InfluxLogsParser implements LogsParser<Point> {
                     closingTag = XmlUtils.getClosingTagName(rawLog);
                 }
                 xmlLogs.remove(rawLog); //remove closing tag from list
-                var map = getXmlMap(xmlLogs);
-                this.configurationPoint = Point.measurement(tagName)
-                        .addFields(map); //todo save it
+                var xmlMap = getXmlMap(xmlLogs);
+                Point configurationPoint = Point.measurement(tagName)
+                        .addFields(xmlMap);
+                configurationLogs.add(configurationPoint);
             } else {
                 InfluxLogsParser.log.warn("Header {} not parsed", log[0]);
             }
         }
-        return points;
+        return List.of(
+                new ParsedLogs(evaluationLogsBucketName, evaluationLogs),
+                new ParsedLogs(configurationLogsBucketName, configurationLogs)
+        );
     }
 
     private Map<String, Object> getXmlMap(List<String> xmlLogs) {

@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
-import com.cloudberry.cloudberry.db.influx.point.PointBuilder;
+import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.processing.EventProcessor;

@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.db.influx.data.ParsedLogs;
 import com.cloudberry.cloudberry.service.LogsParser;
 import com.cloudberry.cloudberry.service.RawLogsHandler;
-import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -16,11 +16,12 @@ import java.util.List;
 @Profile("influx")
 public class InfluxRawLogsHandler implements RawLogsHandler {
     private final InfluxDataWriter influxDBConnector;
-    private final LogsParser<Point> logsParser;
+    private final LogsParser<ParsedLogs> logsParser;
 
     public boolean saveLogsToDatabase(String rawLogs) {
-        List<Point> points = logsParser.parseMeasurements(rawLogs);
-        influxDBConnector.writePoints(null, points);
+        List<ParsedLogs> parsedLogs = logsParser.parseMeasurements(rawLogs);
+        parsedLogs.forEach(parsedLog -> influxDBConnector
+                .writePoints(parsedLog.getBucketName(), parsedLog.getPoints()));
         return true;
     }
 }
