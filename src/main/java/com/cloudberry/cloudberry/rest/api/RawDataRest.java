@@ -29,7 +29,7 @@ public class RawDataRest {
 
     @DeleteMapping("/{measurementName}")
     public void deleteComputationLogs(@PathVariable String measurementName,
-                                    @RequestParam(required = false) String bucketName) {
+                                      @RequestParam(required = false) String bucketName) {
         rawDataService.deleteComputationLogs(measurementName, bucketName);
     }
 

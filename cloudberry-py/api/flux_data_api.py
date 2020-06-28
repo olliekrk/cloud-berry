@@ -2,7 +2,7 @@ from .config import CloudberryConfig
 import requests
 
 
-class FluxApi:
+class FluxDataApi:
 
     def __init__(self, config: CloudberryConfig) -> None:
         self.config = config
