@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.rest.api;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
 import com.cloudberry.cloudberry.service.RawLogsHandler;
 import com.cloudberry.cloudberry.service.api.RawDataService;
+import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/raw")
@@ -31,6 +33,13 @@ public class RawDataRest {
     public void deleteComputationLogs(@PathVariable String measurementName,
                                       @RequestParam(required = false) String bucketName) {
         rawDataService.deleteComputationLogs(measurementName, bucketName);
+    }
+
+    @GetMapping("/{measurementName}")
+    public List<Point> getComputationLogs(@PathVariable String measurementName,
+                                          @RequestParam(required = false) String bucketName,
+                                          @RequestParam Map<String, Object> filters) {
+        return rawDataService.getComputationLogs(measurementName, bucketName, filters);
     }
 
     @PostMapping("/file")

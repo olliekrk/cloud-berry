@@ -1,7 +1,7 @@
 from typing import List
 
 import requests
-import json
+
 from . import ComputationData
 from .config import CloudberryConfig
 
@@ -22,7 +22,7 @@ class RawDataApi:
             params['bucketName'] = bucket_name
 
         converted_data = list(map(lambda data: data.__dict__, computation_data))
-        response = requests.post(url, params=params, json=json.dumps(converted_data))
+        response = requests.post(url, params=params, json=converted_data)
         return response.ok
 
     def delete_measurement_data(self,

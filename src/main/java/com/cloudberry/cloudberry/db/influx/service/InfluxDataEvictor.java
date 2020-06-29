@@ -25,7 +25,7 @@ public class InfluxDataEvictor {
     public void deleteComputationLogs(@Nullable String bucketName, String measurementName) {
         var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
         influxClient.getDeleteApi().delete(
-                new DeletePredicateRequest().predicate(String.format("_measurement=\"%s\"", bucket)),
+                new DeletePredicateRequest().predicate("_measurement=\"" + measurementName + "\""),
                 bucket,
                 defaultOrganization
         );
