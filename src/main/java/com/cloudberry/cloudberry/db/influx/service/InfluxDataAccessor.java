@@ -25,7 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class InfluxDataAccessor {
     @Value("${influx.buckets.default-logs}")
-    private String defaultBucketName;
+    private String defaultLogsBucketName;
+    @Value("${influx.buckets.default-logs-meta}")
+    private String defaultMetaBucketName;
 
     private final InfluxDBClient influxClient;
 
@@ -33,7 +35,7 @@ public class InfluxDataAccessor {
                                              String measurementName,
                                              Map<String, Object> fields,
                                              Map<String, String> tags) {
-        var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
+        var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
         var api = influxClient.getQueryApi();
 
         var measurementRestriction = Restrictions.measurement().equal(measurementName);
@@ -54,6 +56,20 @@ public class InfluxDataAccessor {
                 .map(FluxTable::getRecords)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
+    }
+
+    public void getMeanAndStdOfGroupedData(String comparedField,
+                                           String measurementName,
+                                           String metaMeasurementName,
+                                           @Nullable String bucketName,
+                                           @Nullable String metaBucketName,
+                                           Map<String, String> metaTags) {
+        var metaBucket = Optional.ofNullable(metaBucketName).orElse(defaultMetaBucketName);
+        var dataBucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
+        var api = influxClient.getQueryApi();
+
+        Flux query = Flux.from(metaBucket).range(Instant.EPOCH);
+
     }
 
     private static Optional<Restrictions> getCompoundTagRestrictions(Map<String, String> tags) {
