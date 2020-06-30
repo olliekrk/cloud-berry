@@ -5,7 +5,8 @@ import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
-import com.influxdb.client.write.Point;
+import com.cloudberry.cloudberry.rest.dto.LogFilters;
+import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -40,9 +41,18 @@ public class RawDataService {
         influxDataEvictor.deleteComputationLogs(bucketName, measurementName);
     }
 
-    public List<Point> getComputationLogs(String measurementName,
-                                          @Nullable String bucketName,
-                                          Map<String, Object> filters) {
-        return influxDataAccessor.getComputationLogs(bucketName, measurementName, filters, filters);
+    public List<Map<String, Object>> findComputationLogs(String measurementName,
+                                                         @Nullable String bucketName,
+                                                         LogFilters filters) {
+        var records = influxDataAccessor.findMeasurements(
+                bucketName,
+                measurementName,
+                filters.getFieldFilters(),
+                filters.getTagFilters()
+        );
+
+        return records.stream()
+                .map(FluxRecord::getValues)
+                .collect(Collectors.toList());
     }
 }

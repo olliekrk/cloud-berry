@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.domain.DeletePredicateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +8,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Slf4j
@@ -24,8 +28,12 @@ public class InfluxDataEvictor {
 
     public void deleteComputationLogs(@Nullable String bucketName, String measurementName) {
         var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
+        var start = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS).withOffsetSameLocal(ZoneOffset.UTC);
+        var stop = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).withOffsetSameLocal(ZoneOffset.UTC);
         influxClient.getDeleteApi().delete(
-                new DeletePredicateRequest().predicate("_measurement=\"" + measurementName + "\""),
+                start,
+                stop,
+                "_measurement=\"" + measurementName + "\"",
                 bucket,
                 defaultOrganization
         );

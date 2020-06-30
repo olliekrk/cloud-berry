@@ -1,7 +1,10 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.util.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.write.Point;
+import com.influxdb.query.FluxRecord;
+import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,28 +29,62 @@ public class InfluxDataAccessor {
 
     private final InfluxDBClient influxClient;
 
-    // todo
-    public List<Point> getComputationLogs(@Nullable String bucketName,
-                                          String measurementName,
-                                          Map<String, Object> fields,
-                                          Map<String, Object> tags) {
+    public List<FluxRecord> findMeasurements(@Nullable String bucketName,
+                                             String measurementName,
+                                             Map<String, Object> fields,
+                                             Map<String, String> tags) {
         var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
         var api = influxClient.getQueryApi();
 
         var measurementRestriction = Restrictions.measurement().equal(measurementName);
+        var columnRestrictions = getCompoundColumnRestrictions(fields);
+        var tagRestrictions = getCompoundTagRestrictions(tags);
+        var tagNames = tags.keySet();
+
+        Flux query = Flux.from(bucket).range(Instant.EPOCH).filter(measurementRestriction);
+        query = tagRestrictions.isPresent() ? query.filter(tagRestrictions.get()) : query;
+        query = query.pivot(
+                SetSyntax.with(tagNames, InfluxDefaults.Columns.TIME),
+                Set.of(InfluxDefaults.Columns.FIELD),
+                InfluxDefaults.Columns.VALUE);
+        query = columnRestrictions.isPresent() ? query.filter(columnRestrictions.get()) : query;
+
+        return api.query(query.toString())
+                .stream()
+                .map(FluxTable::getRecords)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    private static Optional<Restrictions> getCompoundTagRestrictions(Map<String, String> tags) {
         var tagRestrictions = tags
                 .entrySet()
                 .stream()
                 .map(entry -> Restrictions.tag(entry.getKey()).equal(entry.getValue()))
-                .collect(Collectors.toList());
+                .toArray(Restrictions[]::new);
 
-        tagRestrictions.add(measurementRestriction);
+        return tagRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.and(tagRestrictions));
+    }
 
-        var query = Flux.from(bucket)
-                .range(Instant.EPOCH, Instant.now())
-                .filter(Restrictions.and(tagRestrictions.toArray(Restrictions[]::new)))
-                .toString();
+    private static Optional<Restrictions> getCompoundColumnRestrictions(Map<String, Object> fields) {
+        var fieldRestrictions = fields
+                .entrySet()
+                .stream()
+                .map(entry -> Restrictions.column(entry.getKey()).equal(entry.getValue()))
+                .toArray(Restrictions[]::new);
 
-        return api.query(query, Point.class);
+        return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.and(fieldRestrictions));
+    }
+
+    private static Optional<Restrictions> getCompoundFieldRestrictions(Map<String, Object> fields) {
+        var fieldRestrictions = fields
+                .entrySet()
+                .stream()
+                .map(entry -> Restrictions.and(
+                        Restrictions.field().equal(entry.getKey()),
+                        Restrictions.value().equal(entry.getValue())))
+                .toArray(Restrictions[]::new);
+
+        return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.or(fieldRestrictions));
     }
 }
