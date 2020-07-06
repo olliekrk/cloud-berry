@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
 import com.cloudberry.cloudberry.rest.dto.LogFilters;
+import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +52,6 @@ public class RawDataService {
                 filters.getTagFilters()
         );
 
-        return records.stream()
-                .map(FluxRecord::getValues)
-                .collect(Collectors.toList());
+        return ListSyntax.mapped(records, FluxRecord::getValues);
     }
 }

@@ -1,10 +1,14 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.service.api.StatisticsService;
+import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/statistics")
@@ -12,6 +16,19 @@ import java.util.Map;
 public class StatisticsRest {
 
     private final StatisticsService statisticsService;
+
+    @PostMapping("/compare/mean")
+    public List<List<Map<String, Object>>> getSeriesDataAndMean(@RequestParam String comparedField,
+                                                                @RequestParam String measurementName,
+                                                                @RequestParam(required = false) String bucketName,
+                                                                @RequestBody List<String> evaluationIds) {
+        return evaluationIds.isEmpty() ? Collections.emptyList() : statisticsService.getEvaluationsDataAndMean(
+                measurementName,
+                bucketName,
+                comparedField,
+                ListSyntax.mapped(evaluationIds, UUID::fromString)
+        );
+    }
 
     /**
      * @param comparedField      name of the numeric field to compare
@@ -22,7 +39,7 @@ public class StatisticsRest {
      *                           Values are allowed set of tag values to filter measurements by.
      *                           If the list is empty, no filters are applied for that tag.
      */
-    @PostMapping("/grouped/compare")
+    @PostMapping("/compare/grouped")
     public void getMeanAndStdOfGroupedData(@RequestParam String comparedField,
                                            @RequestParam String measurementName,
                                            @RequestParam String metaMeasurementName,

@@ -1,6 +1,9 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.InfluxCommonTags;
+import com.cloudberry.cloudberry.db.influx.util.converter.RestrictionsFactory;
+import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.cloudberry.cloudberry.util.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
@@ -14,10 +17,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,9 +38,9 @@ public class InfluxDataAccessor {
         var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
         var api = influxClient.getQueryApi();
 
-        var measurementRestriction = Restrictions.measurement().equal(measurementName);
-        var columnRestrictions = getCompoundColumnRestrictions(fields);
-        var tagRestrictions = getCompoundTagRestrictions(tags);
+        var measurementRestriction = RestrictionsFactory.measurement(measurementName);
+        var columnRestrictions = RestrictionsFactory.everyColumn(fields);
+        var tagRestrictions = RestrictionsFactory.everyTag(tags);
         var tagNames = tags.keySet();
 
         Flux query = Flux.from(bucket).range(Instant.EPOCH).filter(measurementRestriction);
@@ -58,6 +58,38 @@ public class InfluxDataAccessor {
                 .collect(Collectors.toList());
     }
 
+    public List<List<FluxRecord>> getEvaluationsData(String measurementName,
+                                                     @Nullable String bucketName,
+                                                     String comparedField,
+                                                     List<UUID> evaluationIds) {
+        var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
+        var api = influxClient.getQueryApi();
+
+        var measurementRestriction = RestrictionsFactory.measurement(measurementName);
+        var evaluationIdTag = InfluxCommonTags.EVALUATION_ID;
+        var evaluationIdRestriction = Restrictions.or(evaluationIds
+                .stream()
+                .map(id -> Restrictions.tag(evaluationIdTag).equal(id.toString()))
+                .toArray(Restrictions[]::new));
+        var fieldRestriction = Restrictions.field().equal(comparedField);
+
+        Flux query = Flux.from(bucket)
+                .range(Instant.EPOCH)
+                .filter(Restrictions.and(measurementRestriction, evaluationIdRestriction, fieldRestriction))
+                .groupBy(evaluationIdTag)
+                .pivot(
+                        Set.of(evaluationIdTag, InfluxDefaults.Columns.TIME),
+                        Set.of(InfluxDefaults.Columns.FIELD),
+                        InfluxDefaults.Columns.VALUE
+                )
+                .keep(List.of(InfluxDefaults.Columns.TIME, comparedField, evaluationIdTag));
+
+        return api.query(query.toString())
+                .stream()
+                .map(FluxTable::getRecords)
+                .collect(Collectors.toList());
+    }
+
     public void getMeanAndStdOfGroupedData(String comparedField,
                                            String measurementName,
                                            String metaMeasurementName,
@@ -72,35 +104,4 @@ public class InfluxDataAccessor {
 
     }
 
-    private static Optional<Restrictions> getCompoundTagRestrictions(Map<String, String> tags) {
-        var tagRestrictions = tags
-                .entrySet()
-                .stream()
-                .map(entry -> Restrictions.tag(entry.getKey()).equal(entry.getValue()))
-                .toArray(Restrictions[]::new);
-
-        return tagRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.and(tagRestrictions));
-    }
-
-    private static Optional<Restrictions> getCompoundColumnRestrictions(Map<String, Object> fields) {
-        var fieldRestrictions = fields
-                .entrySet()
-                .stream()
-                .map(entry -> Restrictions.column(entry.getKey()).equal(entry.getValue()))
-                .toArray(Restrictions[]::new);
-
-        return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.and(fieldRestrictions));
-    }
-
-    private static Optional<Restrictions> getCompoundFieldRestrictions(Map<String, Object> fields) {
-        var fieldRestrictions = fields
-                .entrySet()
-                .stream()
-                .map(entry -> Restrictions.and(
-                        Restrictions.field().equal(entry.getKey()),
-                        Restrictions.value().equal(entry.getValue())))
-                .toArray(Restrictions[]::new);
-
-        return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.or(fieldRestrictions));
-    }
 }
