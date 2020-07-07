@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.model.Parametrized;
 import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,7 +23,7 @@ public class MongoWorkplaceLog extends MongoLog implements Parametrized<String, 
     long workplaceId;
     Map<String, Object> parameters;
 
-    public MongoWorkplaceLog(Instant time, UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
+    public MongoWorkplaceLog(Instant time, ObjectId evaluationId, long workplaceId, Map<String, Object> parameters) {
         super(time, evaluationId);
         this.workplaceId = workplaceId;
         this.parameters = parameters;

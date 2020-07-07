@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Document(collection = "experiment")
 public class Experiment implements Parametrized<String, Object> {
     @Id
-    private Long id;
+    private ObjectId id;
     @With
     @Indexed
     private String name;

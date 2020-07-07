@@ -3,10 +3,10 @@ package com.cloudberry.cloudberry.db.mongo.data.logs;
 import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * S tag from AgE
@@ -18,7 +18,7 @@ public class MongoSummaryLog extends MongoLog {
     double bestEvaluation;
     long evaluationsCount;
 
-    public MongoSummaryLog(Instant time, UUID evaluationId, double bestEvaluation, long evaluationsCount) {
+    public MongoSummaryLog(Instant time, ObjectId evaluationId, double bestEvaluation, long evaluationsCount) {
         super(time, evaluationId);
         this.bestEvaluation = bestEvaluation;
         this.evaluationsCount = evaluationsCount;

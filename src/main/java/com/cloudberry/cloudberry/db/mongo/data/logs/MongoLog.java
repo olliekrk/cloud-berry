@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Data
 public abstract class MongoLog implements Timed {
@@ -18,9 +17,9 @@ public abstract class MongoLog implements Timed {
     protected final Instant time;
     @Indexed
     @Field(targetType = FieldType.STRING)
-    protected final UUID evaluationId;
+    protected final ObjectId evaluationId;
 
-    protected MongoLog(Instant time, UUID evaluationId) {
+    protected MongoLog(Instant time, ObjectId evaluationId) {
         this.time = time;
         this.evaluationId = evaluationId;
     }

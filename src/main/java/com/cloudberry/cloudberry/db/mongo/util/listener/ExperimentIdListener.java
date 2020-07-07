@@ -15,9 +15,9 @@ public class ExperimentIdListener extends AbstractMongoEventListener<Experiment>
 
     @Override
     public void onBeforeConvert(BeforeConvertEvent<Experiment> event) {
-        Long sourceId = event.getSource().getId();
-        if (sourceId == null || sourceId < 1) {
-            event.getSource().setId(idGenerator.nextId("id_" + Experiment.class.getSimpleName()));
-        }
+//        Long sourceId = event.getSource().getId();
+//        if (sourceId == null || sourceId < 1) {
+//            event.getSource().setId(idGenerator.nextId("id_" + Experiment.class.getSimpleName()));
+//        }
     }
 }

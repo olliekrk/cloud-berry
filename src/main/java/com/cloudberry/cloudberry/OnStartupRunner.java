@@ -10,6 +10,7 @@ import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,18 +31,18 @@ public class OnStartupRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // good place for quick dev testing
-        var evaluationId = UUID.randomUUID();
+        var evaluationId =ObjectId.get();
 
         sendSampleProblem(evaluationId);
         sendSampleLogs(evaluationId);
     }
 
-    private void sendSampleProblem(UUID evaluationId) {
+    private void sendSampleProblem(ObjectId evaluationId) {
         var problemEvent = new MetadataEvent(evaluationId, "No problem at all", Map.of(), Map.of());
         IntStream.range(0, 1).forEach(__ -> kafkaTemplate.send(KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC, problemEvent));
     }
 
-    private void sendSampleLogs(UUID evaluationId) {
+    private void sendSampleLogs(ObjectId evaluationId) {
         var workplaceEvent = new WorkplaceEvent(evaluationId, 1L, Map.of());
         var summaryEvent = new SummaryEvent(evaluationId, 21.37, 1L);
         var bestSolutionEvent = new BestSolutionEvent(

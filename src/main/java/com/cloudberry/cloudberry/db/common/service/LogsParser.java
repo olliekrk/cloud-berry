@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.service;
+package com.cloudberry.cloudberry.db.common.service;
 
 import java.util.List;
 

@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public interface WorkplaceLogsRepository extends ReactiveMongoRepository<MongoWorkplaceLog, ObjectId> {
 
-    Flux<MongoWorkplaceLog> findAllByEvaluationId(UUID evaluationId);
+    Flux<MongoWorkplaceLog> findAllByEvaluationId(ObjectId evaluationId);
 
-    Flux<MongoWorkplaceLog> findAllByEvaluationIdIn(Collection<UUID> evaluationId);
+    Flux<MongoWorkplaceLog> findAllByEvaluationIdIn(Collection<ObjectId> evaluationId);
 
 }

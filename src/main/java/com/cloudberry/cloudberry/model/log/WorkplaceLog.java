@@ -3,19 +3,19 @@ package com.cloudberry.cloudberry.model.log;
 import com.cloudberry.cloudberry.model.Parametrized;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.bson.types.ObjectId;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class WorkplaceLog extends Log implements Parametrized<String, Object> {
-    UUID evaluationId;
+    ObjectId evaluationId;
     long workplaceId;
     Map<String, Object> parameters;
 
-    public WorkplaceLog(Instant time, UUID evaluationId, long workplaceId, Map<String, Object> parameters) {
+    public WorkplaceLog(Instant time, ObjectId evaluationId, long workplaceId, Map<String, Object> parameters) {
         super(time);
         this.evaluationId = evaluationId;
         this.workplaceId = workplaceId;

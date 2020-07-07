@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -25,7 +26,7 @@ public class MongoBestSolutionLog extends MongoLog {
     long occurrencesCount;
 
     public MongoBestSolutionLog(Instant time,
-                                UUID evaluationId,
+                                ObjectId evaluationId,
                                 Solution solution,
                                 SolutionDetails details) {
         super(time, evaluationId);

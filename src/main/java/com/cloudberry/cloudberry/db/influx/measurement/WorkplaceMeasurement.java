@@ -5,6 +5,7 @@ import com.influxdb.annotations.Measurement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.time.Instant;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class WorkplaceMeasurement {
     long workplaceId;
 
     @Column(tag = true)
-    String evaluationId;
+    ObjectId evaluationId;
 
     @Column(timestamp = true)
     Instant time;

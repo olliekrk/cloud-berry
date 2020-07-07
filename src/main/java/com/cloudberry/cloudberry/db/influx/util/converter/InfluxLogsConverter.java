@@ -6,7 +6,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.UUID;
 
 @Component
 public class InfluxLogsConverter implements Converter<WorkplaceMeasurement, WorkplaceLog> {
@@ -14,7 +13,7 @@ public class InfluxLogsConverter implements Converter<WorkplaceMeasurement, Work
     public WorkplaceLog convert(WorkplaceMeasurement source) {
         return new WorkplaceLog(
                 source.getTime(),
-                UUID.fromString(source.getEvaluationId()),
+                source.getEvaluationId(),
                 source.getWorkplaceId(),
                 Collections.emptyMap()
         );

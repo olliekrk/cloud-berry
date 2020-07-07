@@ -6,5 +6,5 @@ import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Flux;
 
 public interface ConfigurationsRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
-    Flux<ExperimentConfiguration> findAllByExperimentId(Long experimentId);
+    Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
 }

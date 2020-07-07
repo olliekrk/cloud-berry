@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.ToString;
+import org.bson.types.ObjectId;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,11 +21,11 @@ import java.util.stream.Stream;
 @Getter
 public class MetadataEvent extends Event implements Parametrized<String, Object> {
     private final String name;
-    private final UUID evaluationId;
+    private final ObjectId evaluationId;
     private final Map<String, Object> experimentParameters;
     private final Map<String, Object> configurationParameters;
 
-    public MetadataEvent(UUID evaluationId,
+    public MetadataEvent(ObjectId evaluationId,
                          String name,
                          Map<String, Object> experimentParameters,
                          Map<String, Object> configurationParameters) {
@@ -36,7 +36,7 @@ public class MetadataEvent extends Event implements Parametrized<String, Object>
     }
 
     @JsonCreator
-    private MetadataEvent(@JsonProperty("evaluationId") UUID evaluationId,
+    private MetadataEvent(@JsonProperty("evaluationId") ObjectId evaluationId,
                           @JsonProperty("time") Instant time,
                           @JsonProperty("name") String name,
                           @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
