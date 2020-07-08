@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.influx.util.converter;
+package com.cloudberry.cloudberry.db.influx.util;
 
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
@@ -31,7 +31,7 @@ public class RestrictionsFactory {
         return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.and(fieldRestrictions));
     }
 
-    public static Optional<Restrictions> getAnyFieldRestrictions(Map<String, Object> fields) {
+    public static Optional<Restrictions> anyField(Map<String, Object> fields) {
         var fieldRestrictions = fields
                 .entrySet()
                 .stream()

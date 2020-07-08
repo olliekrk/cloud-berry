@@ -17,12 +17,33 @@ public class StatisticsRest {
 
     private final StatisticsService statisticsService;
 
-    @PostMapping("/compare/mean")
-    public List<List<Map<String, Object>>> getSeriesDataAndMean(@RequestParam String comparedField,
-                                                                @RequestParam String measurementName,
-                                                                @RequestParam(required = false) String bucketName,
-                                                                @RequestBody List<String> evaluationIds) {
-        return evaluationIds.isEmpty() ? Collections.emptyList() : statisticsService.getEvaluationsDataAndMean(
+    @PostMapping("/compare/configurations/all")
+    public void compareAllConfigurations(@RequestParam String comparedField,
+                                         @RequestParam String configurationIdHex,
+                                         @RequestParam(required = false) String bucketName) {
+        // todo
+    }
+
+    @PostMapping("/compare/configurations")
+    public void compareSelectedConfigurations(@RequestParam String comparedField,
+                                              @RequestParam String configurationIdHex,
+                                              @RequestParam(required = false) String bucketName) {
+        // todo
+    }
+
+    @PostMapping("/compare/evaluations/all")
+    public void compareAllEvaluations(@RequestParam String comparedField,
+                                      @RequestParam String configurationIdHex,
+                                      @RequestParam(required = false) String bucketName) {
+        // todo
+    }
+
+    @PostMapping("/compare/evaluations")
+    public List<List<Map<String, Object>>> compareMultipleEvaluations(@RequestParam String comparedField,
+                                                                      @RequestParam String measurementName,
+                                                                      @RequestParam(required = false) String bucketName,
+                                                                      @RequestBody List<String> evaluationIds) {
+        return evaluationIds.isEmpty() ? Collections.emptyList() : statisticsService.compareMultipleEvaluations(
                 measurementName,
                 bucketName,
                 comparedField,

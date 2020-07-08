@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @ToString
 @AllArgsConstructor

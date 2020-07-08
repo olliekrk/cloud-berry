@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
+import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StatisticsService {
 
+    private final MetadataService metadataService;
     private final InfluxDataAccessor influxDataAccessor;
 
     public void getMeanAndStdOfGroupedData(String comparedField,
@@ -47,10 +49,10 @@ public class StatisticsService {
          * */
     }
 
-    public List<List<Map<String, Object>>> getEvaluationsDataAndMean(String measurementName,
-                                                                     @Nullable String bucketName,
-                                                                     String comparedField,
-                                                                     List<UUID> evaluationIds) {
+    public List<List<Map<String, Object>>> compareMultipleEvaluations(String measurementName,
+                                                                      @Nullable String bucketName,
+                                                                      String comparedField,
+                                                                      List<UUID> evaluationIds) {
         var data = influxDataAccessor.getEvaluationsData(
                 measurementName,
                 bucketName,

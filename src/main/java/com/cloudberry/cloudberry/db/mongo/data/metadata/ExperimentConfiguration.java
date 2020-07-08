@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.db.mongo.data.metadata;
 
 import com.cloudberry.cloudberry.model.Parametrized;
+import com.cloudberry.cloudberry.model.Timed;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -14,7 +15,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @Document(collection = "experiment_configuration")
-public class ExperimentConfiguration implements Parametrized<String, Object> {
+public class ExperimentConfiguration implements Parametrized<String, Object>, Timed {
     @Id
     private ObjectId id;
     @Indexed
