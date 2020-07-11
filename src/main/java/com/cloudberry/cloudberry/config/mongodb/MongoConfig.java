@@ -20,7 +20,7 @@ public class MongoConfig {
     public MappingMongoConverter mappingMongoConverter(MongoDbFactory mongoDbFactory, MongoMappingContext context) {
         MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(mongoDbFactory), context);
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        converter.setMapKeyDotReplacement("_DOT_");
+        converter.setMapKeyDotReplacement("_");
         return converter;
     }
 }
