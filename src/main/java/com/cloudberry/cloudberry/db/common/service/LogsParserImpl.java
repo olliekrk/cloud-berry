@@ -25,8 +25,16 @@ import static java.lang.Long.parseLong;
 public class LogsParserImpl implements LogsParser<ParsedLogs> {
     @Value("${influx.buckets.default-logs}")
     private String defaultLogsBucketName;
-    private static final String MEASUREMENT_PREFIX = "measurement_";
-    private final Map<String, String> keys = Map.of("[WH]", "[W]", "[SH]", "[S]", "[BH]", "[B]");
+    private final static Map<String, String> keys = Map.of(
+            "[WH]", "[W]",
+            "[SH]", "[S]",
+            "[BH]", "[B]"
+    );
+    private final static Map<String, String> logMeasurementNames = Map.of(
+            "[W]", "workplace_log",
+            "[S]", "summary_log",
+            "[B]", "best_solution_log"
+    );
     // todo ^ above fields can come from e.g. rest parameter
 
     @Override
@@ -104,7 +112,7 @@ public class LogsParserImpl implements LogsParser<ParsedLogs> {
     }
 
     private Point getMeasurementPoint(Map<String, String[]> parameters, String logType, String[] log) {
-        Point point = Point.measurement(MEASUREMENT_PREFIX + logType)
+        Point point = Point.measurement(logMeasurementNames.getOrDefault(logType, "unknown_log"))
                 .addFields(getMapFromArrays(parameters.get(logType), log));
 
         if (parameters.get(logType)[1].equalsIgnoreCase("time")) {

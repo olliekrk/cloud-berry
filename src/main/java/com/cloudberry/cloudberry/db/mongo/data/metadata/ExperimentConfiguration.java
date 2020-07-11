@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.Map;
 
 @Data
-@Document(collection = "experiment_configuration")
+@Document
 public class ExperimentConfiguration implements Parametrized<String, Object>, Timed {
     @Id
     private ObjectId id;

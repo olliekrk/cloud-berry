@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -102,9 +103,9 @@ public class StatisticsService {
                         .filter(data -> data.containsKey(InfluxDefaults.Columns.TIME) && data.containsKey(comparedField))
                         .map(data -> {
                             try {
-                                var timestamp = (double) data.get(InfluxDefaults.Columns.TIME);
-                                var value = (double) data.get(comparedField);
-                                return Pair.of(timestamp, value);
+                                var timestamp = (Instant) data.get(InfluxDefaults.Columns.TIME);
+                                var value = (Double) data.get(comparedField);
+                                return Pair.of(timestamp.toEpochMilli(), value);
                             } catch (ClassCastException e) {
                                 throw new FieldNotNumericException(comparedField);
                             }
@@ -115,7 +116,7 @@ public class StatisticsService {
         var joinedSeries = timeSeries
                 .stream()
                 .flatMap(rawSeries -> {
-                    var minTime = rawSeries.stream().map(Map.Entry::getKey).min(Double::compareTo).orElse(.0);
+                    var minTime = rawSeries.stream().map(Map.Entry::getKey).min(Long::compareTo).orElse(0L);
                     return rawSeries.stream().map(pair -> Pair.of(pair.getKey() - minTime, pair.getValue()));
                 })
                 .collect(Collectors.toList());
@@ -125,14 +126,14 @@ public class StatisticsService {
                         .map(List::size)
                         .collect(Collectors.averagingInt(i -> i))
         );
-        var intervalGap = joinedSeries.stream().map(Pair::getKey).max(Double::compareTo).orElse(.0);
-        var intervalLength = intervalGap / intervalCount;
+        var intervalGap = joinedSeries.stream().map(Pair::getKey).max(Long::compareTo).orElse(0L);
+        var intervalLength = intervalGap.doubleValue() / intervalCount;
 
         var meanSeries = IntStream.range(0, intervalCount)
                 .boxed()
                 .map(i -> {
                     var start = i * intervalLength;
-                    var mid = start + intervalLength * .5;
+                    var mid = Instant.ofEpochMilli((long) (start + intervalLength * .5));
                     var end = start + intervalLength;
 
                     var bucket = joinedSeries.stream()

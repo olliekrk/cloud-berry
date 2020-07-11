@@ -13,7 +13,7 @@ import java.time.Instant;
 
 @Data
 @AllArgsConstructor
-@Document(collection = "experiment_evaluation")
+@Document
 public class ExperimentEvaluation implements Timed {
     @Id
     private ObjectId id;

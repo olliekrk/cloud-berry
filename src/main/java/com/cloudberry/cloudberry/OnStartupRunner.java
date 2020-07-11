@@ -31,10 +31,6 @@ public class OnStartupRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // good place for quick dev testing
-        var evaluationId =ObjectId.get();
-
-        sendSampleProblem(evaluationId);
-        sendSampleLogs(evaluationId);
     }
 
     private void sendSampleProblem(ObjectId evaluationId) {

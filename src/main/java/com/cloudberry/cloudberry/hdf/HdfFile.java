@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Consider using GridFS if support for larger files is necessary.
  */
 @Data
-@Document(collection = "hdf")
+@Document
 public class HdfFile {
     @Id
     private ObjectId id;

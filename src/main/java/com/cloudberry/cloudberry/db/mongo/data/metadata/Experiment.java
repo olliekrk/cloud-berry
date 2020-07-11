@@ -16,7 +16,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "experiment")
+@Document
 public class Experiment implements Parametrized<String, Object> {
     @Id
     private ObjectId id;

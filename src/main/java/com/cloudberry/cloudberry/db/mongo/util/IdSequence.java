@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Used to maintain sequential long IDs.
  */
 @Data
-@Document(collection = "id_sequences")
+@Document
 public class IdSequence {
     @Id
     private String id;
