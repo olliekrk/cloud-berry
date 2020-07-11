@@ -10,5 +10,4 @@ public interface ExperimentsRepository extends ReactiveSortingRepository<Experim
 
     Flux<Experiment> findAllByName(String name);
 
-    Mono<Experiment> findByName(String name);
 }

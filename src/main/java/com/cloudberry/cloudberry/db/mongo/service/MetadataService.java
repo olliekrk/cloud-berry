@@ -27,9 +27,8 @@ public class MetadataService {
     }
 
     public List<ObjectId> findAllConfigurationIdsForExperiment(String experimentName) {
-        return experimentsRepository.findByName(experimentName)
+        return experimentsRepository.findAllByName(experimentName)
                 .map(Experiment::getId)
-                .flux()
                 .flatMap(configurationsRepository::findAllByExperimentId)
                 .map(ExperimentConfiguration::getId)
                 .collectList()

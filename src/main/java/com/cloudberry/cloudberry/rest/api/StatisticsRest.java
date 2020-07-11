@@ -1,14 +1,16 @@
 package com.cloudberry.cloudberry.rest.api;
 
+import com.cloudberry.cloudberry.model.statistics.DataSeries;
+import com.cloudberry.cloudberry.rest.exceptions.ConfigurationIdInvalidException;
+import com.cloudberry.cloudberry.rest.exceptions.EvaluationIdInvalidException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
-import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/statistics")
@@ -17,64 +19,82 @@ public class StatisticsRest {
 
     private final StatisticsService statisticsService;
 
-    @PostMapping("/compare/configurations/all")
-    public void compareAllConfigurations(@RequestParam String comparedField,
-                                         @RequestParam String configurationIdHex,
-                                         @RequestParam(required = false) String bucketName) {
-        // todo
-    }
+    @PostMapping("/compare/evaluations")
+    public List<DataSeries> compareSelectedEvaluations(@RequestParam String comparedField,
+                                                       @RequestParam String measurementName,
+                                                       @RequestParam(required = false) String bucketName,
+                                                       @RequestBody List<String> evaluationIdsHex
+    ) throws EvaluationIdInvalidException {
+        var evaluationIds = evaluationIdsHex.stream()
+                .filter(ObjectId::isValid)
+                .map(ObjectId::new)
+                .collect(Collectors.toList());
 
-    @PostMapping("/compare/configurations")
-    public void compareSelectedConfigurations(@RequestParam String comparedField,
-                                              @RequestParam String configurationIdHex,
-                                              @RequestParam(required = false) String bucketName) {
-        // todo
+        if (evaluationIds.isEmpty())
+            throw new EvaluationIdInvalidException();
+
+        return statisticsService.compareEvaluations(
+                comparedField,
+                measurementName,
+                bucketName,
+                evaluationIds,
+                true
+        );
     }
 
     @PostMapping("/compare/evaluations/all")
-    public void compareAllEvaluations(@RequestParam String comparedField,
-                                      @RequestParam String configurationIdHex,
-                                      @RequestParam(required = false) String bucketName) {
-        // todo
-    }
+    public List<DataSeries> compareAllEvaluationsForConfiguration(@RequestParam String comparedField,
+                                                                  @RequestParam String measurementName,
+                                                                  @RequestParam(required = false) String bucketName,
+                                                                  @RequestParam String configurationIdHex
+    ) throws ConfigurationIdInvalidException {
+        var configurationId = Optional.of(configurationIdHex)
+                .filter(ObjectId::isValid)
+                .map(ObjectId::new)
+                .orElseThrow(ConfigurationIdInvalidException::new);
 
-    @PostMapping("/compare/evaluations")
-    public List<List<Map<String, Object>>> compareMultipleEvaluations(@RequestParam String comparedField,
-                                                                      @RequestParam String measurementName,
-                                                                      @RequestParam(required = false) String bucketName,
-                                                                      @RequestBody List<String> evaluationIds) {
-        return evaluationIds.isEmpty() ? Collections.emptyList() : statisticsService.compareMultipleEvaluations(
+        return statisticsService.compareEvaluationsForConfiguration(
+                comparedField,
                 measurementName,
                 bucketName,
-                comparedField,
-                ListSyntax.mapped(evaluationIds, UUID::fromString)
+                configurationId,
+                true
         );
     }
 
-    /**
-     * @param comparedField      name of the numeric field to compare
-     * @param measurementName    measurement name
-     * @param bucketName         custom data bucket name
-     * @param metadataBucketName custom metadata bucket name
-     * @param metaTags           tags used to group data, i.e. evaluation_id
-     *                           Values are allowed set of tag values to filter measurements by.
-     *                           If the list is empty, no filters are applied for that tag.
-     */
-    @PostMapping("/compare/grouped")
-    public void getMeanAndStdOfGroupedData(@RequestParam String comparedField,
-                                           @RequestParam String measurementName,
-                                           @RequestParam String metaMeasurementName,
-                                           @RequestParam(required = false) String bucketName,
-                                           @RequestParam(required = false) String metadataBucketName,
-                                           @RequestBody Map<String, String> metaTags) {
-        statisticsService.getMeanAndStdOfGroupedData(
+    @PostMapping("/compare/configurations")
+    public List<DataSeries> compareSelectedConfigurations(@RequestParam String comparedField,
+                                                          @RequestParam String measurementName,
+                                                          @RequestParam(required = false) String bucketName,
+                                                          @RequestBody List<String> configurationIdsHex
+    ) throws ConfigurationIdInvalidException {
+        var configurationIds = configurationIdsHex.stream()
+                .filter(ObjectId::isValid)
+                .map(ObjectId::new)
+                .collect(Collectors.toList());
+
+        if (configurationIds.isEmpty())
+            throw new ConfigurationIdInvalidException();
+
+        return statisticsService.compareConfigurations(
                 comparedField,
                 measurementName,
-                metaMeasurementName,
                 bucketName,
-                metadataBucketName,
-                metaTags
+                configurationIds
         );
     }
 
+    @PostMapping("/compare/configurations/all")
+    public List<DataSeries> compareAllConfigurationsForExperiment(@RequestParam String comparedField,
+                                                                  @RequestParam String measurementName,
+                                                                  @RequestParam(required = false) String bucketName,
+                                                                  @RequestParam String experimentName
+    ) {
+        return statisticsService.compareConfigurationsForExperiment(
+                comparedField,
+                measurementName,
+                bucketName,
+                experimentName
+        );
+    }
 }
