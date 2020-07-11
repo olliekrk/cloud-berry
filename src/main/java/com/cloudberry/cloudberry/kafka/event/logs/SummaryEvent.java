@@ -10,6 +10,12 @@ import java.time.Instant;
 
 @Getter
 public class SummaryEvent extends Event {
+
+    public interface Fields {
+        String BEST_EVALUATION = "bestEvaluation";
+        String EVALUATIONS_COUNT = "evaluationsCount";
+    }
+
     private final ObjectId evaluationId;
     private final double bestEvaluation;
     private final long evaluationsCount;

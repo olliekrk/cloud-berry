@@ -12,6 +12,11 @@ import java.util.Map;
 
 @Getter
 public class WorkplaceEvent extends Event implements Parametrized<String, Object> {
+
+    public interface Fields {
+        String WORKPLACE_ID = "workplaceId";
+    }
+
     private final ObjectId evaluationId;
     private final long workplaceId;
     private final Map<String, Object> parameters;

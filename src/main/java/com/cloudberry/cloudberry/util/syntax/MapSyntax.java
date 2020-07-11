@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class MapSyntax {
-    public static <K, V> Map<K, V> updated(Map<K, V> map, K key, V value) {
+    public static <K, V> Map<K, V> with(Map<K, V> map, K key, V value) {
         map.put(key, value);
         return map;
     }

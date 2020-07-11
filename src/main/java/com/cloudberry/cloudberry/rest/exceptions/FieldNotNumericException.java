@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.rest.exceptions;
 
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 

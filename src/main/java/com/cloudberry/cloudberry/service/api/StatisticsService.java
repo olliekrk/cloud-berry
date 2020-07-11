@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.db.influx.InfluxCommonTags;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
@@ -89,7 +89,7 @@ public class StatisticsService {
                 bucketName,
                 measurementName,
                 Collections.emptyMap(),
-                of(InfluxCommonTags.EVALUATION_ID, evaluationIdHex));
+                of(InfluxDefaults.CommonTags.EVALUATION_ID, evaluationIdHex));
 
         return new DataSeries(evaluationIdHex, ListSyntax.mapped(records, FluxRecord::getValues));
     }

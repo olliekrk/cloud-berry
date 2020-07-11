@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.db.influx.InfluxCommonTags;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.cloudberry.cloudberry.util.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
@@ -65,7 +65,7 @@ public class InfluxDataAccessor {
         var api = influxClient.getQueryApi();
 
         var measurementRestriction = RestrictionsFactory.measurement(measurementName);
-        var evaluationIdTag = InfluxCommonTags.EVALUATION_ID;
+        var evaluationIdTag = InfluxDefaults.CommonTags.EVALUATION_ID;
         var evaluationIdRestriction = Restrictions.or(evaluationIds
                 .stream()
                 .map(id -> Restrictions.tag(evaluationIdTag).equal(id.toString()))

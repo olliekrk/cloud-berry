@@ -3,7 +3,6 @@ package com.cloudberry.cloudberry.db.common.service;
 import com.cloudberry.cloudberry.db.common.data.ParsedLogs;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.db.mongo.repository.facades.MetadataRepositoryFacade;
-import com.cloudberry.cloudberry.service.RawLogsHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

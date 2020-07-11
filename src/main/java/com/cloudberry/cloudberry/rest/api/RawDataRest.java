@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
 import com.cloudberry.cloudberry.rest.dto.LogFilters;
-import com.cloudberry.cloudberry.service.RawLogsHandler;
+import com.cloudberry.cloudberry.db.common.service.RawLogsHandler;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

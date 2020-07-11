@@ -11,4 +11,8 @@ public interface InfluxDefaults {
         String FIELD = "_field";
         String MEASUREMENT = "_measurement";
     }
+
+    interface CommonTags {
+        String EVALUATION_ID = "evaluationId";
+    }
 }

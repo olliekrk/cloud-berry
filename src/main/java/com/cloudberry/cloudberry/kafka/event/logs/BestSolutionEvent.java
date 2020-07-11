@@ -12,6 +12,13 @@ import java.time.Instant;
 
 @Getter
 public class BestSolutionEvent extends Event {
+
+    public interface Fields {
+        String OCCURRENCES_COUNT = "occurrencesCount";
+        String STEP_NUMBER = "stepNumber";
+        String WORKPLACE_ID = "workplaceId";
+    }
+
     private final ObjectId evaluationId;
     private final Solution solution;
     private final SolutionDetails details;

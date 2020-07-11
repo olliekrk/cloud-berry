@@ -1,16 +1,16 @@
 package com.cloudberry.cloudberry.db.influx.util.converter;
 
-import com.cloudberry.cloudberry.db.influx.InfluxCommonTags;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
-import com.cloudberry.cloudberry.util.syntax.MapSyntax;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -20,46 +20,47 @@ public class LogsEventToPointConverter {
     private final PointBuilder pointBuilder;
 
     public Converter<WorkplaceEvent, Point> workplaceEventConverter() {
-        return event -> pointBuilder.buildPoint(
-                event.getClass().getSimpleName(),
-                event.getTime(),
-                MapSyntax.updated(event.getParameters(), "workplaceId", event.getWorkplaceId()),
-                Map.of(
-                        InfluxCommonTags.EVALUATION_ID, event.getEvaluationId().toHexString()
-                )
-        );
+        return event -> {
+            var fields = new HashMap<>(event.getParameters());
+            fields.put(WorkplaceEvent.Fields.WORKPLACE_ID, event.getWorkplaceId());
+
+            return pointBuilder.buildPoint(
+                    event.getClass().getSimpleName(),
+                    event.getTime(),
+                    fields,
+                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+            );
+        };
     }
 
     public Converter<SummaryEvent, Point> summaryEventConverter() {
-        return event -> pointBuilder.buildPoint(
-                event.getClass().getSimpleName(),
-                event.getTime(),
-                Map.of(
-                        "bestEvaluation", event.getBestEvaluation(),
-                        "evaluationsCount", event.getEvaluationsCount()
-                ),
-                Map.of(
-                        InfluxCommonTags.EVALUATION_ID, event.getEvaluationId().toHexString()
-                )
-        );
+        return event -> {
+            Map<String, Object> fields = Map.of(
+                    SummaryEvent.Fields.BEST_EVALUATION, event.getBestEvaluation(),
+                    SummaryEvent.Fields.EVALUATIONS_COUNT, event.getEvaluationsCount()
+            );
+            return pointBuilder.buildPoint(
+                    event.getClass().getSimpleName(),
+                    event.getTime(),
+                    fields,
+                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+            );
+        };
     }
 
     public Converter<BestSolutionEvent, Point> bestSolutionEventConverter() {
-        return event -> pointBuilder.buildPoint(
-                event.getClass().getSimpleName(),
-                event.getTime(),
-                MapSyntax.merged( // todo?
-                        event.getSolution().parameters,
-                        Map.of(
+        return event -> {
+            var fields = new HashMap<>(event.getSolution().getParameters());
+            fields.put(BestSolutionEvent.Fields.OCCURRENCES_COUNT, event.getDetails().getOccurrencesCount());
+            fields.put(BestSolutionEvent.Fields.STEP_NUMBER, event.getDetails().getStepNumber());
+            fields.put(BestSolutionEvent.Fields.WORKPLACE_ID, event.getDetails().getWorkplaceId());
 
-                                "occurrencesCount", event.getDetails().getOccurrencesCount(),
-                                "stepNumber", event.getDetails().getStepNumber(),
-                                "workplaceId", event.getDetails().getWorkplaceId()
-                        )
-                ),
-                Map.of(
-                        InfluxCommonTags.EVALUATION_ID, event.getEvaluationId().toHexString()
-                )
-        );
+            return pointBuilder.buildPoint(
+                    event.getClass().getSimpleName(),
+                    event.getTime(),
+                    fields,
+                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+            );
+        };
     }
 }
