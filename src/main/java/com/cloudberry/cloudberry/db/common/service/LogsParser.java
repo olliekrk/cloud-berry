@@ -1,7 +1,11 @@
 package com.cloudberry.cloudberry.db.common.service;
 
-import java.util.List;
+import com.cloudberry.cloudberry.db.common.data.ImportDetails;
+import org.bson.types.ObjectId;
+
+import java.io.File;
+import java.io.IOException;
 
 public interface LogsParser<T> {
-    List<T> parseMeasurements(String rawLogs);
+    T parseExperimentFile(File file, ObjectId experimentId, ImportDetails importDetails) throws IOException;
 }

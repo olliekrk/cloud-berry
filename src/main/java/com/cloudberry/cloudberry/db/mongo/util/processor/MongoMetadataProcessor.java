@@ -12,7 +12,7 @@ public class MongoMetadataProcessor {
 
     public Experiment extractExperimentData(MetadataEvent event) {
         return new Experiment(event.getTime(),
-                event.getName(),
+                event.getExperimentName(),
                 event.getExperimentParameters());
     }
 

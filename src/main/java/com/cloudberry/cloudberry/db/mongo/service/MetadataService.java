@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +34,15 @@ public class MetadataService {
                 .map(ExperimentConfiguration::getId)
                 .collectList()
                 .block();
+    }
+
+    public Optional<Experiment> findExperimentByName(String experimentName) {
+        return experimentsRepository.findAllByName(experimentName)
+                .toStream()
+                .findFirst();
+    }
+
+    public Experiment createExperiment(Experiment experiment) {
+        return experimentsRepository.save(experiment).block();
     }
 }

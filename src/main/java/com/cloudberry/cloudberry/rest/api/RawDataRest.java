@@ -1,8 +1,11 @@
 package com.cloudberry.cloudberry.rest.api;
 
+import com.cloudberry.cloudberry.db.common.data.ImportDetails;
+import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
 import com.cloudberry.cloudberry.rest.dto.LogFilters;
-import com.cloudberry.cloudberry.db.common.service.RawLogsHandler;
+import com.cloudberry.cloudberry.rest.exceptions.FileCouldNotBeImportedException;
+import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +27,7 @@ import java.util.Map;
 public class RawDataRest {
 
     private final RawDataService rawDataService;
-    private final RawLogsHandler rawLogsHandler;
+    private final LogsImporterService logsImporterService;
 
     @PostMapping("/save/{measurementName}")
     public void saveComputationLogs(@PathVariable String measurementName,
@@ -43,10 +49,27 @@ public class RawDataRest {
         rawDataService.deleteComputationLogs(measurementName, bucketName);
     }
 
-    @PostMapping("/file")
-    public boolean saveFromFile(@RequestParam("file") MultipartFile file) throws IOException {
-        String rawLogs = new String(file.getBytes());
-        return rawLogsHandler.saveLogsToDatabase(rawLogs);
+    @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public boolean uploadDataFile(@PathVariable String experimentName,
+                                  @RequestPart MultipartFile file,
+                                  @RequestPart Map<String, String> headersKeys,
+                                  @RequestPart Map<String, String> headersMeasurements) throws RestException {
+        Path tmpPath = null;
+        var ok = false;
+        var importDetails = new ImportDetails(headersKeys, headersMeasurements);
+        try {
+            tmpPath = Files.createTempFile("log_" + Instant.now().toString() + "_", file.getOriginalFilename());
+            file.transferTo(tmpPath);
+            ok = logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
+        } catch (IOException e) {
+            throw new FileCouldNotBeImportedException(e);
+        } finally {
+            if (tmpPath != null) {
+                ok = tmpPath.toFile().delete();
+            }
+        }
+
+        return ok;
     }
 
 }

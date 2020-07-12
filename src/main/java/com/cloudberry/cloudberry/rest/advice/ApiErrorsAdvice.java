@@ -1,9 +1,6 @@
 package com.cloudberry.cloudberry.rest.advice;
 
-import com.cloudberry.cloudberry.rest.exceptions.ConfigurationIdInvalidException;
-import com.cloudberry.cloudberry.rest.exceptions.EvaluationIdInvalidException;
-import com.cloudberry.cloudberry.rest.exceptions.EvaluationNotFoundException;
-import com.cloudberry.cloudberry.rest.exceptions.FieldNotNumericException;
+import com.cloudberry.cloudberry.rest.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +30,11 @@ public class ApiErrorsAdvice {
     @ExceptionHandler(FieldNotNumericException.class)
     public ApiError handleFieldNotNumeric(FieldNotNumericException exception) {
         return logErrors(exception, exception.getFieldName() + " is not a numeric field");
+    }
+
+    @ExceptionHandler(RestException.class)
+    public ApiError handleRest(RestException exception) {
+        return logErrors(exception, exception.getMessage());
     }
 
     private ApiError logErrors(Throwable t, String message) {
