@@ -9,6 +9,7 @@ import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +59,7 @@ public class RawDataRest {
         var ok = false;
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);
         try {
-            tmpPath = Files.createTempFile("log_" + Instant.now().toString() + "_", file.getOriginalFilename());
+            tmpPath = getTmpPath(file);
             file.transferTo(tmpPath);
             ok = logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
         } catch (IOException e) {
@@ -72,4 +73,15 @@ public class RawDataRest {
         return ok;
     }
 
+    private Path getTmpPath(@RequestPart MultipartFile file) throws IOException {
+        return Files.createTempFile("log_" + formatTimeToFileName(Instant.now()) + "_", file.getOriginalFilename());
+    }
+
+    @NotNull
+    private String formatTimeToFileName(Instant time) {
+        return time
+                .toString()
+                .replace("-", "")
+                .replace(":", "");
+    }
 }
