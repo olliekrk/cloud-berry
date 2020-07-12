@@ -5,16 +5,19 @@ import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.exceptions.FieldNotNumericException;
+import com.cloudberry.cloudberry.util.MathUtils;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.math.MathContext;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -153,9 +156,11 @@ public class StatisticsService {
                     if (bucketSize > 0) {
                         var bucketSum = bucket.stream().map(Pair::getValue).reduce(.0, Double::sum);
                         var bucketMean = bucketSum / bucketSize; // average from bucket
-                        var meanPoint = Map.of(
+                        var bucketStd = MathUtils.standardDeviation(bucket.stream().map(Pair::getValue).collect(Collectors.toList()));
+                        Map<String, Object> meanPoint = Map.of(
                                 InfluxDefaults.Columns.TIME, mid,
-                                comparedField, (Object) bucketMean
+                                comparedField, bucketMean,
+                                String.format("%s_STD", comparedField), bucketStd
                         );
                         return Stream.of(meanPoint);
                     } else {
