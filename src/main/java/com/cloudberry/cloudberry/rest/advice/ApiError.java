@@ -4,5 +4,6 @@ import lombok.Value;
 
 @Value
 public class ApiError {
-    String message;
+    String error;
+    int code;
 }

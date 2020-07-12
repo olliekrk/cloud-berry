@@ -11,5 +11,4 @@ public interface EvaluationsRepository extends ReactiveSortingRepository<Experim
 
     Flux<ExperimentEvaluation> findAllByConfigurationId(ObjectId configurationId);
 
-    Flux<ExperimentEvaluation> findAllByConfigurationIdIn(Collection<ObjectId> configurationId);
 }

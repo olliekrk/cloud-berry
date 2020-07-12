@@ -1,12 +1,19 @@
 package com.cloudberry.cloudberry.rest.exceptions;
 
-public abstract class RestException extends Exception {
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
-    public RestException(String message) {
+public abstract class RestException extends Exception {
+    @Getter
+    private final HttpStatus status;
+
+    public RestException(String message, HttpStatus status) {
         super(message);
+        this.status = status;
     }
 
-    public RestException(String message, Throwable cause) {
+    public RestException(String message, Throwable cause, HttpStatus status) {
         super(message, cause);
+        this.status = status;
     }
 }

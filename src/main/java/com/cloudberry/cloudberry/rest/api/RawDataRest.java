@@ -4,7 +4,7 @@ import com.cloudberry.cloudberry.db.common.data.ImportDetails;
 import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
 import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
 import com.cloudberry.cloudberry.rest.dto.LogFilters;
-import com.cloudberry.cloudberry.rest.exceptions.FileCouldNotBeImportedException;
+import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
@@ -56,14 +56,14 @@ public class RawDataRest {
                                   @RequestPart Map<String, String> headersKeys,
                                   @RequestPart Map<String, String> headersMeasurements) throws RestException {
         Path tmpPath = null;
-        var ok = false;
+        var ok = true;
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);
         try {
             tmpPath = getTmpPath(file);
             file.transferTo(tmpPath);
-            ok = logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
+            logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
         } catch (IOException e) {
-            throw new FileCouldNotBeImportedException(e);
+            throw new FileImportException(e);
         } finally {
             if (tmpPath != null) {
                 ok = tmpPath.toFile().delete();

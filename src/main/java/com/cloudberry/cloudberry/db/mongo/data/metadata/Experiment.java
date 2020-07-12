@@ -27,6 +27,7 @@ public class Experiment implements Parametrized<String, Object> {
     private Instant time;
 
     public Experiment(Instant time, String name, Map<String, Object> parameters) {
+        this.id = new ObjectId();
         this.time = time;
         this.name = name;
         this.parameters = parameters;

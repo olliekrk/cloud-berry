@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.rest.advice;
 
 import com.cloudberry.cloudberry.rest.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -12,33 +13,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiErrorsAdvice {
 
-    @ExceptionHandler(EvaluationNotFoundException.class)
-    public ApiError handleExperimentNotFound(EvaluationNotFoundException exception) {
-        return logErrors(exception, "No experiment found for ID: " + exception.getEvaluationId());
-    }
-
-    @ExceptionHandler(EvaluationIdInvalidException.class)
-    public ApiError handleEvaluationIdInvalid(EvaluationIdInvalidException exception) {
-        return logErrors(exception, "You must provide at least one valid evaluation ID");
-    }
-
-    @ExceptionHandler(ConfigurationIdInvalidException.class)
-    public ApiError handleConfigurationIdInvalid(ConfigurationIdInvalidException exception) {
-        return logErrors(exception, "You must provide at least one valid configuration ID");
-    }
-
-    @ExceptionHandler(FieldNotNumericException.class)
-    public ApiError handleFieldNotNumeric(FieldNotNumericException exception) {
-        return logErrors(exception, exception.getFieldName() + " is not a numeric field");
-    }
-
     @ExceptionHandler(RestException.class)
     public ApiError handleRest(RestException exception) {
-        return logErrors(exception, exception.getMessage());
+        return logErrors(exception, exception.getStatus());
     }
 
-    private ApiError logErrors(Throwable t, String message) {
-        log.warn(message, t.getMessage());
-        return new ApiError(message);
+    @ExceptionHandler(RestRuntimeException.class)
+    public ApiError handleRestRuntime(RestException exception) {
+        return logErrors(exception, exception.getStatus());
+    }
+
+    private ApiError logErrors(Throwable t, HttpStatus status) {
+        log.error(String.format("Cannot process REST API request - %s - %s", status.toString(), t.getMessage()));
+        return new ApiError(t.getMessage(), status.value());
     }
 }

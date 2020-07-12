@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
-import com.cloudberry.cloudberry.rest.exceptions.ConfigurationIdInvalidException;
-import com.cloudberry.cloudberry.rest.exceptions.EvaluationIdInvalidException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidEvaluationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -24,14 +24,14 @@ public class StatisticsRest {
                                                        @RequestParam String measurementName,
                                                        @RequestParam(required = false) String bucketName,
                                                        @RequestBody List<String> evaluationIdsHex
-    ) throws EvaluationIdInvalidException {
+    ) throws InvalidEvaluationIdException {
         var evaluationIds = evaluationIdsHex.stream()
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new)
                 .collect(Collectors.toList());
 
         if (evaluationIds.isEmpty())
-            throw new EvaluationIdInvalidException();
+            throw new InvalidEvaluationIdException(evaluationIdsHex);
 
         return statisticsService.compareEvaluations(
                 comparedField,
@@ -47,11 +47,11 @@ public class StatisticsRest {
                                                                   @RequestParam String measurementName,
                                                                   @RequestParam(required = false) String bucketName,
                                                                   @RequestParam String configurationIdHex
-    ) throws ConfigurationIdInvalidException {
+    ) throws InvalidConfigurationIdException {
         var configurationId = Optional.of(configurationIdHex)
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new)
-                .orElseThrow(ConfigurationIdInvalidException::new);
+                .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
 
         return statisticsService.compareEvaluationsForConfiguration(
                 comparedField,
@@ -67,14 +67,14 @@ public class StatisticsRest {
                                                           @RequestParam String measurementName,
                                                           @RequestParam(required = false) String bucketName,
                                                           @RequestBody List<String> configurationIdsHex
-    ) throws ConfigurationIdInvalidException {
+    ) throws InvalidConfigurationIdException {
         var configurationIds = configurationIdsHex.stream()
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new)
                 .collect(Collectors.toList());
 
         if (configurationIds.isEmpty())
-            throw new ConfigurationIdInvalidException();
+            throw new InvalidConfigurationIdException(configurationIdsHex);
 
         return statisticsService.compareConfigurations(
                 comparedField,

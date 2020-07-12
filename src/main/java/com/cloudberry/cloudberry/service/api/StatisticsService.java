@@ -7,6 +7,7 @@ import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.exceptions.FieldNotNumericException;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
