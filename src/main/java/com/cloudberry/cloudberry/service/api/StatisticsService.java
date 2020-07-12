@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.Map.of;
 
@@ -29,7 +29,7 @@ import static java.util.Map.of;
 @RequiredArgsConstructor
 public class StatisticsService {
 
-    private final static String MEAN_SERIES_NAME = "_mean";
+    private final static String MEAN_SERIES_NAME = "mean";
     private final MetadataService metadataService;
     private final InfluxDataAccessor influxDataAccessor;
 
@@ -43,9 +43,11 @@ public class StatisticsService {
                 .map(id -> getEvaluationData(measurementName, bucketName, id))
                 .collect(Collectors.toList());
 
-        return computeMean ?
-                ListSyntax.with(evaluationSeries, getMeanSeries(comparedField, evaluationSeries)) :
-                evaluationSeries;
+        if (computeMean) {
+            return ListSyntax.with(evaluationSeries, getMeanSeries(comparedField, evaluationSeries, MEAN_SERIES_NAME));
+        } else {
+            return evaluationSeries;
+        }
     }
 
     public List<DataSeries> compareEvaluationsForConfiguration(String comparedField,
@@ -63,14 +65,17 @@ public class StatisticsService {
                                                   List<ObjectId> configurationIds) {
         return configurationIds
                 .stream()
-                .map(configurationId -> compareEvaluationsForConfiguration(
-                        comparedField,
-                        measurementName,
-                        bucketName,
-                        configurationId,
-                        false
-                ))
-                .map(series -> getMeanSeries(comparedField, series))
+                .map(configurationId -> {
+                    var series = compareEvaluationsForConfiguration(
+                            comparedField,
+                            measurementName,
+                            bucketName,
+                            configurationId,
+                            false
+                    );
+                    var seriesName = String.format("%s_%s", MEAN_SERIES_NAME, configurationId.toHexString());
+                    return getMeanSeries(comparedField, series, seriesName);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -95,7 +100,9 @@ public class StatisticsService {
         return new DataSeries(evaluationIdHex, ListSyntax.mapped(records, FluxRecord::getValues));
     }
 
-    private DataSeries getMeanSeries(String comparedField, List<DataSeries> series) {
+    private DataSeries getMeanSeries(String comparedField,
+                                     List<DataSeries> series,
+                                     String meanSeriesName) {
         var timeSeries = series.stream()
                 .map(DataSeries::getData)
                 .map(dataPoints -> dataPoints
@@ -131,7 +138,7 @@ public class StatisticsService {
 
         var meanSeries = IntStream.range(0, intervalCount)
                 .boxed()
-                .map(i -> {
+                .flatMap(i -> {
                     var start = i * intervalLength;
                     var mid = Instant.ofEpochMilli((long) (start + intervalLength * .5));
                     var end = start + intervalLength;
@@ -141,16 +148,22 @@ public class StatisticsService {
                             .takeWhile(dataPoint -> dataPoint.getLeft() <= end)
                             .collect(Collectors.toList());
 
-                    var bucketSum = bucket.stream().map(Pair::getValue).reduce(.0, Double::sum);
-                    var bucketMean = bucketSum / bucket.size(); // average from bucket
-                    return Map.of(
-                            InfluxDefaults.Columns.TIME, mid,
-                            InfluxDefaults.Columns.VALUE, (Object) bucketMean
-                    );
+                    var bucketSize = bucket.size();
+                    if (bucketSize > 0) {
+                        var bucketSum = bucket.stream().map(Pair::getValue).reduce(.0, Double::sum);
+                        var bucketMean = bucketSum / bucketSize; // average from bucket
+                        var meanPoint = Map.of(
+                                InfluxDefaults.Columns.TIME, mid,
+                                comparedField, (Object) bucketMean
+                        );
+                        return Stream.of(meanPoint);
+                    } else {
+                        return Stream.empty();
+                    }
                 })
                 .collect(Collectors.toList());
 
 
-        return new DataSeries(comparedField + MEAN_SERIES_NAME, meanSeries);
+        return new DataSeries(meanSeriesName, meanSeries);
     }
 }

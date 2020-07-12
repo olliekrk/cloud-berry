@@ -5,12 +5,6 @@ class ComputationData:
         self.tags = tags
 
 
-class DataSeries:
-    def __init__(self, seriesName: str, data: list) -> None:
-        self.seriesName = seriesName
-        self.data = data
-
-
 class LogFilters:
     def __init__(self, tags: dict, fields: dict) -> None:
         self.tags = tags
