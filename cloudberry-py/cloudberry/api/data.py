@@ -2,18 +2,24 @@ from typing import List
 
 import requests
 
-from . import ComputationData, LogFilters
-from .config import CloudberryConfig
+from .wrappers import DataPoint
+from .config import CloudberryConfig, CloudberryApi
 
 
-class RawDataApi:
+class DataFilters:
+    def __init__(self, tags: dict, fields: dict) -> None:
+        self.tags = tags
+        self.fields = fields
+
+
+class Data(CloudberryApi):
 
     def __init__(self, config: CloudberryConfig) -> None:
-        self.config = config
-        self.base_url = f'{self.config.get_base_url()}/raw'
+        super().__init__(config)
+        self.base_url = f'{config.base_url()}/raw'
 
     def save_measurement_data(self,
-                              computation_data: List[ComputationData],
+                              computation_data: List[DataPoint],
                               measurement_name: str,
                               bucket_name: str = None) -> bool:
         url = f'{self.base_url}/save/{measurement_name}'
@@ -26,7 +32,7 @@ class RawDataApi:
         return response.ok
 
     def get_measurement_data(self,
-                             filters: LogFilters,
+                             filters: DataFilters,
                              measurement_name: str,
                              bucket_name: str = None):
         url = f'{self.base_url}/find/{measurement_name}'

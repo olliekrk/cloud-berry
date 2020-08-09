@@ -1,13 +1,13 @@
 import requests
 
-from .config import CloudberryConfig
+from .config import CloudberryConfig, CloudberryApi
 
 
-class BucketsApi:
+class Buckets(CloudberryApi):
 
     def __init__(self, config: CloudberryConfig) -> None:
-        self.config = config
-        self.base_url = f'{self.config.get_base_url()}/buckets'
+        super().__init__(config)
+        self.base_url = f'{config.base_url()}/buckets'
 
     def delete_bucket(self, bucket_name):
         response = requests.delete(f'{self.base_url}/{bucket_name}')

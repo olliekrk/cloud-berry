@@ -1,21 +1,6 @@
-from data import DataSeries
-import pandas as pd
-import matplotlib.pyplot as plt
+class Plots:
 
-
-class DataHelpers:
-    @staticmethod
-    def get_data_series(raw_series: list) -> list:
-        data_series = []
-        for series in raw_series:
-            data_series.append(DataSeries(series['seriesName'], series['data']))
-
-        return data_series
-
-    @staticmethod
-    def merge_data_frames(data_frames: list) -> pd.DataFrame:
-        return pd.concat(data_frames)
-
+    # todo: better if it took cloudberry.DataSeries as an argument
     @staticmethod
     def comparison_plot(data_frames: list,
                         y_field: str,
