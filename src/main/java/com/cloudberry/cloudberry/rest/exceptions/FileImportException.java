@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.rest.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class FileImportException extends RestException {
+public class FileImportException extends RestRuntimeException {
     public static final String message = "Failed to import requested file";
     public static final HttpStatus status = HttpStatus.BAD_REQUEST;
 

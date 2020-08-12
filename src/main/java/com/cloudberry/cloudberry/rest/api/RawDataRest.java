@@ -6,8 +6,8 @@ import com.cloudberry.cloudberry.model.statistics.DataPoint;
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
-import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
+import com.cloudberry.cloudberry.util.FileSystemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -51,32 +48,25 @@ public class RawDataRest {
         rawDataService.deleteData(bucketName, measurementName, filters);
     }
 
-    // todo: make headersMeasurements optional
     @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public boolean uploadAgeFile(@PathVariable String experimentName,
                                  @RequestPart MultipartFile file,
                                  @RequestPart Map<String, String> headersKeys,
-                                 @RequestPart Map<String, String> headersMeasurements) throws RestException {
-        Path tmpPath = null;
-        var ok = true;
+                                 @RequestPart Map<String, String> headersMeasurements) {
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);
         try {
-            tmpPath = createTemporaryFile(file.getOriginalFilename());
-            file.transferTo(tmpPath);
-            logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
+            return FileSystemUtils.withTemporaryFile(
+                    file,
+                    temporaryFilePath -> {
+                        try {
+                            logsImporterService.importAgeFile(temporaryFilePath.toFile(), importDetails, experimentName);
+                        } catch (IOException e) {
+                            throw new FileImportException(e);
+                        }
+                    }
+            );
         } catch (IOException e) {
             throw new FileImportException(e);
-        } finally {
-            if (tmpPath != null) {
-                ok = tmpPath.toFile().delete();
-            }
         }
-
-        return ok;
-    }
-
-    private static Path createTemporaryFile(String originalFileName) throws IOException {
-        var prefix = "log_" + Instant.now().toEpochMilli() + "_";
-        return Files.createTempFile(prefix, originalFileName);
     }
 }

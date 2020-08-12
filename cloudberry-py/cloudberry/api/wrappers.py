@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+from .plots import DataSeriesPlots
 
 
 # wrapper classes
@@ -23,12 +24,8 @@ class DataSeries:
         df['series_name'] = self.series_name
         return df
 
-    # todo: replace it and usages with cloudberry.Plots
-    def get_plot(self, x, y, kind='scatter', color='red', title=None):
-        df = self.as_data_frame
-        axes = df.plot(kind=kind, x=x, y=y, color=color, title=title)
-        plt.show()
-        return axes
+    def plots(self) -> DataSeriesPlots:
+        return DataSeriesPlots(self)
 
     @staticmethod
     def get_data_series(raw_series: list) -> list:

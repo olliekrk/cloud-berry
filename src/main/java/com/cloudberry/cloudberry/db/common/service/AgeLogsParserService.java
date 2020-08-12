@@ -26,13 +26,14 @@ import static java.lang.Long.parseLong;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AgeLogsParserService implements AgeLogsParser<ParsedLogs> {
+public class AgeLogsParserService {
     @Value("${influx.buckets.default-logs}")
     private String defaultLogsBucketName;
+    @Value("${influx.measurements.default-measurement-name}")
+    private String defaultMeasurementName;
     private final MetadataService metadataService;
 
-    @Override
-    public ParsedLogs parseExperimentFile(File file, String experimentName, ImportDetails importDetails) throws IOException {
+    public ParsedLogs parseFile(File file, String experimentName, ImportDetails importDetails) throws IOException {
         var now = Instant.now();
         var headerKeys = importDetails.getHeadersKeys();
         var headerMeasurements = importDetails.getHeadersMeasurements();
@@ -106,7 +107,7 @@ public class AgeLogsParserService implements AgeLogsParser<ParsedLogs> {
                                       String logType,
                                       String[] log) {
         Point point = Point
-                .measurement(headerMeasurements.getOrDefault(logType, "unknown_log"))
+                .measurement(headerMeasurements.getOrDefault(logType, defaultMeasurementName))
                 .addFields(getMapFromArrays(parameters.get(logType), log));
 
         if (parameters.get(logType)[1].equalsIgnoreCase("time")) {

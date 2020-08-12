@@ -32,7 +32,7 @@ class AgeFileUploader(FileUploader):
                 'headersKeys': (None, json.dumps(details.headers_keys), 'application/json'),
                 'headersMeasurements': (None, json.dumps(details.headers_measurements), 'application/json')
             })
-            return r.json()
+            return r.ok
 
 
 class CsvFileUploader(FileUploader):
