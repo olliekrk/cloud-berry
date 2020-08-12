@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.rest.api;
 import com.cloudberry.cloudberry.db.common.data.ImportDetails;
 import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
 import com.cloudberry.cloudberry.model.statistics.DataPoint;
+import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
@@ -30,25 +31,27 @@ public class RawDataRest {
     private final LogsImporterService logsImporterService;
 
     @PostMapping("/save")
-    public void saveData(@RequestParam(required = false) String measurementName,
-                         @RequestParam(required = false) String bucketName,
+    public void saveData(@RequestParam(required = false) String bucketName,
+                         @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
-        rawDataService.saveData(measurementName, bucketName, dataPoints);
+        rawDataService.saveData(bucketName, measurementName, dataPoints);
     }
 
     @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<Map<String, Object>> findData(@RequestParam(required = false) String measurementName,
-                                              @RequestParam(required = false) String bucketName,
-                                              @RequestBody DataFilters filters) {
-        return rawDataService.findData(measurementName, bucketName, filters);
+    public DataSeries findData(@RequestParam(required = false) String bucketName,
+                               @RequestParam(required = false) String measurementName,
+                               @RequestBody DataFilters filters) {
+        return rawDataService.findData(bucketName, measurementName, filters);
     }
 
-    @DeleteMapping
-    public void deleteComputationLogs(@RequestParam(required = false) String measurementName,
-                                      @RequestParam(required = false) String bucketName) {
-        rawDataService.deleteComputationLogs(measurementName, bucketName);
+    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteData(@RequestParam(required = false) String bucketName,
+                           @RequestParam(required = false) String measurementName,
+                           @RequestBody DataFilters filters) {
+        rawDataService.deleteData(bucketName, measurementName, filters);
     }
 
+    // todo: make headersMeasurements optional
     @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public boolean uploadAgeFile(@PathVariable String experimentName,
                                  @RequestPart MultipartFile file,

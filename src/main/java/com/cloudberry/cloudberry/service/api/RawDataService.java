@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.model.statistics.DataPoint;
+import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
@@ -29,9 +30,10 @@ public class RawDataService {
     private final InfluxDataAccessor influxDataAccessor;
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
+    public static final String rawDataSeriesName = "raw_data";
 
-    public void saveData(@Nullable String measurementNameOpt,
-                         @Nullable String bucketName,
+    public void saveData(@Nullable String bucketName,
+                         @Nullable String measurementNameOpt,
                          List<DataPoint> dataPoints) {
         var measurementName = Optional.ofNullable(measurementNameOpt).orElse(defaultMeasurementName);
         var influxDataPoints = ListSyntax.mapped(dataPoints,
@@ -42,9 +44,9 @@ public class RawDataService {
         influxDataWriter.writePoints(bucketName, influxDataPoints);
     }
 
-    public List<Map<String, Object>> findData(@Nullable String measurementName,
-                                              @Nullable String bucketName,
-                                              DataFilters filters) {
+    public DataSeries findData(@Nullable String bucketName,
+                               @Nullable String measurementName,
+                               DataFilters filters) {
         var records = influxDataAccessor.findData(
                 bucketName,
                 measurementName,
@@ -52,11 +54,17 @@ public class RawDataService {
                 filters.getTagFilters()
         );
 
-        return ListSyntax.mapped(records, FluxRecord::getValues);
+        var data = ListSyntax.mapped(records, FluxRecord::getValues);
+        return new DataSeries(rawDataSeriesName, data);
     }
 
-    public void deleteComputationLogs(String measurementName,
-                                      @Nullable String bucketName) {
-        influxDataEvictor.deleteData(bucketName, measurementName);
+    public void deleteData(@Nullable String bucketName,
+                           @Nullable String measurementName,
+                           DataFilters filters) {
+        influxDataEvictor.deleteData(
+                bucketName,
+                measurementName,
+                filters.getTagFilters()
+        );
     }
 }

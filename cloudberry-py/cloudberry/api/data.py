@@ -2,7 +2,7 @@ from typing import List
 
 import requests
 
-from .wrappers import DataPoint
+from .wrappers import DataPoint, DataSeries
 from .config import CloudberryConfig, CloudberryApi
 
 
@@ -18,38 +18,47 @@ class Data(CloudberryApi):
         super().__init__(config)
         self.base_url = f'{config.base_url()}/raw'
 
-    def save_data_points(self,
-                         computation_data: List[DataPoint],
-                         measurement_name: str = None,
-                         bucket_name: str = None) -> bool:
+    def save_data(self,
+                  computation_data: List[DataPoint],
+                  measurement_name: str = None,
+                  bucket_name: str = None) -> bool:
         url = f'{self.base_url}/save/{measurement_name}'
-        params = {}
-        if bucket_name is not None:
-            params['bucketName'] = bucket_name
+        params = Data._build_params(measurement_name, bucket_name)
 
         converted_data = list(map(lambda d: d.__dict__, computation_data))
         response = requests.post(url, params=params, json=converted_data)
         return response.ok
 
-    def get_measurement_data(self,
-                             filters: DataFilters,
-                             measurement_name: str,
-                             bucket_name: str = None):
+    def get_data(self,
+                 filters: DataFilters,
+                 measurement_name: str = None,
+                 bucket_name: str = None) -> DataSeries:
         url = f'{self.base_url}/find/{measurement_name}'
-        params = {}
-        if bucket_name is not None:
-            params['bucketName'] = bucket_name
+        params = Data._build_params(measurement_name, bucket_name)
 
-        response = requests.post(url, params=params, json={'tagFilters': filters.tags, 'fieldFilters': filters.fields})
-        return response.json()
+        response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
+        return DataSeries.from_json(response.json())
 
     def delete_data(self,
-                    measurement_name: str,
+                    filters: DataFilters,
+                    measurement_name: str = None,
                     bucket_name: str = None) -> bool:
-        url = f'{self.base_url}/{measurement_name}'
+        url = f'{self.base_url}/delete/{measurement_name}'
+        params = Data._build_params(measurement_name, bucket_name)
+
+        response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
+        return response.ok
+
+    @staticmethod
+    def _build_params(measurement_name: str,
+                      bucket_name: str) -> dict:
         params = {}
+        if measurement_name is not None:
+            params['measurementName'] = measurement_name
         if bucket_name is not None:
             params['bucketName'] = bucket_name
+        return params
 
-        response = requests.delete(url, params=params)
-        return response.ok
+    @staticmethod
+    def _build_filters_dto(filters: DataFilters) -> dict:
+        return {'tagFilters': filters.tags, 'fieldFilters': filters.fields}

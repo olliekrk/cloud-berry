@@ -5,7 +5,7 @@ import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import java.util.Map;
 import java.util.Optional;
 
-public class RestrictionsFactory {
+public abstract class RestrictionsFactory {
 
     public static Restrictions measurement(String measurementName) {
         return Restrictions.measurement().equal(measurementName);
