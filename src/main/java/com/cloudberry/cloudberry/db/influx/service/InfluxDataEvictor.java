@@ -26,7 +26,7 @@ public class InfluxDataEvictor {
 
     private final InfluxDBClient influxClient;
 
-    public void deleteComputationLogs(@Nullable String bucketName, String measurementName) {
+    public void deleteData(@Nullable String bucketName, String measurementName) {
         var bucket = Optional.ofNullable(bucketName).orElse(defaultBucketName);
         var start = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()).truncatedTo(ChronoUnit.SECONDS).withOffsetSameLocal(ZoneOffset.UTC);
         var stop = OffsetDateTime.now().truncatedTo(ChronoUnit.SECONDS).withOffsetSameLocal(ZoneOffset.UTC);

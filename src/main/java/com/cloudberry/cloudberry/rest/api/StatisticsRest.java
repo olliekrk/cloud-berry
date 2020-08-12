@@ -21,7 +21,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/evaluations")
     public List<DataSeries> compareSelectedEvaluations(@RequestParam String comparedField,
-                                                       @RequestParam String measurementName,
+                                                       @RequestParam(required = false) String measurementName,
                                                        @RequestParam(required = false) String bucketName,
                                                        @RequestBody List<String> evaluationIdsHex
     ) throws InvalidEvaluationIdException {

@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class LogsImporterService {
     private final InfluxDataWriter influxDBConnector;
-    private final LogsParser<ParsedLogs> logsParser;
+    private final AgeLogsParser<ParsedLogs> logsParser;
 
     public void importExperimentFile(File file,
                                      ImportDetails importDetails,

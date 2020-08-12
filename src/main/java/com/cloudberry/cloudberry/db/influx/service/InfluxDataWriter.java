@@ -19,8 +19,6 @@ import java.util.Optional;
 public class InfluxDataWriter {
     @Value("${influx.buckets.default-logs}")
     private String defaultLogsBucketName;
-    @Value("${influx.buckets.default-logs-meta}")
-    private String defaultLogsMetaBucketName;
     @Value("${spring.influx2.org}")
     private String defaultOrganization;
 

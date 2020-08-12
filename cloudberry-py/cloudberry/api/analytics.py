@@ -3,8 +3,11 @@ from typing import List
 import requests
 
 # TODO:
-# - make measurementName optional on backend
-# - wrap json results in some wrapper class
+# - make measurementName optional on backend <- DONE
+# - wrap json results in some wrapper class <- DONE
+# - update example notebook
+from .. import DataSeries
+
 
 class Analytics(CloudberryApi):
 
@@ -16,43 +19,47 @@ class Analytics(CloudberryApi):
                             evaluation_ids: List[str],
                             compared_field: str,
                             measurement_name: str = None,
-                            bucket_name: str = None) -> list:
+                            bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/evaluations'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         response = requests.post(url=url, params=params, json=evaluation_ids)
-        return response.json()
+        return Analytics._wrap_response(response)
 
     def compare_evaluations_for_configuration(self,
                                               configuration_id: str,
                                               compared_field: str,
                                               measurement_name: str = None,
-                                              bucket_name: str = None) -> list:
+                                              bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/evaluations/all'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         params['configurationIdHex'] = configuration_id
         response = requests.post(url=url, params=params)
-        return response.json()
+        return Analytics._wrap_response(response)
 
     def compare_configurations(self,
                                configuration_ids: list,
                                compared_field: str,
                                measurement_name: str = None,
-                               bucket_name: str = None) -> list:
+                               bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/configurations'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         response = requests.post(url=url, params=params, json=configuration_ids)
-        return response.json()
+        return Analytics._wrap_response(response)
 
     def compare_configurations_for_experiment(self,
                                               experiment_name: str,
                                               compared_field: str,
                                               measurement_name: str = None,
-                                              bucket_name: str = None) -> list:
+                                              bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/configurations/all'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         params['experimentName'] = experiment_name
         response = requests.post(url=url, params=params)
-        return response.json()
+        return Analytics._wrap_response(response)
+
+    @staticmethod
+    def _wrap_response(response: requests.Response):
+        return DataSeries.from_json(response.json())
 
     @staticmethod
     def _as_comparison_params(compared_field: str,

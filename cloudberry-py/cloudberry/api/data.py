@@ -18,16 +18,16 @@ class Data(CloudberryApi):
         super().__init__(config)
         self.base_url = f'{config.base_url()}/raw'
 
-    def save_measurement_data(self,
-                              computation_data: List[DataPoint],
-                              measurement_name: str,
-                              bucket_name: str = None) -> bool:
+    def save_data_points(self,
+                         computation_data: List[DataPoint],
+                         measurement_name: str = None,
+                         bucket_name: str = None) -> bool:
         url = f'{self.base_url}/save/{measurement_name}'
         params = {}
         if bucket_name is not None:
             params['bucketName'] = bucket_name
 
-        converted_data = list(map(lambda data: data.__dict__, computation_data))
+        converted_data = list(map(lambda d: d.__dict__, computation_data))
         response = requests.post(url, params=params, json=converted_data)
         return response.ok
 
@@ -43,9 +43,9 @@ class Data(CloudberryApi):
         response = requests.post(url, params=params, json={'tagFilters': filters.tags, 'fieldFilters': filters.fields})
         return response.json()
 
-    def delete_measurement_data(self,
-                                measurement_name: str,
-                                bucket_name: str = None) -> bool:
+    def delete_data(self,
+                    measurement_name: str,
+                    bucket_name: str = None) -> bool:
         url = f'{self.base_url}/{measurement_name}'
         params = {}
         if bucket_name is not None:

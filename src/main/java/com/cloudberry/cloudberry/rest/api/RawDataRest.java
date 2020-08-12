@@ -2,8 +2,8 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.db.common.data.ImportDetails;
 import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
-import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
-import com.cloudberry.cloudberry.rest.dto.LogFilters;
+import com.cloudberry.cloudberry.model.statistics.DataPoint;
+import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
@@ -29,31 +29,31 @@ public class RawDataRest {
     private final RawDataService rawDataService;
     private final LogsImporterService logsImporterService;
 
-    @PostMapping("/save/{measurementName}")
-    public void saveComputationLogs(@PathVariable String measurementName,
-                                    @RequestParam(required = false) String bucketName,
-                                    @RequestBody List<ComputationLogDto> computationLogs) {
-        rawDataService.saveComputationLogs(measurementName, bucketName, computationLogs);
+    @PostMapping("/save")
+    public void saveData(@RequestParam(required = false) String measurementName,
+                         @RequestParam(required = false) String bucketName,
+                         @RequestBody List<DataPoint> dataPoints) {
+        rawDataService.saveData(measurementName, bucketName, dataPoints);
     }
 
-    @PostMapping(value = "/find/{measurementName}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<Map<String, Object>> findComputationLogs(@PathVariable String measurementName,
-                                                         @RequestParam(required = false) String bucketName,
-                                                         @RequestBody LogFilters filters) {
-        return rawDataService.findComputationLogs(measurementName, bucketName, filters);
+    @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<Map<String, Object>> findData(@RequestParam(required = false) String measurementName,
+                                              @RequestParam(required = false) String bucketName,
+                                              @RequestBody DataFilters filters) {
+        return rawDataService.findData(measurementName, bucketName, filters);
     }
 
-    @DeleteMapping("/{measurementName}")
-    public void deleteComputationLogs(@PathVariable String measurementName,
+    @DeleteMapping
+    public void deleteComputationLogs(@RequestParam(required = false) String measurementName,
                                       @RequestParam(required = false) String bucketName) {
         rawDataService.deleteComputationLogs(measurementName, bucketName);
     }
 
     @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public boolean uploadDataFile(@PathVariable String experimentName,
-                                  @RequestPart MultipartFile file,
-                                  @RequestPart Map<String, String> headersKeys,
-                                  @RequestPart Map<String, String> headersMeasurements) throws RestException {
+    public boolean uploadAgeFile(@PathVariable String experimentName,
+                                 @RequestPart MultipartFile file,
+                                 @RequestPart Map<String, String> headersKeys,
+                                 @RequestPart Map<String, String> headersMeasurements) throws RestException {
         Path tmpPath = null;
         var ok = true;
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);

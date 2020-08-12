@@ -17,13 +17,15 @@ class DataSeries:
         self.series_name = series_name
         self.data = data
 
+    @property
     def as_data_frame(self) -> pd.DataFrame:
         df = pd.DataFrame(self.data)
         df['series_name'] = self.series_name
         return df
 
+    # todo: replace it and usages with cloudberry.Plots
     def get_plot(self, x, y, kind='scatter', color='red', title=None):
-        df = self.as_data_frame()
+        df = self.as_data_frame
         axes = df.plot(kind=kind, x=x, y=y, color=color, title=title)
         plt.show()
         return axes
@@ -35,3 +37,7 @@ class DataSeries:
             data_series.append(DataSeries(series['seriesName'], series['data']))
 
         return data_series
+
+    @staticmethod
+    def from_json(data_series_json: dict):
+        return DataSeries(series_name=data_series_json['seriesName'], data=data_series_json['data'])

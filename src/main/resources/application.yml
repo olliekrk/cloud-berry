@@ -33,7 +33,8 @@ influx:
   organization-name: cloudberry
   buckets:
     default-logs: cloudberry-logs
-    default-logs-meta: cloudberry-logs-meta
+  measurements:
+    default-measurement-name: cloudberry-default
 
 ---
 

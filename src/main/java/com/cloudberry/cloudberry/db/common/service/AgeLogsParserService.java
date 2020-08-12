@@ -26,7 +26,7 @@ import static java.lang.Long.parseLong;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LogsParserService implements LogsParser<ParsedLogs> {
+public class AgeLogsParserService implements AgeLogsParser<ParsedLogs> {
     @Value("${influx.buckets.default-logs}")
     private String defaultLogsBucketName;
     private final MetadataService metadataService;
