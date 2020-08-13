@@ -55,7 +55,7 @@ class Analytics(CloudberryApi):
 
     @staticmethod
     def _wrap_response(response: requests.Response):
-        return DataSeries.from_json(response.json())
+        return DataSeries.from_json_list(response.json())
 
     @staticmethod
     def _as_comparison_params(compared_field: str,

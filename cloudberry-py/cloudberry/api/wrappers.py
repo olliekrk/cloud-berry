@@ -1,5 +1,7 @@
 import pandas as pd
 
+from typing import List
+
 
 # wrapper classes
 
@@ -28,6 +30,10 @@ class DataSeries:
             data_series.append(DataSeries(series['seriesName'], series['data']))
 
         return data_series
+
+    @staticmethod
+    def from_json_list(data_series_jsons: List[dict]):
+        return [DataSeries(series_name=ds['seriesName'], data=ds['data']) for ds in data_series_jsons]
 
     @staticmethod
     def from_json(data_series_json: dict):

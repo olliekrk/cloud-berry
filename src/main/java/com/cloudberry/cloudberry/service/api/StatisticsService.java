@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -124,9 +125,18 @@ public class StatisticsService {
 
                     var bucketSize = bucket.size();
                     if (bucketSize > 0) {
-                        var bucketSum = bucket.stream().map(Pair::getValue).reduce(.0, Double::sum);
+                        var bucketSum = bucket
+                                .stream()
+                                .map(Pair::getValue)
+                                .filter(Objects::nonNull)
+                                .reduce(.0, Double::sum);
                         var bucketMean = bucketSum / bucketSize; // average from bucket
-                        var bucketStd = MathUtils.standardDeviation(ListSyntax.mapped(bucket, Pair::getValue));
+                        var bucketStd = MathUtils.standardDeviation(
+                                bucket.stream()
+                                        .map(Pair::getValue)
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList())
+                        );
                         Map<String, Object> meanPoint = Map.of(
                                 InfluxDefaults.Columns.TIME, mid,
                                 comparedField, bucketMean,
