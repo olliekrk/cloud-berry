@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.rest.exceptions.FieldNotNumericException;
 import com.cloudberry.cloudberry.util.MathUtils;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -166,15 +167,11 @@ public class StatisticsService {
         return series.getData()
                 .stream()
                 .filter(data -> data.containsKey(InfluxDefaults.Columns.TIME) && data.containsKey(comparedField))
-                .map(data -> {
-                    try {
-                        var timestamp = (Instant) data.get(InfluxDefaults.Columns.TIME);
-                        var value = (Double) data.get(comparedField);
-                        return Pair.of(timestamp.toEpochMilli(), value);
-                    } catch (ClassCastException e) {
-                        throw new FieldNotNumericException(comparedField);
-                    }
-                })
+                .map(data -> Try.of(() -> {
+                    var timestamp = (Instant) data.get(InfluxDefaults.Columns.TIME);
+                    var value = (Double) data.get(comparedField);
+                    return Pair.of(timestamp.toEpochMilli(), value);
+                }).getOrElseThrow(a -> new FieldNotNumericException(comparedField)))
                 .collect(Collectors.toList());
     }
 }

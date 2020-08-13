@@ -16,7 +16,7 @@ public abstract class ListSyntax {
     }
 
     public static <E> List<E> with(Collection<E> collection, E element) {
-        var list = new LinkedList<E>(collection);
+        var list = new LinkedList<>(collection);
         list.add(element);
         return list;
     }

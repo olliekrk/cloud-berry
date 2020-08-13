@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import com.cloudberry.cloudberry.util.FileSystemUtils;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -15,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -55,19 +56,14 @@ public class RawDataRest {
                                   @RequestPart(required = false) Map<String, String> headersKeys,
                                   @RequestPart(required = false) Map<String, String> headersMeasurements) {
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);
-        try {
-            return FileSystemUtils.<ObjectId>withTemporaryFile(
-                    file,
-                    temporaryFilePath -> {
-                        try {
-                            return logsImporterService.importAgeFile(temporaryFilePath.toFile(), importDetails, experimentName);
-                        } catch (IOException e) {
-                            throw new FileImportException(e);
-                        }
-                    }
-            );
-        } catch (IOException e) {
-            throw new FileImportException(e);
-        }
+        return Try.of(() -> FileSystemUtils.withTemporaryFile(
+                file,
+                temporaryFilePath -> importAgeFile(experimentName, importDetails, temporaryFilePath)
+        )).getOrElseThrow(FileImportException::new);
+    }
+
+    private ObjectId importAgeFile(String experimentName, ImportDetails importDetails, Path temporaryFilePath) {
+        return Try.of(() -> logsImporterService.importAgeFile(temporaryFilePath.toFile(), importDetails, experimentName))
+                .getOrElseThrow(FileImportException::new);
     }
 }

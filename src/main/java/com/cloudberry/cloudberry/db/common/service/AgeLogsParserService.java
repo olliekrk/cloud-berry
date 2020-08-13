@@ -9,13 +9,17 @@ import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.util.XmlUtils;
 import com.influxdb.client.write.Point;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,7 +71,7 @@ public class AgeLogsParserService {
                     configurationParameters = getXmlMap(xmlLogs);
                     configurationName = String.valueOf(configurationParameters.get("file"));
                 } else {
-                    log.warn("Header {} not parsed", lineParts[0]);
+                    log.warn("Header {} not parsed", logPrefix);
                 }
             }
         }
@@ -77,8 +81,9 @@ public class AgeLogsParserService {
                 .block();
 
         var configuration = metadataService
-                .getOrCreateConfiguration(new ExperimentConfiguration(new ObjectId(), experiment.getId(), configurationName, configurationParameters, now))
-                .block();
+                .getOrCreateConfiguration(new ExperimentConfiguration(
+                        new ObjectId(), experiment.getId(), configurationName, configurationParameters, now)
+                ).block();
 
         var evaluation = metadataService
                 .createEvaluation(new ExperimentEvaluation(new ObjectId(), configuration.getId(), now))
@@ -129,7 +134,9 @@ public class AgeLogsParserService {
         String logKey = headerKeys.get(logType);
         parameters.compute(logKey, (s, fieldNames) -> {
             if (fieldNames == null) {
-                return log;
+                return Arrays.stream(log)
+                        .filter(part -> !part.equals(logType))
+                        .toArray(String[]::new);
             }
             throw new IllegalArgumentException(String.format("Log with prefix [%s] already specified.", logType));
         });
@@ -141,11 +148,8 @@ public class AgeLogsParserService {
     }
 
     private Object parseValue(String value) {
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            return value;
-        }
+        return Try.of(() -> (Object) Double.parseDouble(value))
+                .getOrElse(value);
     }
 
 }
