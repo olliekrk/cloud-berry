@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class InfluxDataWriter {
     @Value("${spring.influx2.org}")
     private String defaultOrganization;
 
+    private final BucketsService bucketsService;
     private final InfluxDBClient influxClient;
 
     public <M> void writeMeasurement(M measurement) {
@@ -43,21 +45,8 @@ public class InfluxDataWriter {
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
         try (var writeApi = influxClient.getWriteApi()) {
             var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
-            createBucketIfAbsent(bucket);
+            bucketsService.createBucket(bucket);
             writeApi.writePoints(bucket, defaultOrganization, List.copyOf(points));
-        }
-    }
-
-    private void createBucketIfAbsent(String bucketName) {
-        var bucketsApi = influxClient.getBucketsApi();
-        var existingBucket = bucketsApi.findBuckets()
-                .stream()
-                .filter(bucket -> bucket.getName().equals(bucketName))
-                .findAny();
-
-        if (existingBucket.isEmpty()) {
-            log.info("Creating new bucket: " + bucketName);
-            bucketsApi.createBucket(bucketName, defaultOrganization);
         }
     }
 

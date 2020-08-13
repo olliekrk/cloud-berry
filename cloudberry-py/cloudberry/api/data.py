@@ -7,7 +7,7 @@ from .config import CloudberryConfig, CloudberryApi
 
 
 class DataFilters:
-    def __init__(self, tags: dict, fields: dict) -> None:
+    def __init__(self, tags: dict = None, fields: dict = None) -> None:
         self.tags = tags
         self.fields = fields
 
@@ -19,13 +19,14 @@ class Data(CloudberryApi):
         self.base_url = f'{config.base_url()}/raw'
 
     def save_data(self,
-                  computation_data: List[DataPoint],
+                  data: List[DataPoint],
                   measurement_name: str = None,
                   bucket_name: str = None) -> bool:
-        url = f'{self.base_url}/save/{measurement_name}'
+        url = f'{self.base_url}/save'
         params = Data._build_params(measurement_name, bucket_name)
 
-        converted_data = list(map(lambda d: d.__dict__, computation_data))
+        converted_data = list(map(lambda d: d.__dict__, data))
+
         response = requests.post(url, params=params, json=converted_data)
         return response.ok
 
@@ -33,7 +34,7 @@ class Data(CloudberryApi):
                  filters: DataFilters,
                  measurement_name: str = None,
                  bucket_name: str = None) -> DataSeries:
-        url = f'{self.base_url}/find/{measurement_name}'
+        url = f'{self.base_url}/find'
         params = Data._build_params(measurement_name, bucket_name)
 
         response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
@@ -43,7 +44,7 @@ class Data(CloudberryApi):
                     filters: DataFilters,
                     measurement_name: str = None,
                     bucket_name: str = None) -> bool:
-        url = f'{self.base_url}/delete/{measurement_name}'
+        url = f'{self.base_url}/delete'
         params = Data._build_params(measurement_name, bucket_name)
 
         response = requests.post(url, params=params, json=Data._build_filters_dto(filters))

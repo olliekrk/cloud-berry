@@ -1,10 +1,7 @@
-import matplotlib.pyplot as plt
 import pandas as pd
-from .plots import DataSeriesPlots
 
 
 # wrapper classes
-
 
 class DataPoint:
     def __init__(self, time, fields, tags) -> None:
@@ -23,9 +20,6 @@ class DataSeries:
         df = pd.DataFrame(self.data)
         df['series_name'] = self.series_name
         return df
-
-    def plots(self) -> DataSeriesPlots:
-        return DataSeriesPlots(self)
 
     @staticmethod
     def get_data_series(raw_series: list) -> list:

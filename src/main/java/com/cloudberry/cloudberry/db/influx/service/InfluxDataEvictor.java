@@ -36,15 +36,6 @@ public class InfluxDataEvictor {
                 .delete(start, stop, buildDeletePredicate(measurementName, tags), bucket, defaultOrganization);
     }
 
-    public void deleteBucket(@NonNull String bucketName) {
-        influxClient.getBucketsApi()
-                .findBuckets()
-                .stream()
-                .filter(bucket -> bucket.getName().equals(bucketName))
-                .findAny()
-                .ifPresent(bucket -> influxClient.getBucketsApi().deleteBucket(bucket.getId()));
-    }
-
     private static String buildDeletePredicate(@Nullable String measurementName,
                                                Map<String, String> tags) {
         // build predicates set using tags

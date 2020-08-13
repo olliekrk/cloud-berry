@@ -1,12 +1,8 @@
-from .config import CloudberryConfig, CloudberryApi
-from typing import List
 import requests
+from typing import List
 
-# TODO:
-# - make measurementName optional on backend <- DONE
-# - wrap json results in some wrapper class <- DONE
-# - update example notebook
-from .. import DataSeries
+from .config import CloudberryApi, CloudberryConfig
+from .wrappers import DataSeries
 
 
 class Analytics(CloudberryApi):

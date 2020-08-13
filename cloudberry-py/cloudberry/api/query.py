@@ -11,6 +11,6 @@ class Query(CloudberryApi):
     def query(self, raw_query: str, raw=False):
         r = requests.post(f'{self.base_url}/query', data=raw_query)
         if raw:
-            return r.text
+            return r.content
         else:
             return r.json()

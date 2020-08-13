@@ -1,5 +1,4 @@
-from cloudberry import CloudberryConfig
-from cloudberry.api.config import CloudberryApi
+from .config import CloudberryConfig, CloudberryApi
 
 
 class Metadata(CloudberryApi):
