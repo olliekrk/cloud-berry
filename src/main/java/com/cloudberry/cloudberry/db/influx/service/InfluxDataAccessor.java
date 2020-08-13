@@ -1,14 +1,12 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.cloudberry.cloudberry.util.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
-import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +14,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j

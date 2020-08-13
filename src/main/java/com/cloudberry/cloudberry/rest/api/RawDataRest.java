@@ -10,6 +10,7 @@ import com.cloudberry.cloudberry.service.api.RawDataService;
 import com.cloudberry.cloudberry.util.FileSystemUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,17 +50,17 @@ public class RawDataRest {
     }
 
     @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public boolean uploadAgeFile(@PathVariable String experimentName,
-                                 @RequestPart MultipartFile file,
-                                 @RequestPart Map<String, String> headersKeys,
-                                 @RequestPart Map<String, String> headersMeasurements) {
+    public ObjectId uploadAgeFile(@PathVariable String experimentName,
+                                  @RequestPart MultipartFile file,
+                                  @RequestPart(required = false) Map<String, String> headersKeys,
+                                  @RequestPart(required = false) Map<String, String> headersMeasurements) {
         var importDetails = new ImportDetails(headersKeys, headersMeasurements);
         try {
-            return FileSystemUtils.withTemporaryFile(
+            return FileSystemUtils.<ObjectId>withTemporaryFile(
                     file,
                     temporaryFilePath -> {
                         try {
-                            logsImporterService.importAgeFile(temporaryFilePath.toFile(), importDetails, experimentName);
+                            return logsImporterService.importAgeFile(temporaryFilePath.toFile(), importDetails, experimentName);
                         } catch (IOException e) {
                             throw new FileImportException(e);
                         }
