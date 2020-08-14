@@ -1,18 +1,13 @@
-package com.cloudberry.cloudberry.db.common.service;
+package com.cloudberry.cloudberry.db.common.service.age.parsing;
 
 import com.cloudberry.cloudberry.db.common.data.ImportDetails;
-import com.cloudberry.cloudberry.db.common.data.ParsedLogs;
+import com.cloudberry.cloudberry.db.common.data.SimpleParsedExperiment;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
-import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.util.XmlUtils;
 import com.influxdb.client.write.Point;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,15 +24,11 @@ import static java.lang.Long.parseLong;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AgeLogsParserService {
-    @Value("${influx.buckets.default-logs}")
-    private String defaultLogsBucketName;
+public class SimpleLogsParser {
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
-    private final MetadataService metadataService;
 
-    public ParsedLogs parseFile(File file, String experimentName, ImportDetails importDetails) throws IOException {
-        var now = Instant.now();
+    public SimpleParsedExperiment parseFile(File file, ImportDetails importDetails) throws IOException {
         var headerKeys = importDetails.getHeadersKeys();
         var headerMeasurements = importDetails.getHeadersMeasurements();
         var headerParameters = new HashMap<String, String[]>();
@@ -76,24 +66,7 @@ public class AgeLogsParserService {
             }
         }
 
-        var experiment = metadataService
-                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
-                .block();
-
-        var configuration = metadataService
-                .getOrCreateConfiguration(new ExperimentConfiguration(
-                        new ObjectId(), experiment.getId(), configurationName, configurationParameters, now)
-                ).block();
-
-        var evaluation = metadataService
-                .createEvaluation(new ExperimentEvaluation(new ObjectId(), configuration.getId(), now))
-                .block();
-
-        dataPoints.forEach(point ->
-                point.addTag(InfluxDefaults.CommonTags.EVALUATION_ID, evaluation.getId().toHexString())
-        );
-
-        return new ParsedLogs(defaultLogsBucketName, dataPoints, configuration, evaluation);
+        return new SimpleParsedExperiment(configurationName, configurationParameters, dataPoints);
     }
 
     private Map<String, Object> getXmlMap(List<String> xmlLogs) {
@@ -149,7 +122,7 @@ public class AgeLogsParserService {
 
     private Object parseValue(String value) {
         return Try.of(() -> (Object) Double.parseDouble(value))
+                .orElse(Try.of(() -> (Object) Boolean.parseBoolean(value)))
                 .getOrElse(value);
     }
-
 }

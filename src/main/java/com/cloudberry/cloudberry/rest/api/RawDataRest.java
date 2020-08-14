@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.db.common.data.ImportDetails;
-import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
+import com.cloudberry.cloudberry.db.common.service.age.parsing.LogsImporterService;
 import com.cloudberry.cloudberry.model.statistics.DataPoint;
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
