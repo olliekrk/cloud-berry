@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from .wrappers import DataSeries
 
 DEFAULT_PLOT_SIZE = (15, 5)
-DEFAULT_PLOT_KIND = 'scatter'
 DEFAULT_PLOT_COLOR = 'red'
+ERROR_COLOR_RGB = (1, 0, 0)
 
 
 class DataSeriesPlots:
@@ -16,16 +16,22 @@ class DataSeriesPlots:
     def show(self,
              x_field: str,
              y_field: str,
+             yerr_field: str = None,
              figsize=DEFAULT_PLOT_SIZE,
-             kind=DEFAULT_PLOT_KIND,
-             title=None) -> plt.Axes:
+             title: str = None) -> plt.Axes:
         df = self.series.as_data_frame
-        axes = df.plot(x=x_field,
-                       y=y_field,
-                       color=DataSeriesPlots._get_series_color(self.series),
-                       title=title,
-                       figsize=figsize,
-                       kind=kind)
+        figure, axes = plt.subplots(figsize=figsize)
+        if title:
+            axes.set_title(title)
+
+        y_errors = None if yerr_field is None or yerr_field not in df else df[yerr_field]
+        axes.errorbar(x=df[x_field],
+                      y=df[y_field],
+                      yerr=y_errors,
+                      label=self.series.series_name,
+                      ecolor=ERROR_COLOR_RGB,
+                      color=DataSeriesPlots._get_series_color(self.series))
+
         plt.show()
         return axes
 
@@ -34,18 +40,22 @@ class DataSeriesPlots:
                 series: List[DataSeries],
                 x_field: str,
                 y_field: str,
+                yerr_field: str = None,
                 figsize=DEFAULT_PLOT_SIZE,
-                kind=DEFAULT_PLOT_KIND,
                 title=None) -> plt.Axes:
         figure, axes = plt.subplots(figsize=figsize)
         if title:
             axes.set_title(title)
         for ds in series:
             df = ds.as_data_frame
-            axes.plot(df[x_field],
-                      df[y_field],
-                      label=ds.series_name,
-                      color=DataSeriesPlots._get_series_color(ds))
+            y_errors = None if yerr_field is None or yerr_field not in df else df[yerr_field]
+
+            axes.errorbar(x=df[x_field],
+                          y=df[y_field],
+                          yerr=y_errors,
+                          label=ds.series_name,
+                          ecolor=ERROR_COLOR_RGB,
+                          color=DataSeriesPlots._get_series_color(ds))
         axes.legend()
         return axes
 
