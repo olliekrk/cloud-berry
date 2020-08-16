@@ -19,23 +19,23 @@ public class BestSolutionEvent extends Event {
         String WORKPLACE_ID = "workplaceId";
     }
 
-    private final ObjectId evaluationId;
+    private final ObjectId computationId;
     private final Solution solution;
     private final SolutionDetails details;
 
-    public BestSolutionEvent(ObjectId evaluationId, Solution solution, SolutionDetails details) {
-        this.evaluationId = evaluationId;
+    public BestSolutionEvent(ObjectId computationId, Solution solution, SolutionDetails details) {
+        this.computationId = computationId;
         this.solution = solution;
         this.details = details;
     }
 
     @JsonCreator
-    private BestSolutionEvent(@JsonProperty("evaluationId") ObjectId evaluationId,
+    private BestSolutionEvent(@JsonProperty("computationId") ObjectId computationId,
                               @JsonProperty("time") Instant time,
                               @JsonProperty("solution") Solution solution,
                               @JsonProperty("details") SolutionDetails details) {
         super(time);
-        this.evaluationId = evaluationId;
+        this.computationId = computationId;
         this.solution = solution;
         this.details = details;
     }

@@ -11,4 +11,9 @@ public abstract class RestRuntimeException extends RuntimeException {
         super(message);
         this.status = status;
     }
+
+    public RestRuntimeException(String message, Throwable cause, HttpStatus status) {
+        super(message, cause);
+        this.status = status;
+    }
 }

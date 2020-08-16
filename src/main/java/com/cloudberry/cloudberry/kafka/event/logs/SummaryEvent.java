@@ -12,29 +12,29 @@ import java.time.Instant;
 public class SummaryEvent extends Event {
 
     public interface Fields {
-        String BEST_EVALUATION = "bestEvaluation";
-        String EVALUATIONS_COUNT = "evaluationsCount";
+        String BEST_COMPUTATION = "bestComputation";
+        String COMPUTATIONS_COUNT = "computationsCount";
     }
 
-    private final ObjectId evaluationId;
-    private final double bestEvaluation;
-    private final long evaluationsCount;
+    private final ObjectId computationId;
+    private final double bestComputation;
+    private final long computationsCount;
 
-    public SummaryEvent(ObjectId evaluationId, double bestEvaluation, long evaluationsCount) {
-        this.evaluationId = evaluationId;
-        this.bestEvaluation = bestEvaluation;
-        this.evaluationsCount = evaluationsCount;
+    public SummaryEvent(ObjectId computationId, double bestComputation, long computationsCount) {
+        this.computationId = computationId;
+        this.bestComputation = bestComputation;
+        this.computationsCount = computationsCount;
     }
 
     @JsonCreator
-    private SummaryEvent(@JsonProperty("evaluationId") ObjectId evaluationId,
+    private SummaryEvent(@JsonProperty("computationId") ObjectId computationId,
                          @JsonProperty("time") Instant time,
-                         @JsonProperty("bestEvaluation") double bestEvaluation,
-                         @JsonProperty("evaluationsCount") long evaluationsCount) {
+                         @JsonProperty("bestComputation") double bestComputation,
+                         @JsonProperty("computationsCount") long computationsCount) {
         super(time);
-        this.evaluationId = evaluationId;
-        this.bestEvaluation = bestEvaluation;
-        this.evaluationsCount = evaluationsCount;
+        this.computationId = computationId;
+        this.bestComputation = bestComputation;
+        this.computationsCount = computationsCount;
     }
 
 }

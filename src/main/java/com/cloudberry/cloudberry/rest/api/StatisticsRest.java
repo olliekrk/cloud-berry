@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidEvaluationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -19,32 +19,32 @@ public class StatisticsRest {
 
     private final StatisticsService statisticsService;
 
-    @PostMapping("/compare/evaluations")
-    public List<DataSeries> compareSelectedEvaluations(@RequestParam String comparedField,
-                                                       @RequestParam String measurementName,
+    @PostMapping("/compare/computations")
+    public List<DataSeries> compareSelectedComputations(@RequestParam String comparedField,
+                                                       @RequestParam(required = false) String measurementName,
                                                        @RequestParam(required = false) String bucketName,
-                                                       @RequestBody List<String> evaluationIdsHex
-    ) throws InvalidEvaluationIdException {
-        var evaluationIds = evaluationIdsHex.stream()
+                                                       @RequestBody List<String> computationIdsHex
+    ) throws InvalidComputationIdException {
+        var computationIds = computationIdsHex.stream()
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new)
                 .collect(Collectors.toList());
 
-        if (evaluationIds.isEmpty())
-            throw new InvalidEvaluationIdException(evaluationIdsHex);
+        if (computationIds.isEmpty())
+            throw new InvalidComputationIdException(computationIdsHex);
 
-        return statisticsService.compareEvaluations(
+        return statisticsService.compareComputations(
                 comparedField,
                 measurementName,
                 bucketName,
-                evaluationIds,
+                computationIds,
                 true
         );
     }
 
-    @PostMapping("/compare/evaluations/all")
-    public List<DataSeries> compareAllEvaluationsForConfiguration(@RequestParam String comparedField,
-                                                                  @RequestParam String measurementName,
+    @PostMapping("/compare/computations/all")
+    public List<DataSeries> compareAllComputationsForConfiguration(@RequestParam String comparedField,
+                                                                  @RequestParam(required = false) String measurementName,
                                                                   @RequestParam(required = false) String bucketName,
                                                                   @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
@@ -53,7 +53,7 @@ public class StatisticsRest {
                 .map(ObjectId::new)
                 .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
 
-        return statisticsService.compareEvaluationsForConfiguration(
+        return statisticsService.compareComputationsForConfiguration(
                 comparedField,
                 measurementName,
                 bucketName,
@@ -64,7 +64,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/configurations")
     public List<DataSeries> compareSelectedConfigurations(@RequestParam String comparedField,
-                                                          @RequestParam String measurementName,
+                                                          @RequestParam(required = false) String measurementName,
                                                           @RequestParam(required = false) String bucketName,
                                                           @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
@@ -86,7 +86,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/configurations/all")
     public List<DataSeries> compareAllConfigurationsForExperiment(@RequestParam String comparedField,
-                                                                  @RequestParam String measurementName,
+                                                                  @RequestParam(required = false) String measurementName,
                                                                   @RequestParam(required = false) String bucketName,
                                                                   @RequestParam String experimentName
     ) {

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LogsEventProcessor implements EventProcessor<Event> {
     @Value("${influx.buckets.default-logs}")
-    private String evaluationLogsBucketName;
+    private String computationLogsBucketName;
     private final InfluxDataWriter influxDataWriter;
     private final LogsEventToPointConverter logsEventToPointConverter;
 
@@ -33,7 +33,7 @@ public class LogsEventProcessor implements EventProcessor<Event> {
         }
 
         if (point != null) {
-            influxDataWriter.writePoint(evaluationLogsBucketName, point);
+            influxDataWriter.writePoint(computationLogsBucketName, point);
         }
     }
 

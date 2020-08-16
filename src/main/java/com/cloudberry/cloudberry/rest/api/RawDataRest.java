@@ -1,22 +1,21 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.db.common.data.ImportDetails;
-import com.cloudberry.cloudberry.db.common.service.LogsImporterService;
-import com.cloudberry.cloudberry.rest.dto.ComputationLogDto;
-import com.cloudberry.cloudberry.rest.dto.LogFilters;
-import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
+import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
+import com.cloudberry.cloudberry.model.statistics.DataPoint;
+import com.cloudberry.cloudberry.model.statistics.DataSeries;
+import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
+import com.cloudberry.cloudberry.rest.dto.DataFilters;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -27,53 +26,57 @@ import java.util.Map;
 public class RawDataRest {
 
     private final RawDataService rawDataService;
-    private final LogsImporterService logsImporterService;
 
-    @PostMapping("/save/{measurementName}")
-    public void saveComputationLogs(@PathVariable String measurementName,
-                                    @RequestParam(required = false) String bucketName,
-                                    @RequestBody List<ComputationLogDto> computationLogs) {
-        rawDataService.saveComputationLogs(measurementName, bucketName, computationLogs);
+    @PostMapping("/save")
+    public void saveData(@RequestParam(required = false) String bucketName,
+                         @RequestParam(required = false) String measurementName,
+                         @RequestBody List<DataPoint> dataPoints) {
+        rawDataService.saveData(bucketName, measurementName, dataPoints);
     }
 
-    @PostMapping(value = "/find/{measurementName}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<Map<String, Object>> findComputationLogs(@PathVariable String measurementName,
-                                                         @RequestParam(required = false) String bucketName,
-                                                         @RequestBody LogFilters filters) {
-        return rawDataService.findComputationLogs(measurementName, bucketName, filters);
+    @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public DataSeries findData(@RequestParam(required = false) String bucketName,
+                               @RequestParam(required = false) String measurementName,
+                               @RequestBody DataFilters filters) {
+        return rawDataService.findData(bucketName, measurementName, filters);
     }
 
-    @DeleteMapping("/{measurementName}")
-    public void deleteComputationLogs(@PathVariable String measurementName,
-                                      @RequestParam(required = false) String bucketName) {
-        rawDataService.deleteComputationLogs(measurementName, bucketName);
+    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteData(@RequestParam(required = false) String bucketName,
+                           @RequestParam(required = false) String measurementName,
+                           @RequestBody DataFilters filters) {
+        rawDataService.deleteData(bucketName, measurementName, filters);
     }
 
-    @PostMapping(value = "/file/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public boolean uploadDataFile(@PathVariable String experimentName,
+    @PostMapping(value = "/ageFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ObjectId uploadAgeFile(@PathVariable String experimentName,
                                   @RequestPart MultipartFile file,
-                                  @RequestPart Map<String, String> headersKeys,
-                                  @RequestPart Map<String, String> headersMeasurements) throws RestException {
-        Path tmpPath = null;
-        var ok = true;
-        var importDetails = new ImportDetails(headersKeys, headersMeasurements);
-        try {
-            tmpPath = createTemporaryFile(file.getOriginalFilename());
-            file.transferTo(tmpPath);
-            logsImporterService.importExperimentFile(tmpPath.toFile(), importDetails, experimentName);
-        } catch (IOException e) {
-            throw new FileImportException(e);
-        } finally {
-            if (tmpPath != null) {
-                ok = tmpPath.toFile().delete();
-            }
-        }
-
-        return ok;
+                                  @RequestPart(required = false) Map<String, String> headersKeys,
+                                  @RequestPart(required = false) Map<String, String> headersMeasurements) {
+        var uploadDetails = new AgeUploadDetails(headersKeys, headersMeasurements);
+        return rawDataService.uploadAgeFile(file, experimentName, uploadDetails);
     }
 
-    private static Path createTemporaryFile(String originalFileName) throws IOException {
-        var prefix = "log_" + Instant.now().toEpochMilli() + "_";
-        return Files.createTempFile(prefix, originalFileName);
+    @PostMapping(value = "/csvFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ObjectId uploadCsvFile(@PathVariable String experimentName,
+                                  @RequestPart MultipartFile file,
+                                  @RequestPart(required = false) List<String> tags,
+                                  @RequestParam String configurationId,
+                                  @RequestParam(required = false) String computationId,
+                                  @RequestParam(required = false) String measurementName) throws RestException {
+        if (!ObjectId.isValid(configurationId))
+            throw new InvalidConfigurationIdException(List.of(configurationId));
+
+        if (computationId != null && !ObjectId.isValid(computationId))
+            throw new InvalidComputationIdException(List.of(computationId));
+
+        var uploadDetails = new CsvUploadDetails(
+                tags == null ? List.of() : tags,
+                new ObjectId(configurationId),
+                computationId == null ? new ObjectId() : new ObjectId(computationId),
+                measurementName
+        );
+        return rawDataService.uploadCsvFile(file, experimentName, uploadDetails);
     }
+
 }
