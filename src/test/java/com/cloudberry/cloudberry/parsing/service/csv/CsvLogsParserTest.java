@@ -19,10 +19,10 @@ public class CsvLogsParserTest {
     @Test
     public void parseFile_NonEmptyFileWithTags_ShouldParseAllFieldsAndTags() throws IOException {
         var file = FilesUtils.getFileFromResources("testLogs/testCsv.csv");
-        var evaluationId = new ObjectId();
+        var computationId = new ObjectId();
         var measurementName = "CsvLogsParserTest_Measurement";
         var tagsNames = List.of("TAG1", "TAG2", "TAG3");
-        var details = new CsvUploadDetails(tagsNames, new ObjectId(), evaluationId, measurementName);
+        var details = new CsvUploadDetails(tagsNames, new ObjectId(), computationId, measurementName);
 
         var result = csvLogsParser.parseFile(file, details);
         var points = result.getPoints();
@@ -38,9 +38,9 @@ public class CsvLogsParserTest {
         Assertions.assertNotNull(tags);
         Assertions.assertNotNull(fields);
         Assertions.assertNotNull(time);
-        Assertions.assertEquals(tagsNames.size() + 1, tags.size()); // +1 for evaluation id tag
+        Assertions.assertEquals(tagsNames.size() + 1, tags.size()); // +1 for computation id tag
         Assertions.assertTrue(tagsNames.stream().allMatch(tags::containsKey));
-        Assertions.assertTrue(tags.containsKey(InfluxDefaults.CommonTags.EVALUATION_ID));
+        Assertions.assertTrue(tags.containsKey(InfluxDefaults.CommonTags.COMPUTATION_ID));
         Assertions.assertTrue(tagsNames.stream().noneMatch(fields::containsKey));
         Assertions.assertEquals(1234567e6, time.longValue()); // reads from file as millis, stores as nano
     }

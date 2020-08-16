@@ -33,16 +33,16 @@ public class OnStartupRunner implements ApplicationRunner {
         // good place for quick dev testing
     }
 
-    private void sendSampleProblem(ObjectId evaluationId) {
-        var problemEvent = new MetadataEvent(evaluationId, "No problem at all", Map.of(), Map.of());
+    private void sendSampleProblem(ObjectId computationId) {
+        var problemEvent = new MetadataEvent(computationId, "No problem at all", Map.of(), Map.of());
         IntStream.range(0, 1).forEach(__ -> kafkaTemplate.send(KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC, problemEvent));
     }
 
-    private void sendSampleLogs(ObjectId evaluationId) {
-        var workplaceEvent = new WorkplaceEvent(evaluationId, 1L, Map.of());
-        var summaryEvent = new SummaryEvent(evaluationId, 21.37, 1L);
+    private void sendSampleLogs(ObjectId computationId) {
+        var workplaceEvent = new WorkplaceEvent(computationId, 1L, Map.of());
+        var summaryEvent = new SummaryEvent(computationId, 21.37, 1L);
         var bestSolutionEvent = new BestSolutionEvent(
-                evaluationId,
+                computationId,
                 new Solution(Map.of()),
                 new SolutionDetails(1L, 2137L, 1L)
         );
@@ -50,7 +50,7 @@ public class OnStartupRunner implements ApplicationRunner {
                 Instant.now(),
                 "wild_logs",
                 Map.of("level", 10, "wildness", 9),
-                Map.of("evaluationId", evaluationId.toString())
+                Map.of("computationId", computationId.toString())
         );
 
         kafkaTemplate.send(KafkaTopics.Logs.WORKPLACE_TOPIC, workplaceEvent);

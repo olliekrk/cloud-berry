@@ -24,7 +24,7 @@ public class LogsImporter {
     private final CsvLogsParser csvLogsParser;
 
     /**
-     * Import file in AgE-specific format as evaluation data and return id of saved evaluation.
+     * Import file in AgE-specific format as computation data and return id of saved computation.
      */
     public ObjectId importAgeFile(File file,
                                   String experimentName,
@@ -34,7 +34,7 @@ public class LogsImporter {
         var parsedDataWithMetadata =
                 logsMetadataAppender.appendMetadata(parsedData, experimentName);
         influxDataWriter.writePoints(parsedDataWithMetadata.getBucketName(), parsedDataWithMetadata.getPoints());
-        return parsedDataWithMetadata.getExperimentEvaluation().getId();
+        return parsedDataWithMetadata.getExperimentComputation().getId();
     }
 
     public ObjectId importCsvFile(File file,
@@ -47,10 +47,10 @@ public class LogsImporter {
                         parsedData,
                         experimentName,
                         uploadDetails.getConfigurationId(),
-                        uploadDetails.getEvaluationId()
+                        uploadDetails.getComputationId()
                 );
         influxDataWriter.writePoints(parsedDataWithMetadata.getBucketName(), parsedDataWithMetadata.getPoints());
-        return parsedDataWithMetadata.getExperimentEvaluation().getId();
+        return parsedDataWithMetadata.getExperimentComputation().getId();
     }
 
 }

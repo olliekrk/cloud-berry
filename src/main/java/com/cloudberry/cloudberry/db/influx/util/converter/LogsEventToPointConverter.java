@@ -28,7 +28,7 @@ public class LogsEventToPointConverter {
                     event.getClass().getSimpleName(),
                     event.getTime(),
                     fields,
-                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+                    Map.of(InfluxDefaults.CommonTags.COMPUTATION_ID, event.getComputationId().toHexString())
             );
         };
     }
@@ -36,14 +36,14 @@ public class LogsEventToPointConverter {
     public Converter<SummaryEvent, Point> summaryEventConverter() {
         return event -> {
             Map<String, Object> fields = Map.of(
-                    SummaryEvent.Fields.BEST_EVALUATION, event.getBestEvaluation(),
-                    SummaryEvent.Fields.EVALUATIONS_COUNT, event.getEvaluationsCount()
+                    SummaryEvent.Fields.BEST_COMPUTATION, event.getBestComputation(),
+                    SummaryEvent.Fields.COMPUTATIONS_COUNT, event.getComputationsCount()
             );
             return pointBuilder.buildPoint(
                     event.getClass().getSimpleName(),
                     event.getTime(),
                     fields,
-                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+                    Map.of(InfluxDefaults.CommonTags.COMPUTATION_ID, event.getComputationId().toHexString())
             );
         };
     }
@@ -59,7 +59,7 @@ public class LogsEventToPointConverter {
                     event.getClass().getSimpleName(),
                     event.getTime(),
                     fields,
-                    Map.of(InfluxDefaults.CommonTags.EVALUATION_ID, event.getEvaluationId().toHexString())
+                    Map.of(InfluxDefaults.CommonTags.COMPUTATION_ID, event.getComputationId().toHexString())
             );
         };
     }

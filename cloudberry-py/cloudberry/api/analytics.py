@@ -12,21 +12,21 @@ class Analytics(CloudberryApi):
         super().__init__(config)
         self.base_url = f'{config.base_url()}/statistics'
 
-    def compare_evaluations(self,
-                            evaluation_ids: List[str],
+    def compare_computations(self,
+                            computation_ids: List[str],
                             compared_field: str,
                             measurement_name: str = None,
                             bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/evaluations'
+        url = f'{self.base_url}/compare/computations'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
-        return Analytics._wrap_request(lambda: requests.post(url=url, params=params, json=evaluation_ids))
+        return Analytics._wrap_request(lambda: requests.post(url=url, params=params, json=computation_ids))
 
-    def compare_evaluations_for_configuration(self,
+    def compare_computations_for_configuration(self,
                                               configuration_id: str,
                                               compared_field: str,
                                               measurement_name: str = None,
                                               bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/evaluations/all'
+        url = f'{self.base_url}/compare/computations/all'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         params['configurationIdHex'] = configuration_id
         return Analytics._wrap_request(lambda: requests.post(url=url, params=params))

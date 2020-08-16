@@ -5,7 +5,7 @@ import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class LogsMetadataAppender {
     public ParsedLogsWithMetadata appendMetadata(ParsedLogs parsedLogs,
                                                  String experimentName,
                                                  ObjectId configurationId,
-                                                 ObjectId evaluationId) {
+                                                 ObjectId computationId) {
         var now = Instant.now();
         var experiment = metadataService
                 .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
@@ -37,11 +37,11 @@ public class LogsMetadataAppender {
         var configuration = metadataService
                 .getOrCreateConfiguration(new ExperimentConfiguration(configurationId, experiment.getId(), null, Map.of(), now))
                 .block();
-        var evaluation = metadataService
-                .getOrCreateEvaluation(new ExperimentEvaluation(evaluationId, configuration.getId(), now))
+        var computation = metadataService
+                .getOrCreateComputation(new ExperimentComputation(computationId, configuration.getId(), now))
                 .block();
         
-        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, evaluation);
+        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, computation);
     }
 
     public ParsedLogsWithMetadata appendMetadata(AgeParsedLogs parsedLogs, String experimentName) {
@@ -58,14 +58,14 @@ public class LogsMetadataAppender {
                                 parsedLogs.getConfigurationParameters(),
                                 now))
                 .block();
-        var evaluation = metadataService
-                .getOrCreateEvaluation(new ExperimentEvaluation(new ObjectId(), configuration.getId(), now))
+        var computation = metadataService
+                .getOrCreateComputation(new ExperimentComputation(new ObjectId(), configuration.getId(), now))
                 .block();
         parsedLogs
                 .getPoints()
-                .forEach(point -> point.addTag(InfluxDefaults.CommonTags.EVALUATION_ID, evaluation.getId().toHexString()));
+                .forEach(point -> point.addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computation.getId().toHexString()));
 
-        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, evaluation);
+        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, computation);
     }
 
     private Mono<Experiment> getOrCreateExperiment(String experimentName, Instant time) {

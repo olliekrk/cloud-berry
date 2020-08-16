@@ -2,9 +2,9 @@ package com.cloudberry.cloudberry.db.mongo.service;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.repository.ConfigurationsRepository;
-import com.cloudberry.cloudberry.db.mongo.repository.EvaluationsRepository;
+import com.cloudberry.cloudberry.db.mongo.repository.ComputationsRepository;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +20,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MetadataService {
     private final ConfigurationsRepository configurationsRepository;
-    private final EvaluationsRepository evaluationsRepository;
+    private final ComputationsRepository computationsRepository;
     private final ExperimentsRepository experimentsRepository;
 
-    public List<ObjectId> findAllEvaluationIdsForConfiguration(ObjectId configurationId) {
-        return evaluationsRepository.findAllByConfigurationId(configurationId)
-                .map(ExperimentEvaluation::getId)
+    public List<ObjectId> findAllComputationIdsForConfiguration(ObjectId configurationId) {
+        return computationsRepository.findAllByConfigurationId(configurationId)
+                .map(ExperimentComputation::getId)
                 .collectList()
                 .block();
     }
@@ -67,12 +67,12 @@ public class MetadataService {
                 .doOnNext(next -> log.info("Created new configuration " + next.getId()));
     }
 
-    public Mono<ExperimentEvaluation> getOrCreateEvaluation(ExperimentEvaluation evaluation) {
-        return evaluationsRepository
-                .findById(evaluation.getId())
-                .doOnNext(next -> log.info("Existing evaluation " + next.getId() + " was found"))
-                .switchIfEmpty(evaluationsRepository.save(evaluation))
-                .doOnNext(next -> log.info("Created new evaluation " + next.getId()));
+    public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
+        return computationsRepository
+                .findById(computation.getId())
+                .doOnNext(next -> log.info("Existing computation " + next.getId() + " was found"))
+                .switchIfEmpty(computationsRepository.save(computation))
+                .doOnNext(next -> log.info("Created new computation " + next.getId()));
     }
 
 }

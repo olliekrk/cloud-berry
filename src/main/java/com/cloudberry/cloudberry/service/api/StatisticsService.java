@@ -35,31 +35,31 @@ public class StatisticsService {
     private final MetadataService metadataService;
     private final InfluxDataAccessor influxDataAccessor;
 
-    public List<DataSeries> compareEvaluations(String comparedField,
+    public List<DataSeries> compareComputations(String comparedField,
                                                @Nullable String measurementName,
                                                @Nullable String bucketName,
-                                               List<ObjectId> evaluationIds,
+                                               List<ObjectId> computationIds,
                                                boolean computeMean) {
-        var evaluationSeries = evaluationIds
+        var computationSeries = computationIds
                 .stream()
-                .map(id -> findEvaluationData(measurementName, bucketName, id))
+                .map(id -> findComputationData(measurementName, bucketName, id))
                 .filter(DataSeries::nonEmpty)
                 .collect(Collectors.toList());
 
         if (computeMean) {
-            return ListSyntax.with(evaluationSeries, getMeanSeries(comparedField, evaluationSeries, MEAN_SERIES_NAME));
+            return ListSyntax.with(computationSeries, getMeanSeries(comparedField, computationSeries, MEAN_SERIES_NAME));
         } else {
-            return evaluationSeries;
+            return computationSeries;
         }
     }
 
-    public List<DataSeries> compareEvaluationsForConfiguration(String comparedField,
+    public List<DataSeries> compareComputationsForConfiguration(String comparedField,
                                                                @Nullable String measurementName,
                                                                @Nullable String bucketName,
                                                                ObjectId configurationId,
                                                                boolean computeMean) {
-        var evaluationIds = metadataService.findAllEvaluationIdsForConfiguration(configurationId);
-        return compareEvaluations(comparedField, measurementName, bucketName, evaluationIds, computeMean);
+        var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+        return compareComputations(comparedField, measurementName, bucketName, computationIds, computeMean);
     }
 
     public List<DataSeries> compareConfigurations(String comparedField,
@@ -69,7 +69,7 @@ public class StatisticsService {
         return configurationIds
                 .stream()
                 .map(configurationId -> {
-                    var series = compareEvaluationsForConfiguration(
+                    var series = compareComputationsForConfiguration(
                             comparedField,
                             measurementName,
                             bucketName,
@@ -90,17 +90,17 @@ public class StatisticsService {
         return compareConfigurations(comparedField, measurementName, bucketName, configurationIds);
     }
 
-    private DataSeries findEvaluationData(@Nullable String measurementName,
+    private DataSeries findComputationData(@Nullable String measurementName,
                                           @Nullable String bucketName,
-                                          ObjectId evaluationId) {
-        var evaluationIdHex = evaluationId.toHexString();
+                                          ObjectId computationId) {
+        var computationIdHex = computationId.toHexString();
         var records = influxDataAccessor.findData(
                 bucketName,
                 measurementName,
                 Collections.emptyMap(),
-                of(InfluxDefaults.CommonTags.EVALUATION_ID, evaluationIdHex));
+                of(InfluxDefaults.CommonTags.COMPUTATION_ID, computationIdHex));
 
-        return new DataSeries(evaluationIdHex, ListSyntax.mapped(records, FluxRecord::getValues));
+        return new DataSeries(computationIdHex, ListSyntax.mapped(records, FluxRecord::getValues));
     }
 
     private DataSeries getMeanSeries(String comparedField,

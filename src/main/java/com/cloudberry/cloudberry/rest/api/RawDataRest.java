@@ -6,7 +6,7 @@ import com.cloudberry.cloudberry.model.statistics.DataSeries;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidEvaluationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
@@ -62,18 +62,18 @@ public class RawDataRest {
                                   @RequestPart MultipartFile file,
                                   @RequestPart(required = false) List<String> tags,
                                   @RequestParam String configurationId,
-                                  @RequestParam(required = false) String evaluationId,
+                                  @RequestParam(required = false) String computationId,
                                   @RequestParam(required = false) String measurementName) throws RestException {
         if (!ObjectId.isValid(configurationId))
             throw new InvalidConfigurationIdException(List.of(configurationId));
 
-        if (evaluationId != null && !ObjectId.isValid(evaluationId))
-            throw new InvalidEvaluationIdException(List.of(evaluationId));
+        if (computationId != null && !ObjectId.isValid(computationId))
+            throw new InvalidComputationIdException(List.of(computationId));
 
         var uploadDetails = new CsvUploadDetails(
                 tags == null ? List.of() : tags,
                 new ObjectId(configurationId),
-                evaluationId == null ? new ObjectId() : new ObjectId(evaluationId),
+                computationId == null ? new ObjectId() : new ObjectId(computationId),
                 measurementName
         );
         return rawDataService.uploadCsvFile(file, experimentName, uploadDetails);

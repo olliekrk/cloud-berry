@@ -14,7 +14,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @Document
-public class ExperimentEvaluation implements Timed {
+public class ExperimentComputation implements Timed {
     @Id
     private ObjectId id;
     @Indexed

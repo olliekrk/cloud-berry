@@ -17,23 +17,23 @@ public class WorkplaceEvent extends Event implements Parametrized<String, Object
         String WORKPLACE_ID = "workplaceId";
     }
 
-    private final ObjectId evaluationId;
+    private final ObjectId computationId;
     private final long workplaceId;
     private final Map<String, Object> parameters;
 
-    public WorkplaceEvent(ObjectId evaluationId, long workplaceId, Map<String, Object> parameters) {
-        this.evaluationId = evaluationId;
+    public WorkplaceEvent(ObjectId computationId, long workplaceId, Map<String, Object> parameters) {
+        this.computationId = computationId;
         this.workplaceId = workplaceId;
         this.parameters = parameters;
     }
 
     @JsonCreator
-    private WorkplaceEvent(@JsonProperty("evaluationId") ObjectId evaluationId,
+    private WorkplaceEvent(@JsonProperty("computationId") ObjectId computationId,
                            @JsonProperty("time") Instant time,
                            @JsonProperty("workplaceId") long workplaceId,
                            @JsonProperty("parameters") Map<String, Object> parameters) {
         super(time);
-        this.evaluationId = evaluationId;
+        this.computationId = computationId;
         this.workplaceId = workplaceId;
         this.parameters = parameters;
     }

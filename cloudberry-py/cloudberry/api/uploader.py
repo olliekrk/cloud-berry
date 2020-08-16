@@ -15,7 +15,7 @@ class FileUploader(CloudberryApi):
         super().__init__(config)
 
     def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails):
-        """Upload experiment data from file under given path and return ID of saved evaluation"""
+        """Upload experiment data from file under given path and return ID of saved computation"""
         pass
 
 
@@ -45,11 +45,11 @@ class CsvUploadDetails(UploadDetails):
     def __init__(self,
                  tags_names,
                  configuration_id,
-                 evaluation_id=None,
+                 computation_id=None,
                  measurement_name=None) -> None:
         self.tags_names = tags_names
         self.configuration_id = configuration_id
-        self.evaluation_id = evaluation_id
+        self.computation_id = computation_id
         self.measurement_name = measurement_name
 
 
@@ -59,8 +59,8 @@ class CsvFileUploader(FileUploader):
         with open(file_path, 'rb') as file:
             url = f'{self.config.base_url()}/raw/csvFile/{experiment_name}'
             params = {'configurationId': details.configuration_id}
-            if details.evaluation_id is not None:
-                params['evaluationId'] = details.evaluation_id
+            if details.computation_id is not None:
+                params['computationId'] = details.computation_id
             if details.measurement_name is not None:
                 params['measurementName'] = details.measurement_name
             r = requests.post(url,

@@ -26,9 +26,9 @@ public class CsvUploadDetails implements UploadDetails {
     ObjectId configurationId;
 
     /**
-     * Evaluation id of uploaded data. If none is given, then it is assumes that data is from new evaluation.
+     * Computation id of uploaded data. If none is given, then it is assumes that data is from new computation.
      */
-    ObjectId evaluationId;
+    ObjectId computationId;
 
     /**
      * Measurement name with which the data should be marked. If none is given, default one will be used.

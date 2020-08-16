@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.kafka.processing.processor;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.kafka.processing.EventProcessor;
@@ -25,8 +25,8 @@ public class MetadataEventProcessor implements EventProcessor<MetadataEvent> {
                 .flatMap(metadataService::getOrCreateExperiment)
                 .map(experiment -> extractConfigurationData(event, experiment.getId()))
                 .flatMap(metadataService::getOrCreateConfiguration)
-                .map(configuration -> extractEvaluationData(event, configuration.getId()))
-                .flatMap(metadataService::getOrCreateEvaluation)
+                .map(configuration -> extractComputationData(event, configuration.getId()))
+                .flatMap(metadataService::getOrCreateComputation)
                 .subscribe();
     }
 
@@ -48,9 +48,9 @@ public class MetadataEventProcessor implements EventProcessor<MetadataEvent> {
         );
     }
 
-    private static ExperimentEvaluation extractEvaluationData(MetadataEvent event, ObjectId configurationId) {
-        return new ExperimentEvaluation(
-                event.getEvaluationId(),
+    private static ExperimentComputation extractComputationData(MetadataEvent event, ObjectId configurationId) {
+        return new ExperimentComputation(
+                event.getComputationId(),
                 configurationId,
                 event.getTime()
         );

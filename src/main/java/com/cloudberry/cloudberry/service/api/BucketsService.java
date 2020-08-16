@@ -36,7 +36,10 @@ public class BucketsService {
     public void deleteBucket(String bucketName) {
         var buckets = bucketsApi();
         Optional.ofNullable(buckets.findBucketByName(bucketName))
-                .ifPresent(buckets::deleteBucket);
+                .ifPresent(bucket -> {
+                    log.info("Deleting bucket: " + bucketName);
+                    buckets.deleteBucket(bucket);
+                });
     }
 
     private Optional<Bucket> findBucketByName(String bucketName) {

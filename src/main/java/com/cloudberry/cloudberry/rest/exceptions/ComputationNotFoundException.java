@@ -7,10 +7,10 @@ import org.springframework.http.HttpStatus;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class EvaluationNotFoundException extends RestException {
+public class ComputationNotFoundException extends RestException {
     public static final HttpStatus status = HttpStatus.NOT_FOUND;
 
-    public EvaluationNotFoundException(ObjectId id) {
-        super("Evaluation " + id + " not found", status);
+    public ComputationNotFoundException(ObjectId id) {
+        super("Computation " + id + " not found", status);
     }
 }

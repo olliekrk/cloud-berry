@@ -13,6 +13,6 @@ public interface InfluxDefaults {
     }
 
     interface CommonTags {
-        String EVALUATION_ID = "evaluationId";
+        String COMPUTATION_ID = "computationId";
     }
 }

@@ -35,7 +35,7 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
     @Override
     public ParsedLogs parseFile(File file, CsvUploadDetails details) throws IOException {
         var measurementName = Optional.ofNullable(details.getMeasurementName()).orElse(defaultMeasurementName);
-        var evaluationId = details.getEvaluationId().toHexString();
+        var computationId = details.getComputationId().toHexString();
 
         Function<Map<String, String>, Map<String, String>> getTags =
                 values -> details.getTagsNames()
@@ -56,7 +56,7 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
                 return Point.measurement(measurementName)
                         .time(parseTime(recordValues.get(TIME_COLUMN_NAME)), InfluxDefaults.WRITE_PRECISION)
                         .addTags(getTags.apply(recordValues))
-                        .addTag(InfluxDefaults.CommonTags.EVALUATION_ID, evaluationId)
+                        .addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computationId)
                         .addFields(getFields.apply(recordValues));
             });
 

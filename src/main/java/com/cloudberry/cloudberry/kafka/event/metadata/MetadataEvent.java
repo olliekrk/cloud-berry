@@ -14,35 +14,35 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * An initial event, received at the beginning of each evaluation.
+ * An initial event, received at the beginning of each computation.
  * Contains information about configuration used, problem type and other metadata.
  */
 @ToString(callSuper = true)
 @Getter
 public class MetadataEvent extends Event implements Parametrized<String, Object> {
     private final String experimentName;
-    private final ObjectId evaluationId;
+    private final ObjectId computationId;
     private final Map<String, Object> experimentParameters;
     private final Map<String, Object> configurationParameters;
 
-    public MetadataEvent(ObjectId evaluationId,
+    public MetadataEvent(ObjectId computationId,
                          String experimentName,
                          Map<String, Object> experimentParameters,
                          Map<String, Object> configurationParameters) {
-        this.evaluationId = evaluationId;
+        this.computationId = computationId;
         this.experimentName = experimentName;
         this.experimentParameters = experimentParameters;
         this.configurationParameters = configurationParameters;
     }
 
     @JsonCreator
-    private MetadataEvent(@JsonProperty("evaluationId") ObjectId evaluationId,
+    private MetadataEvent(@JsonProperty("computationId") ObjectId computationId,
                           @JsonProperty("time") Instant time,
                           @JsonProperty("experimentName") String experimentName,
                           @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
                           @JsonProperty("configurationParameters") Map<String, Object> configurationParameters) {
         super(time);
-        this.evaluationId = evaluationId;
+        this.computationId = computationId;
         this.experimentName = experimentName;
         this.experimentParameters = experimentParameters;
         this.configurationParameters = configurationParameters;
