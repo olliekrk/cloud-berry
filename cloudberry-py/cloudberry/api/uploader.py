@@ -2,10 +2,24 @@ import json
 
 import requests
 
-from .config import CloudberryConfig
+from .config import CloudberryConfig, CloudberryApi
 
 
 class UploadDetails:
+    """Marker class, used to deliver all necessary information to successfully upload and parse data file"""
+    pass
+
+
+class FileUploader(CloudberryApi):
+    def __init__(self, config: CloudberryConfig) -> None:
+        super().__init__(config)
+
+    def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails):
+        """Upload experiment data from file under given path and return ID of saved evaluation"""
+        pass
+
+
+class AgeUploadDetails(UploadDetails):
     def __init__(self,
                  headers_keys=None,
                  headers_measurements=None) -> None:
@@ -13,20 +27,11 @@ class UploadDetails:
         self.headers_measurements = headers_measurements
 
 
-class FileUploader:
-    def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails):
-        """Upload experiment data from file under given path and return ID of saved evaluation"""
-        pass
-
-
 class AgeFileUploader(FileUploader):
 
-    def __init__(self, config: CloudberryConfig) -> None:
-        self.config = config
-
-    def upload_file(self, file_name, experiment_name: str, details: UploadDetails) -> str:
-        with open(file_name, 'rb') as file:
-            url = f'{self.config.base_url()}/raw/file/{experiment_name}'
+    def upload_file(self, file_path: str, experiment_name: str, details: AgeUploadDetails) -> str:
+        with open(file_path, 'rb') as file:
+            url = f'{self.config.base_url()}/raw/ageFile/{experiment_name}'
             r = requests.post(url, files={
                 'file': file,
                 'headersKeys': (None, json.dumps(details.headers_keys), 'application/json'),
@@ -35,6 +40,16 @@ class AgeFileUploader(FileUploader):
             return r.json()
 
 
+class CsvUploadDetails(UploadDetails):
+    pass
+
+
 class CsvFileUploader(FileUploader):
-    def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails):
-        pass  # todo
+
+    def upload_file(self, file_path: str, experiment_name: str, details: CsvUploadDetails):
+        with open(file_path, 'rb') as file:
+            url = f'{self.config.base_url()}/raw/csvFile/{experiment_name}'
+            r = requests.post(url, files={
+                'file': file,
+            })
+            return r.json()

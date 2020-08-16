@@ -1,16 +1,15 @@
-package com.cloudberry.cloudberry.db.common.service.age.parsing;
+package com.cloudberry.cloudberry.parsing.service.age;
 
-import com.cloudberry.cloudberry.db.common.data.ImportDetails;
-import com.cloudberry.cloudberry.db.common.data.SimpleParsedExperiment;
+import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
+import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.parsing.service.LogsParser;
 import com.cloudberry.cloudberry.util.XmlUtils;
 import com.cloudberry.cloudberry.util.syntax.ArraySyntax;
 import com.cloudberry.cloudberry.util.syntax.MapSyntax;
 import com.influxdb.client.write.Point;
-import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.Streams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,24 +20,21 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.lang.Long.parseLong;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SimpleLogsParser {
+public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
-    private static final String LOG_TIME_COLUMN = "TIME";
 
-    public SimpleParsedExperiment parseFile(File file, ImportDetails importDetails) throws IOException {
-        var logHeadersKeys = importDetails.getHeadersKeys();
-        var logMeasurements = importDetails.getHeadersMeasurements();
+    @Override
+    public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails) throws IOException {
+        var logHeadersKeys = uploadDetails.getHeadersKeys();
+        var logMeasurements = uploadDetails.getHeadersMeasurements();
         var logParametersOrder = new HashMap<String, String[]>();
         String configurationName = null;
         Map<String, Object> configurationParameters = null;
@@ -83,7 +79,7 @@ public class SimpleLogsParser {
             }
         }
 
-        return new SimpleParsedExperiment(configurationName, configurationParameters, dataPoints);
+        return new AgeParsedLogs(dataPoints, configurationName, configurationParameters);
     }
 
     private Map<String, Object> getXmlMap(List<String> xmlLogs) {
@@ -92,7 +88,7 @@ public class SimpleLogsParser {
                 .collect(
                         Collectors.toMap(
                                 log -> log[0].trim(),
-                                log -> parseValue(log[1].trim())
+                                log -> parseField(log[1].trim())
                         )
                 );
     }
@@ -104,10 +100,10 @@ public class SimpleLogsParser {
         var parametersValues = ArraySyntax.linkedList(parametersValuesRaw);
 
         // extract time field
-        var timeIndex = Arrays.asList(parametersNames).indexOf(LOG_TIME_COLUMN);
+        var timeIndex = Arrays.asList(parametersNames).indexOf(TIME_COLUMN_NAME);
         Instant time = null;
         if (timeIndex >= 0) {
-            time = Instant.ofEpochMilli(Long.parseLong(parametersValues.get(timeIndex)));
+            time = parseTime(parametersValues.get(timeIndex));
             parametersNamesList.remove(timeIndex);
             parametersValues.remove(timeIndex);
         }
@@ -121,18 +117,8 @@ public class SimpleLogsParser {
                 .addFields(MapSyntax.zippedArrays(
                         parametersNamesFiltered,
                         parametersValuesFiltered,
-                        SimpleLogsParser::parseValue
+                        this::parseField
                 ));
     }
 
-    private Map<String, Object> getMapFromArrays(String[] keys, String[] values) {
-        return IntStream.range(0, keys.length).boxed()
-                .collect(Collectors.toMap(i -> keys[i], i -> parseValue(values[i])));
-    }
-
-    private static Object parseValue(String value) {
-        return Try.of(() -> (Object) Double.parseDouble(value))
-                .orElse(Try.of(() -> (Object) Boolean.parseBoolean(value)))
-                .getOrElse(value);
-    }
 }

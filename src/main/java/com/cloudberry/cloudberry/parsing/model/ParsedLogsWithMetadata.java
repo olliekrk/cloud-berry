@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.common.data;
+package com.cloudberry.cloudberry.parsing.model;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentEvaluation;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-public class ParsedLogs {
+public class ParsedLogsWithMetadata {
     private final String bucketName;
     private final List<Point> points;
     private final ExperimentConfiguration experimentConfiguration;

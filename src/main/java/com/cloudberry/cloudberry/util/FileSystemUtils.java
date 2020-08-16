@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.function.Function;
 
+@Slf4j
 public abstract class FileSystemUtils {
 
     public static <R> R withTemporaryFile(MultipartFile file,
@@ -19,7 +21,9 @@ public abstract class FileSystemUtils {
             return temporaryFilePathAction.apply(temporaryFilePath);
         } finally {
             if (temporaryFilePath != null) {
-                temporaryFilePath.toFile().delete();
+                if (!temporaryFilePath.toFile().delete()) {
+                    log.error("Failed to delete temporary file: " + temporaryFilePath.toString());
+                }
             }
         }
     }

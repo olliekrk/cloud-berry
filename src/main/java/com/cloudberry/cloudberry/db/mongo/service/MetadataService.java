@@ -41,35 +41,37 @@ public class MetadataService {
 
     public Mono<Experiment> getOrCreateExperiment(Experiment experiment) {
         return experimentsRepository
-                .findAllByName(experiment.getName())
-                .filter(existing -> existing.getParameters().equals(experiment.getParameters()))
-                .limitRequest(1)
-                .doOnNext(next -> log.info("Existing experiment " + next.getId() + " was found"))
-                .next()
+                .findById(experiment.getId())
                 .switchIfEmpty(
-                        experimentsRepository
-                                .save(experiment)
-                                .doOnNext(next -> log.info("Created new experiment " + next.getId()))
-                );
+                        experimentsRepository.findAllByName(experiment.getName())
+                                .filter(existing -> existing.getParameters().equals(experiment.getParameters()))
+                                .limitRequest(1)
+                                .next()
+                )
+                .doOnNext(next -> log.info("Existing experiment " + next.getId() + " was found"))
+                .switchIfEmpty(experimentsRepository.save(experiment))
+                .doOnNext(next -> log.info("Created new experiment " + next.getId()));
     }
 
     public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
         return configurationsRepository
-                .findAllByExperimentId(configuration.getExperimentId())
-                .filter(existing -> existing.getParameters().equals(configuration.getParameters()))
-                .limitRequest(1)
-                .doOnNext(next -> log.info("Existing configuration " + next.getId() + " was found"))
-                .next()
+                .findById(configuration.getId())
                 .switchIfEmpty(
-                        configurationsRepository
-                                .save(configuration)
-                                .doOnNext(next -> log.info("Created new configuration " + next.getId()))
-                );
+                        configurationsRepository.findAllByExperimentId(configuration.getExperimentId())
+                                .filter(existing -> existing.getParameters().equals(configuration.getParameters()))
+                                .limitRequest(1)
+                                .next()
+                )
+                .doOnNext(next -> log.info("Existing configuration " + next.getId() + " was found"))
+                .switchIfEmpty(configurationsRepository.save(configuration))
+                .doOnNext(next -> log.info("Created new configuration " + next.getId()));
     }
 
-    public Mono<ExperimentEvaluation> createEvaluation(ExperimentEvaluation evaluation) {
+    public Mono<ExperimentEvaluation> getOrCreateEvaluation(ExperimentEvaluation evaluation) {
         return evaluationsRepository
-                .save(evaluation)
+                .findById(evaluation.getId())
+                .doOnNext(next -> log.info("Existing evaluation " + next.getId() + " was found"))
+                .switchIfEmpty(evaluationsRepository.save(evaluation))
                 .doOnNext(next -> log.info("Created new evaluation " + next.getId()));
     }
 

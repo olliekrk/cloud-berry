@@ -1,8 +1,7 @@
-package com.cloudberry.cloudberry.db.common.service;
+package com.cloudberry.cloudberry.parsing.service.age;
 
-import com.cloudberry.cloudberry.db.common.data.ImportDetails;
-import com.cloudberry.cloudberry.db.common.data.SimpleParsedExperiment;
-import com.cloudberry.cloudberry.db.common.service.age.parsing.SimpleLogsParser;
+import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
+import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.util.FilesUtils;
 import io.vavr.control.Try;
 import org.jetbrains.annotations.NotNull;
@@ -13,9 +12,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SimpleLogsParserTest {
+class AgeLogsParserTest {
     private static final String TEST_FILE = "testLogs/testLog.log";
-    private final SimpleLogsParser simpleLogsParser = new SimpleLogsParser();
+    private final AgeLogsParser ageLogsParser = new AgeLogsParser();
 
     @Test
     void properParsedValues() {
@@ -36,15 +35,15 @@ class SimpleLogsParserTest {
     }
 
     @NotNull
-    private Try<SimpleParsedExperiment> parseTestFile(String fileName) {
-        return parseTestFile(fileName, new ImportDetails(null, null));
+    private Try<ParsedLogs> parseTestFile(String fileName) {
+        return parseTestFile(fileName, new AgeUploadDetails(null, null));
     }
 
     @NotNull
-    private Try<SimpleParsedExperiment> parseTestFile(String fileName, ImportDetails importDetails) {
-        return Try.of(() -> simpleLogsParser.parseFile(
+    private Try<ParsedLogs> parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
+        return Try.of(() -> ageLogsParser.parseFile(
                 FilesUtils.getFileFromResources(fileName),
-                importDetails
+                uploadDetails
         ));
     }
 }

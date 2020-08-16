@@ -26,7 +26,7 @@ public class MetadataEventProcessor implements EventProcessor<MetadataEvent> {
                 .map(experiment -> extractConfigurationData(event, experiment.getId()))
                 .flatMap(metadataService::getOrCreateConfiguration)
                 .map(configuration -> extractEvaluationData(event, configuration.getId()))
-                .flatMap(metadataService::createEvaluation)
+                .flatMap(metadataService::getOrCreateEvaluation)
                 .subscribe();
     }
 
