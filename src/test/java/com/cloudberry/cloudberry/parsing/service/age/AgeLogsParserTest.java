@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
+import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
-import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.util.FilesUtils;
 import io.vavr.control.Try;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +19,11 @@ class AgeLogsParserTest {
     @Test
     void properParsedValues() {
         parseTestFile(TEST_FILE)
-                .onSuccess(simpleParsedExperiment -> {
-                    assertEquals("labs-config-cuda.xml", simpleParsedExperiment.getConfigurationName());
-                    assertEquals(17, simpleParsedExperiment.getPoints().size());
+                .onSuccess(ageParsedLogs -> {
+                    assertEquals("labs-config-cuda.xml", ageParsedLogs.getConfigurationName());
+                    assertEquals(17, ageParsedLogs.getPoints().size());
 
-                    Map<String, Object> properties = simpleParsedExperiment.getConfigurationParameters();
+                    Map<String, Object> properties = ageParsedLogs.getConfigurationParameters();
                     assertEquals(12, properties.size());
 
                     assertTrue(properties.containsKey("labs.emas.mutation"));
@@ -35,12 +35,17 @@ class AgeLogsParserTest {
     }
 
     @NotNull
-    private Try<ParsedLogs> parseTestFile(String fileName) {
-        return parseTestFile(fileName, new AgeUploadDetails(null, null));
+    private Try<AgeParsedLogs> parseTestFile(String fileName) {
+        var headersKeys = Map.of(
+                "[WH]", "[W]",
+                "[SH]", "[S]",
+                "[BH]", "[B]"
+        );
+        return parseTestFile(fileName, new AgeUploadDetails(headersKeys, null));
     }
 
     @NotNull
-    private Try<ParsedLogs> parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
+    private Try<AgeParsedLogs> parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
         return Try.of(() -> ageLogsParser.parseFile(
                 FilesUtils.getFileFromResources(fileName),
                 uploadDetails

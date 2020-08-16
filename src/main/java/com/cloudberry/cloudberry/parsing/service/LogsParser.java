@@ -25,8 +25,6 @@ public interface LogsParser<D extends UploadDetails> {
     }
 
     default Object parseField(String value) {
-        return Try.of(() -> (Object) Double.parseDouble(value))
-                .orElse(Try.of(() -> (Object) Boolean.parseBoolean(value)))
-                .getOrElse(value);
+        return Try.of(() -> (Object) Double.parseDouble(value)).getOrElse(value);
     }
 }

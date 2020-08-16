@@ -7,6 +7,7 @@ import com.cloudberry.cloudberry.parsing.service.LogsParser;
 import com.cloudberry.cloudberry.util.syntax.ListSyntax;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
@@ -23,12 +24,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
-    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT;
+    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
     @Override
     public ParsedLogs parseFile(File file, CsvUploadDetails details) throws IOException {
@@ -58,6 +60,7 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
                         .addFields(getFields.apply(recordValues));
             });
 
+            log.info("Successfully read " + points.size() + " data row(s) from CSV file");
             return new ParsedLogs(points);
         }
     }
