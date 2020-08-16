@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -44,6 +43,7 @@ public class StatisticsService {
         var evaluationSeries = evaluationIds
                 .stream()
                 .map(id -> findEvaluationData(measurementName, bucketName, id))
+                .filter(DataSeries::nonEmpty)
                 .collect(Collectors.toList());
 
         if (computeMean) {
@@ -117,29 +117,22 @@ public class StatisticsService {
                 .flatMap(i -> {
                     var start = i * intervalLength;
                     var end = start + intervalLength;
-                    var mid = Instant.ofEpochMilli((long) ((start + end) / 2.));
 
-                    var bucket = joinedSeries.stream()
+                    var bucketData = joinedSeries.stream()
                             .dropWhile(dataPoint -> i != 0 && dataPoint.getKey() <= start)
                             .takeWhile(dataPoint -> dataPoint.getKey() <= end)
+                            .filter(dataPoint -> dataPoint.getValue() != null)
                             .collect(Collectors.toList());
 
-                    var bucketSize = bucket.size();
+                    var bucketSize = bucketData.size();
                     if (bucketSize > 0) {
-                        var bucketSum = bucket
-                                .stream()
-                                .map(Pair::getValue)
-                                .filter(Objects::nonNull)
-                                .reduce(.0, Double::sum);
-                        var bucketMean = bucketSum / bucketSize; // average from bucket
-                        var bucketStd = MathUtils.standardDeviation(
-                                bucket.stream()
-                                        .map(Pair::getValue)
-                                        .filter(Objects::nonNull)
-                                        .collect(Collectors.toList())
-                        );
+                        var bucketValues = ListSyntax.mapped(bucketData, Pair::getValue);
+                        var bucketSum = bucketValues.stream().reduce(.0, Double::sum);
+                        var bucketStd = MathUtils.standardDeviation(bucketValues);
+                        var bucketMean = bucketSum / bucketSize;
+
                         Map<String, Object> meanPoint = Map.of(
-                                InfluxDefaults.Columns.TIME, mid,
+                                InfluxDefaults.Columns.TIME, Instant.ofEpochMilli((long) ((start + end) / 2.)),
                                 comparedField, bucketMean,
                                 standardDeviationFieldName(comparedField), bucketStd
                         );
@@ -149,7 +142,6 @@ public class StatisticsService {
                     }
                 })
                 .collect(Collectors.toList());
-
 
         return new DataSeries(meanSeriesName, meanSeries);
     }

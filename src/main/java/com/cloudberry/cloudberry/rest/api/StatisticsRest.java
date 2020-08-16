@@ -44,7 +44,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/evaluations/all")
     public List<DataSeries> compareAllEvaluationsForConfiguration(@RequestParam String comparedField,
-                                                                  @RequestParam String measurementName,
+                                                                  @RequestParam(required = false) String measurementName,
                                                                   @RequestParam(required = false) String bucketName,
                                                                   @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
@@ -64,7 +64,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/configurations")
     public List<DataSeries> compareSelectedConfigurations(@RequestParam String comparedField,
-                                                          @RequestParam String measurementName,
+                                                          @RequestParam(required = false) String measurementName,
                                                           @RequestParam(required = false) String bucketName,
                                                           @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
@@ -86,7 +86,7 @@ public class StatisticsRest {
 
     @PostMapping("/compare/configurations/all")
     public List<DataSeries> compareAllConfigurationsForExperiment(@RequestParam String comparedField,
-                                                                  @RequestParam String measurementName,
+                                                                  @RequestParam(required = false) String measurementName,
                                                                   @RequestParam(required = false) String bucketName,
                                                                   @RequestParam String experimentName
     ) {

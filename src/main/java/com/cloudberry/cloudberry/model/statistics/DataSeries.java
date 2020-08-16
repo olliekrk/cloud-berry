@@ -12,4 +12,9 @@ public class DataSeries {
 
     List<Map<String, Object>> data;
 
+
+    public boolean nonEmpty() {
+        return !this.data.isEmpty();
+    }
+
 }

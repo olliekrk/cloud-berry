@@ -35,6 +35,8 @@ class DataSeriesPlots:
                 color=DEFAULT_PLOT_COLOR,
                 title=None) -> plt.Axes:
         figure, axes = plt.subplots(figsize=figsize)
+        if title:
+            axes.set_title(title)
         for ds in series:
             df = ds.as_data_frame
             axes.plot(df[x_field], df[y_field], label=ds.series_name)

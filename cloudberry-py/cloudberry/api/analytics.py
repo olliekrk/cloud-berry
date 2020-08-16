@@ -2,6 +2,7 @@ import requests
 from typing import List
 
 from .config import CloudberryApi, CloudberryConfig
+from .exceptions import CloudberryException, CloudberryConnectionException
 from .wrappers import DataSeries
 
 
@@ -18,8 +19,7 @@ class Analytics(CloudberryApi):
                             bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/evaluations'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
-        response = requests.post(url=url, params=params, json=evaluation_ids)
-        return Analytics._wrap_response(response)
+        return Analytics._wrap_request(lambda: requests.post(url=url, params=params, json=evaluation_ids))
 
     def compare_evaluations_for_configuration(self,
                                               configuration_id: str,
@@ -29,8 +29,7 @@ class Analytics(CloudberryApi):
         url = f'{self.base_url}/compare/evaluations/all'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         params['configurationIdHex'] = configuration_id
-        response = requests.post(url=url, params=params)
-        return Analytics._wrap_response(response)
+        return Analytics._wrap_request(lambda: requests.post(url=url, params=params))
 
     def compare_configurations(self,
                                configuration_ids: list,
@@ -39,8 +38,7 @@ class Analytics(CloudberryApi):
                                bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/configurations'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
-        response = requests.post(url=url, params=params, json=configuration_ids)
-        return Analytics._wrap_response(response)
+        return Analytics._wrap_request(lambda: requests.post(url=url, params=params, json=configuration_ids))
 
     def compare_configurations_for_experiment(self,
                                               experiment_name: str,
@@ -50,12 +48,22 @@ class Analytics(CloudberryApi):
         url = f'{self.base_url}/compare/configurations/all'
         params = Analytics._as_comparison_params(compared_field, measurement_name, bucket_name)
         params['experimentName'] = experiment_name
-        response = requests.post(url=url, params=params)
-        return Analytics._wrap_response(response)
+        return Analytics._wrap_request(lambda: requests.post(url=url, params=params))
+
+    @staticmethod
+    def _wrap_request(request_lambda):
+        try:
+            response = request_lambda()
+            return Analytics._wrap_response(response)
+        except requests.RequestException as e:
+            raise CloudberryConnectionException(e)
 
     @staticmethod
     def _wrap_response(response: requests.Response):
-        return DataSeries.from_json_list(response.json())
+        if response.ok:
+            return DataSeries.from_json_list(response.json())
+        else:
+            raise CloudberryException("Server request has failed", response.raise_for_status())
 
     @staticmethod
     def _as_comparison_params(compared_field: str,
