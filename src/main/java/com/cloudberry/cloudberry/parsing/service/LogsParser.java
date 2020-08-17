@@ -14,7 +14,7 @@ public interface LogsParser<D extends UploadDetails> {
 
     String TIME_COLUMN_NAME = "TIME";
 
-    ParsedLogs parseFile(File file, D details) throws IOException;
+    ParsedLogs parseFile(File file, D details, String defaultMeasurementName) throws IOException;
 
     default Instant parseTime(@Nullable String timeValue) {
         try {

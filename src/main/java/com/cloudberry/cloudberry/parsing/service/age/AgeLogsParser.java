@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.service.LogsParser;
 import com.cloudberry.cloudberry.util.XmlUtils;
 import com.cloudberry.cloudberry.util.syntax.ArraySyntax;
@@ -10,7 +10,6 @@ import com.cloudberry.cloudberry.util.syntax.MapSyntax;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -22,17 +21,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.lang.Long.parseLong;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
-    @Value("${influx.measurements.default-measurement-name}")
-    private String defaultMeasurementName;
 
     @Override
-    public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails) throws IOException {
+    public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails, String defaultMeasurementName) throws IOException {
         var logHeadersKeys = uploadDetails.getHeadersKeys();
         var logMeasurements = uploadDetails.getHeadersMeasurements();
         var logParametersOrder = new HashMap<String, String[]>();
@@ -120,5 +115,4 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                         this::parseField
                 ));
     }
-
 }

@@ -1,17 +1,17 @@
 package com.cloudberry.cloudberry.util;
 
+import io.vavr.control.Try;
+
 import java.io.File;
-import java.net.URL;
+import java.nio.file.Paths;
+
 
 public class FilesUtils {
     public static File getFileFromResources(String fileName) {
-        ClassLoader classLoader = FilesUtils.class.getClassLoader();
-
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("file is not found!");
-        } else {
-            return new File(resource.getFile());
-        }
+        return Try.of(() ->
+                Paths.get(FilesUtils.class.getResource(fileName).toURI())
+                        .toFile()
+        )
+                .getOrElseThrow(e -> new IllegalArgumentException("file is not found!"));
     }
 }

@@ -18,13 +18,13 @@ public class CsvLogsParserTest {
 
     @Test
     public void parseFile_NonEmptyFileWithTags_ShouldParseAllFieldsAndTags() throws IOException {
-        var file = FilesUtils.getFileFromResources("testLogs/testCsv.csv");
+        var file = FilesUtils.getFileFromResources("/testLogs/testCsv.csv");
         var computationId = new ObjectId();
         var measurementName = "CsvLogsParserTest_Measurement";
         var tagsNames = List.of("TAG1", "TAG2", "TAG3");
         var details = new CsvUploadDetails(tagsNames, new ObjectId(), computationId, measurementName);
 
-        var result = csvLogsParser.parseFile(file, details);
+        var result = csvLogsParser.parseFile(file, details, "");
         var points = result.getPoints();
 
         Assertions.assertEquals(1, points.size());

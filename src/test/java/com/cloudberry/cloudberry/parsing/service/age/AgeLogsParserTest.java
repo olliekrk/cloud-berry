@@ -13,42 +13,47 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AgeLogsParserTest {
-    private static final String TEST_FILE = "testLogs/testLog.log";
+    private static final String TEST_FILE = "/testLogs/testLog.log";
     private final AgeLogsParser ageLogsParser = new AgeLogsParser();
 
     @Test
     void properParsedValues() {
-        parseTestFile(TEST_FILE)
-                .onSuccess(ageParsedLogs -> {
-                    assertEquals("labs-config-cuda.xml", ageParsedLogs.getConfigurationName());
-                    assertEquals(17, ageParsedLogs.getPoints().size());
+        var ageParsedLogs = parseTestFile(TEST_FILE);
 
-                    Map<String, Object> properties = ageParsedLogs.getConfigurationParameters();
-                    assertEquals(12, properties.size());
+        assertEquals("labs-config-cuda.xml", ageParsedLogs.getConfigurationName());
+        assertEquals(17, ageParsedLogs.getPoints().size());
 
-                    assertTrue(properties.containsKey("labs.emas.mutation"));
-                    assertEquals(true, properties.get("boolean.value"));
-                    assertEquals("andrzej duda", properties.get("string.value"));
-                    assertEquals(2137.0, properties.get("double.value"));
-                    assertEquals(21.37, properties.get("int.value"));
-                });
+        Map<String, Object> properties = ageParsedLogs.getConfigurationParameters();
+        assertEquals(12, properties.size());
+
+        assertTrue(properties.containsKey("labs.problem.cuda.awaitLimitInMicroS"));
+        assertEquals("true", properties.get("boolean.value"));
+        assertEquals("andrzej duda", properties.get("string.value"));
+        assertEquals(21.37, properties.get("double.value"));
+        assertEquals(2137.0, properties.get("int.value"));
     }
 
     @NotNull
-    private Try<AgeParsedLogs> parseTestFile(String fileName) {
+    private AgeParsedLogs parseTestFile(String fileName) {
         var headersKeys = Map.of(
                 "[WH]", "[W]",
                 "[SH]", "[S]",
                 "[BH]", "[B]"
         );
-        return parseTestFile(fileName, new AgeUploadDetails(headersKeys, null));
+        var headerMeasurements = Map.of(
+                "[W]", "workplace_log",
+                "[S]", "summary_log",
+                "[B]", "best_solution_log"
+        );
+        return parseTestFile(fileName, new AgeUploadDetails(headersKeys, headerMeasurements));
     }
 
     @NotNull
-    private Try<AgeParsedLogs> parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
+    private AgeParsedLogs parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
         return Try.of(() -> ageLogsParser.parseFile(
                 FilesUtils.getFileFromResources(fileName),
-                uploadDetails
-        ));
+                uploadDetails,
+                ""
+        )).get();
     }
 }

@@ -1,12 +1,12 @@
 package com.cloudberry.cloudberry.parsing.service;
 
-import com.cloudberry.cloudberry.parsing.model.ParsedLogsWithMetadata;
-import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
-import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
+import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
+import com.cloudberry.cloudberry.parsing.model.ParsedLogsWithMetadata;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,36 +31,33 @@ public class LogsMetadataAppender {
                                                  ObjectId configurationId,
                                                  ObjectId computationId) {
         var now = Instant.now();
-        var experiment = metadataService
-                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+        var experiment = getOrCreateExperiment(experimentName, now)
                 .block();
-        var configuration = metadataService
-                .getOrCreateConfiguration(new ExperimentConfiguration(configurationId, experiment.getId(), null, Map.of(), now))
+
+        var configuration = getOrCreateConfiguration(null, Map.of(), experiment.getId(), now, configurationId)
                 .block();
-        var computation = metadataService
-                .getOrCreateComputation(new ExperimentComputation(computationId, configuration.getId(), now))
+
+        var computation = getOrCreateComputation(configurationId, now, computationId)
                 .block();
-        
+
         return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, computation);
     }
 
     public ParsedLogsWithMetadata appendMetadata(AgeParsedLogs parsedLogs, String experimentName) {
         var now = Instant.now();
-        var experiment = metadataService
-                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+        var experiment = getOrCreateExperiment(experimentName, now)
                 .block();
-        var configuration = metadataService
-                .getOrCreateConfiguration(
-                        new ExperimentConfiguration(
-                                new ObjectId(),
-                                experiment.getId(),
-                                parsedLogs.getConfigurationName(),
-                                parsedLogs.getConfigurationParameters(),
-                                now))
+
+        var configuration = getOrCreateConfiguration(
+                parsedLogs.getConfigurationName(),
+                parsedLogs.getConfigurationParameters(),
+                experiment.getId(),
+                now
+        ).block();
+
+        var computation = getOrCreateComputation(configuration.getId(), now)
                 .block();
-        var computation = metadataService
-                .getOrCreateComputation(new ExperimentComputation(new ObjectId(), configuration.getId(), now))
-                .block();
+
         parsedLogs
                 .getPoints()
                 .forEach(point -> point.addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computation.getId().toHexString()));
@@ -74,8 +71,49 @@ public class LogsMetadataAppender {
                         new ObjectId(),
                         experimentName,
                         Map.of(),
-                        time)
+                        time
+                )
         );
     }
 
+    private Mono<ExperimentComputation> getOrCreateComputation(ObjectId configurationId, Instant time, ObjectId computationId) {
+        return metadataService.getOrCreateComputation(
+                new ExperimentComputation(
+                        computationId,
+                        configurationId,
+                        time
+                )
+        );
+    }
+
+    private Mono<ExperimentComputation> getOrCreateComputation(ObjectId configurationId, Instant time) {
+        return getOrCreateComputation(configurationId, time, new ObjectId());
+    }
+
+    private Mono<ExperimentConfiguration> getOrCreateConfiguration(
+            String configurationFilename,
+            Map<String, Object> parameters,
+            ObjectId experimentId,
+            Instant time,
+            ObjectId configurationId
+    ) {
+        return metadataService.getOrCreateConfiguration(
+                new ExperimentConfiguration(
+                        configurationId,
+                        experimentId,
+                        configurationFilename,
+                        parameters,
+                        time
+                )
+        );
+    }
+
+    private Mono<ExperimentConfiguration> getOrCreateConfiguration(
+            String configurationFilename,
+            Map<String, Object> parameters,
+            ObjectId experimentId,
+            Instant time
+    ) {
+        return getOrCreateConfiguration(configurationFilename, parameters, experimentId, time, new ObjectId());
+    }
 }
