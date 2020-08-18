@@ -1,10 +1,8 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
-import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.util.FilesUtils;
-import io.vavr.control.Try;
-import org.jetbrains.annotations.NotNull;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -13,14 +11,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AgeLogsParserTest {
-    private static final String TEST_FILE = "/testLogs/testLog.log";
+    private static final String TEST_FILE = "/testLogs/age_log_1.log";
+    private static final String TEST_FILE_CONFIGURATION_NAME = "LABS=101 on GPU, TabuSearch-128";
+    private static final Map<String, String> TEST_FILE_KEYS = Map.of(
+            "[WH]", "[W]",
+            "[SH]", "[S]",
+            "[BH]", "[B]"
+    );
+
     private final AgeLogsParser ageLogsParser = new AgeLogsParser();
 
     @Test
-    void properParsedValues() {
-        var ageParsedLogs = parseTestFile(TEST_FILE);
+    @SneakyThrows
+    void parseFileReadsXmlProperties() {
+        var ageParsedLogs = ageLogsParser.parseFile(
+                FilesUtils.getFileFromResources(TEST_FILE),
+                new AgeUploadDetails(TEST_FILE_KEYS, null, null),
+                ""
+        );
 
-        assertEquals("labs-config-cuda.xml", ageParsedLogs.getConfigurationName());
+        assertEquals(TEST_FILE_CONFIGURATION_NAME, ageParsedLogs.getConfigurationName());
         assertEquals(17, ageParsedLogs.getPoints().size());
 
         Map<String, Object> properties = ageParsedLogs.getConfigurationParameters();
@@ -33,27 +43,28 @@ class AgeLogsParserTest {
         assertEquals(2137.0, properties.get("int.value"));
     }
 
-    @NotNull
-    private AgeParsedLogs parseTestFile(String fileName) {
-        var headersKeys = Map.of(
-                "[WH]", "[W]",
-                "[SH]", "[S]",
-                "[BH]", "[B]"
+    @Test
+    @SneakyThrows
+    void parseFileNoExplicitConfigurationNameReturnsXmlConfigurationName() {
+        var ageParsedLogs = ageLogsParser.parseFile(
+                FilesUtils.getFileFromResources(TEST_FILE),
+                new AgeUploadDetails(TEST_FILE_KEYS, null, null),
+                ""
         );
-        var headerMeasurements = Map.of(
-                "[W]", "workplace_log",
-                "[S]", "summary_log",
-                "[B]", "best_solution_log"
-        );
-        return parseTestFile(fileName, new AgeUploadDetails(headersKeys, headerMeasurements));
+
+        assertEquals(TEST_FILE_CONFIGURATION_NAME, ageParsedLogs.getConfigurationName());
     }
 
-    @NotNull
-    private AgeParsedLogs parseTestFile(String fileName, AgeUploadDetails uploadDetails) {
-        return Try.of(() -> ageLogsParser.parseFile(
-                FilesUtils.getFileFromResources(fileName),
-                uploadDetails,
+    @Test
+    @SneakyThrows
+    void parseFileExplicitConfigurationNameReturnsExplicitConfigurationName() {
+        var explicitConfigurationName = "MyExperimentConfiguration1";
+        var ageParsedLogs = ageLogsParser.parseFile(
+                FilesUtils.getFileFromResources(TEST_FILE),
+                new AgeUploadDetails(TEST_FILE_KEYS, null, explicitConfigurationName),
                 ""
-        )).get();
+        );
+
+        assertEquals(explicitConfigurationName, ageParsedLogs.getConfigurationName());
     }
 }

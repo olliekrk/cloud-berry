@@ -17,8 +17,8 @@ public class CsvLogsParserTest {
     private final CsvLogsParser csvLogsParser = new CsvLogsParser();
 
     @Test
-    public void parseFile_NonEmptyFileWithTags_ShouldParseAllFieldsAndTags() throws IOException {
-        var file = FilesUtils.getFileFromResources("/testLogs/testCsv.csv");
+    public void parseFileWithTagsShouldResolveAllFieldsAndTags() throws IOException {
+        var file = FilesUtils.getFileFromResources("/testLogs/csv_1row.csv");
         var computationId = new ObjectId();
         var measurementName = "CsvLogsParserTest_Measurement";
         var tagsNames = List.of("TAG1", "TAG2", "TAG3");

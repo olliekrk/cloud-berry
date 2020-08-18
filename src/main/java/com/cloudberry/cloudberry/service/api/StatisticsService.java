@@ -35,14 +35,14 @@ public class StatisticsService {
     private final MetadataService metadataService;
     private final InfluxDataAccessor influxDataAccessor;
 
-    public List<DataSeries> compareComputations(String comparedField,
-                                               @Nullable String measurementName,
-                                               @Nullable String bucketName,
-                                               List<ObjectId> computationIds,
-                                               boolean computeMean) {
+    public List<DataSeries> getComputationsByIds(String comparedField,
+                                                 @Nullable String measurementName,
+                                                 @Nullable String bucketName,
+                                                 List<ObjectId> computationIds,
+                                                 boolean computeMean) {
         var computationSeries = computationIds
                 .stream()
-                .map(id -> findComputationData(measurementName, bucketName, id))
+                .map(id -> getComputationSeries(measurementName, bucketName, id))
                 .filter(DataSeries::nonEmpty)
                 .collect(Collectors.toList());
 
@@ -53,23 +53,23 @@ public class StatisticsService {
         }
     }
 
-    public List<DataSeries> compareComputationsForConfiguration(String comparedField,
-                                                               @Nullable String measurementName,
-                                                               @Nullable String bucketName,
-                                                               ObjectId configurationId,
-                                                               boolean computeMean) {
+    public List<DataSeries> getComputationsByConfigurationId(String comparedField,
+                                                             @Nullable String measurementName,
+                                                             @Nullable String bucketName,
+                                                             ObjectId configurationId,
+                                                             boolean computeMean) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        return compareComputations(comparedField, measurementName, bucketName, computationIds, computeMean);
+        return getComputationsByIds(comparedField, measurementName, bucketName, computationIds, computeMean);
     }
 
-    public List<DataSeries> compareConfigurations(String comparedField,
-                                                  @Nullable String measurementName,
-                                                  @Nullable String bucketName,
-                                                  List<ObjectId> configurationIds) {
+    public List<DataSeries> getConfigurationsMeansByIds(String comparedField,
+                                                        @Nullable String measurementName,
+                                                        @Nullable String bucketName,
+                                                        List<ObjectId> configurationIds) {
         return configurationIds
                 .stream()
                 .map(configurationId -> {
-                    var series = compareComputationsForConfiguration(
+                    var series = getComputationsByConfigurationId(
                             comparedField,
                             measurementName,
                             bucketName,
@@ -82,17 +82,17 @@ public class StatisticsService {
                 .collect(Collectors.toList());
     }
 
-    public List<DataSeries> compareConfigurationsForExperiment(String comparedField,
-                                                               @Nullable String measurementName,
-                                                               @Nullable String bucketName,
-                                                               String experimentName) {
+    public List<DataSeries> getConfigurationsMeansByExperimentName(String comparedField,
+                                                                   @Nullable String measurementName,
+                                                                   @Nullable String bucketName,
+                                                                   String experimentName) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return compareConfigurations(comparedField, measurementName, bucketName, configurationIds);
+        return getConfigurationsMeansByIds(comparedField, measurementName, bucketName, configurationIds);
     }
 
-    private DataSeries findComputationData(@Nullable String measurementName,
-                                          @Nullable String bucketName,
-                                          ObjectId computationId) {
+    private DataSeries getComputationSeries(@Nullable String measurementName,
+                                            @Nullable String bucketName,
+                                            ObjectId computationId) {
         var computationIdHex = computationId.toHexString();
         var records = influxDataAccessor.findData(
                 bucketName,

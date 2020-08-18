@@ -52,8 +52,9 @@ public class RawDataRest {
     public ObjectId uploadAgeFile(@PathVariable String experimentName,
                                   @RequestPart MultipartFile file,
                                   @RequestPart(required = false) Map<String, String> headersKeys,
-                                  @RequestPart(required = false) Map<String, String> headersMeasurements) {
-        var uploadDetails = new AgeUploadDetails(headersKeys, headersMeasurements);
+                                  @RequestPart(required = false) Map<String, String> headersMeasurements,
+                                  @RequestParam(required = false) String configurationName) {
+        var uploadDetails = new AgeUploadDetails(headersKeys, headersMeasurements, configurationName);
         return rawDataService.uploadAgeFile(file, experimentName, uploadDetails);
     }
 

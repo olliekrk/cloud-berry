@@ -20,10 +20,10 @@ public class StatisticsRest {
     private final StatisticsService statisticsService;
 
     @PostMapping("/compare/computations")
-    public List<DataSeries> compareSelectedComputations(@RequestParam String comparedField,
-                                                       @RequestParam(required = false) String measurementName,
-                                                       @RequestParam(required = false) String bucketName,
-                                                       @RequestBody List<String> computationIdsHex
+    public List<DataSeries> getComputationsByIds(@RequestParam String comparedField,
+                                                 @RequestParam(required = false) String measurementName,
+                                                 @RequestParam(required = false) String bucketName,
+                                                 @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
         var computationIds = computationIdsHex.stream()
                 .filter(ObjectId::isValid)
@@ -33,7 +33,7 @@ public class StatisticsRest {
         if (computationIds.isEmpty())
             throw new InvalidComputationIdException(computationIdsHex);
 
-        return statisticsService.compareComputations(
+        return statisticsService.getComputationsByIds(
                 comparedField,
                 measurementName,
                 bucketName,
@@ -43,17 +43,17 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/computations/all")
-    public List<DataSeries> compareAllComputationsForConfiguration(@RequestParam String comparedField,
-                                                                  @RequestParam(required = false) String measurementName,
-                                                                  @RequestParam(required = false) String bucketName,
-                                                                  @RequestParam String configurationIdHex
+    public List<DataSeries> getComputationsByConfigurationId(@RequestParam String comparedField,
+                                                             @RequestParam(required = false) String measurementName,
+                                                             @RequestParam(required = false) String bucketName,
+                                                             @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
         var configurationId = Optional.of(configurationIdHex)
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new)
                 .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
 
-        return statisticsService.compareComputationsForConfiguration(
+        return statisticsService.getComputationsByConfigurationId(
                 comparedField,
                 measurementName,
                 bucketName,
@@ -63,10 +63,10 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/configurations")
-    public List<DataSeries> compareSelectedConfigurations(@RequestParam String comparedField,
-                                                          @RequestParam(required = false) String measurementName,
-                                                          @RequestParam(required = false) String bucketName,
-                                                          @RequestBody List<String> configurationIdsHex
+    public List<DataSeries> getConfigurationsMeansByIds(@RequestParam String comparedField,
+                                                        @RequestParam(required = false) String measurementName,
+                                                        @RequestParam(required = false) String bucketName,
+                                                        @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
         var configurationIds = configurationIdsHex.stream()
                 .filter(ObjectId::isValid)
@@ -76,7 +76,7 @@ public class StatisticsRest {
         if (configurationIds.isEmpty())
             throw new InvalidConfigurationIdException(configurationIdsHex);
 
-        return statisticsService.compareConfigurations(
+        return statisticsService.getConfigurationsMeansByIds(
                 comparedField,
                 measurementName,
                 bucketName,
@@ -85,12 +85,12 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/configurations/all")
-    public List<DataSeries> compareAllConfigurationsForExperiment(@RequestParam String comparedField,
-                                                                  @RequestParam(required = false) String measurementName,
-                                                                  @RequestParam(required = false) String bucketName,
-                                                                  @RequestParam String experimentName
+    public List<DataSeries> getConfigurationsMeansByExperimentName(@RequestParam String comparedField,
+                                                                   @RequestParam(required = false) String measurementName,
+                                                                   @RequestParam(required = false) String bucketName,
+                                                                   @RequestParam String experimentName
     ) {
-        return statisticsService.compareConfigurationsForExperiment(
+        return statisticsService.getConfigurationsMeansByExperimentName(
                 comparedField,
                 measurementName,
                 bucketName,

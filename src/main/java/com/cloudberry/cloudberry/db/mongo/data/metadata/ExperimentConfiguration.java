@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class ExperimentConfiguration implements Parametrized<String, Object>, Ti
     private ObjectId id;
     @Indexed
     private ObjectId experimentId;
+    @Nullable
     private String configurationFileName;
     private Map<String, Object> parameters;
     private Instant time;

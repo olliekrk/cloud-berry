@@ -4,7 +4,9 @@ import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.influxdb.client.write.Point;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +17,7 @@ public class AgeParsedLogs extends ParsedLogs {
     Map<String, Object> configurationParameters;
 
     public AgeParsedLogs(List<Point> points,
-                         String configurationName,
+                         @Nullable String configurationName,
                          Map<String, Object> configurationParameters) {
         super(points);
         this.configurationName = configurationName;

@@ -26,14 +26,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
 
+    interface AgeXmlProperties {
+        String CONFIGURATION_NAME = "computation.title";
+    }
+
     @Override
     public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails, String defaultMeasurementName) throws IOException {
         var logHeadersKeys = uploadDetails.getHeadersKeys();
         var logMeasurements = uploadDetails.getHeadersMeasurements();
         var logParametersOrder = new HashMap<String, String[]>();
-        String configurationName = null;
+
+        var dataPoints = new LinkedList<Point>();
+        var configurationName = uploadDetails.getConfigurationName();
         Map<String, Object> configurationParameters = null;
-        List<Point> dataPoints = new LinkedList<>();
 
         Function<String[], String[]> skipLineKey = line -> Arrays.stream(line).skip(1).toArray(String[]::new);
 
@@ -67,7 +72,10 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                     }
                     xmlLogs.remove(line); //remove closing tag from list
                     configurationParameters = getXmlMap(xmlLogs);
-                    configurationName = String.valueOf(configurationParameters.get("file"));
+                    var xmlConfigurationName = configurationParameters.get(AgeXmlProperties.CONFIGURATION_NAME);
+                    if (configurationName == null && xmlConfigurationName != null) {
+                        configurationName = String.valueOf(xmlConfigurationName);
+                    }
                 } else {
                     log.warn("Header {} not parsed", lineKey);
                 }

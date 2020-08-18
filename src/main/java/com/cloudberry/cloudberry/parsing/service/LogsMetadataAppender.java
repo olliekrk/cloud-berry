@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.parsing.service;
 
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
@@ -8,12 +8,12 @@ import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogsWithMetadata;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
+import io.vavr.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Map;
@@ -31,89 +31,46 @@ public class LogsMetadataAppender {
                                                  ObjectId configurationId,
                                                  ObjectId computationId) {
         var now = Instant.now();
-        var experiment = getOrCreateExperiment(experimentName, now)
+        return metadataService
+                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+                .map(Tuple::of)
+                .flatMap(meta -> {
+                    var configuration = new ExperimentConfiguration(configurationId, meta._1.getId(), null, Map.of(), now);
+                    return metadataService.getOrCreateConfiguration(configuration).map(meta::append);
+                })
+                .flatMap(meta -> {
+                    var computation = new ExperimentComputation(computationId, meta._2.getId(), now);
+                    return metadataService.getOrCreateComputation(computation).map(meta::append);
+                })
+                .map(tuple -> new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), tuple._2, tuple._3))
                 .block();
-
-        var configuration = getOrCreateConfiguration(null, Map.of(), experiment.getId(), now, configurationId)
-                .block();
-
-        var computation = getOrCreateComputation(configurationId, now, computationId)
-                .block();
-
-        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, computation);
     }
 
     public ParsedLogsWithMetadata appendMetadata(AgeParsedLogs parsedLogs, String experimentName) {
         var now = Instant.now();
-        var experiment = getOrCreateExperiment(experimentName, now)
+        return metadataService
+                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+                .map(Tuple::of)
+                .flatMap(meta -> {
+                    var configuration = new ExperimentConfiguration(
+                            new ObjectId(),
+                            meta._1.getId(),
+                            parsedLogs.getConfigurationName(),
+                            parsedLogs.getConfigurationParameters(),
+                            now
+                    );
+                    return metadataService.getOrCreateConfiguration(configuration).map(meta::append);
+                })
+                .flatMap(meta -> {
+                    var computation = new ExperimentComputation(new ObjectId(), meta._2.getId(), now);
+                    return metadataService.getOrCreateComputation(computation).map(meta::append);
+                })
+                .doOnNext(meta -> {
+                    var computationId = meta._3.getId().toHexString();
+                    parsedLogs.getPoints().forEach(point -> point.addTag(CommonTags.COMPUTATION_ID, computationId));
+                })
+                .map(tuple -> new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), tuple._2, tuple._3))
                 .block();
-
-        var configuration = getOrCreateConfiguration(
-                parsedLogs.getConfigurationName(),
-                parsedLogs.getConfigurationParameters(),
-                experiment.getId(),
-                now
-        ).block();
-
-        var computation = getOrCreateComputation(configuration.getId(), now)
-                .block();
-
-        parsedLogs
-                .getPoints()
-                .forEach(point -> point.addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computation.getId().toHexString()));
-
-        return new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), configuration, computation);
     }
 
-    private Mono<Experiment> getOrCreateExperiment(String experimentName, Instant time) {
-        return metadataService.getOrCreateExperiment(
-                new Experiment(
-                        new ObjectId(),
-                        experimentName,
-                        Map.of(),
-                        time
-                )
-        );
-    }
-
-    private Mono<ExperimentComputation> getOrCreateComputation(ObjectId configurationId, Instant time, ObjectId computationId) {
-        return metadataService.getOrCreateComputation(
-                new ExperimentComputation(
-                        computationId,
-                        configurationId,
-                        time
-                )
-        );
-    }
-
-    private Mono<ExperimentComputation> getOrCreateComputation(ObjectId configurationId, Instant time) {
-        return getOrCreateComputation(configurationId, time, new ObjectId());
-    }
-
-    private Mono<ExperimentConfiguration> getOrCreateConfiguration(
-            String configurationFilename,
-            Map<String, Object> parameters,
-            ObjectId experimentId,
-            Instant time,
-            ObjectId configurationId
-    ) {
-        return metadataService.getOrCreateConfiguration(
-                new ExperimentConfiguration(
-                        configurationId,
-                        experimentId,
-                        configurationFilename,
-                        parameters,
-                        time
-                )
-        );
-    }
-
-    private Mono<ExperimentConfiguration> getOrCreateConfiguration(
-            String configurationFilename,
-            Map<String, Object> parameters,
-            ObjectId experimentId,
-            Instant time
-    ) {
-        return getOrCreateConfiguration(configurationFilename, parameters, experimentId, time, new ObjectId());
-    }
 }
