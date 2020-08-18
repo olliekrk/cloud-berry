@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.util.syntax;
+package com.cloudberry.cloudberry.common.syntax;
 
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -4,7 +4,7 @@ import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsParser;
-import com.cloudberry.cloudberry.util.syntax.ListSyntax;
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.influxdb.client.write.Point;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;

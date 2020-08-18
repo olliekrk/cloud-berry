@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.model.statistics.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;

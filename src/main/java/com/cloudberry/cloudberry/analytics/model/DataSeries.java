@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.model.statistics;
+package com.cloudberry.cloudberry.analytics.model;
 
 import lombok.Value;
 

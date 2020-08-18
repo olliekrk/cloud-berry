@@ -1,12 +1,10 @@
-package com.cloudberry.cloudberry.util.syntax;
+package com.cloudberry.cloudberry.common.syntax;
 
 import io.vavr.collection.Array;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 class ListSyntaxTest {
 

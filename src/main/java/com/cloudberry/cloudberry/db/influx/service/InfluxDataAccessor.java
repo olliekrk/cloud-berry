@@ -2,8 +2,7 @@ package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
-import com.cloudberry.cloudberry.util.syntax.MapSyntax;
-import com.cloudberry.cloudberry.util.syntax.SetSyntax;
+import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
