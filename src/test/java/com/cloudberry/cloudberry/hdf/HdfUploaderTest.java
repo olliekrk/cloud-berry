@@ -1,11 +1,10 @@
 package com.cloudberry.cloudberry.hdf;
 
-import com.cloudberry.cloudberry.EmbeddedMongoTests;
+import com.cloudberry.cloudberry.EmbeddedMongoTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 @Import(HdfUploader.class)
-@EmbeddedMongoTests
+@EmbeddedMongoTest
 class HdfUploaderTest {
     @Autowired
     private HdfUploader hdfUploader;

@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.mongo.repository;
 
-import com.cloudberry.cloudberry.EmbeddedMongoTests;
+import com.cloudberry.cloudberry.EmbeddedMongoTest;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.util.IdSequenceGenerator;
 import com.cloudberry.cloudberry.db.mongo.util.listener.ExperimentIdListener;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Import({ExperimentIdListener.class, IdSequenceGenerator.class})
-@EmbeddedMongoTests
+@EmbeddedMongoTest
 public class ExperimentRepositoryTests {
 
     @Autowired

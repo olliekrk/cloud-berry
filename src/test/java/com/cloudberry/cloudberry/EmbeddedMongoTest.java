@@ -16,5 +16,5 @@ import java.lang.annotation.*;
 @ContextConfiguration(classes = {CloudberryApplication.class})
 @DataMongoTest(properties = {"spring.data.mongodb.port=37017"})
 @ExtendWith(SpringExtension.class)
-public @interface EmbeddedMongoTests {
+public @interface EmbeddedMongoTest {
 }
