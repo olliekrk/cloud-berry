@@ -2,7 +2,7 @@ from typing import List
 
 import matplotlib.pyplot as plt
 
-from .wrappers import DataSeries
+from .model import DataSeries
 
 DEFAULT_PLOT_SIZE = (15, 5)
 DEFAULT_PLOT_COLOR = 'red'

@@ -1,6 +1,6 @@
 import requests
 from typing import List
-from .config import CloudberryConfig, CloudberryApi
+from .backend import CloudberryConfig, CloudberryApi
 
 
 class Buckets(CloudberryApi):

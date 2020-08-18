@@ -96,7 +96,7 @@ public class BestSeriesSupplier implements BestSeriesApi {
                 .group() // ungroups the data back into 1 table
                 .sort(Set.of(Columns.VALUE), isDescendingBetter)
                 .limit(n)
-                .keep(CommonTags.COMPUTATION_ID);
+                .keep(Set.of(CommonTags.COMPUTATION_ID));
     }
 
     private static Flux nBestComputationsByLastValueQuery(int n,
@@ -110,7 +110,7 @@ public class BestSeriesSupplier implements BestSeriesApi {
                 .group() // ungroups the data back into 1 table
                 .sort(Set.of(Columns.VALUE), isDescendingBetter)
                 .limit(n)
-                .keep(CommonTags.COMPUTATION_ID);
+                .keep(Set.of(CommonTags.COMPUTATION_ID));
     }
 
     private static Flux groupByComputationIdQuery(String bucketName,
