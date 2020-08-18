@@ -13,7 +13,7 @@ public interface BestSeriesApi {
                                          String fieldName,
                                          OptimizationGoal optimizationGoal,
                                          OptimizationKind optimizationKind,
-                                         @Nullable String bucketName,
-                                         @Nullable String measurementName);
+                                         @Nullable String measurementName,
+                                         @Nullable String bucketName);
 
 }

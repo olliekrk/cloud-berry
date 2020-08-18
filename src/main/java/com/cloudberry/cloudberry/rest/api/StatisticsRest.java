@@ -1,11 +1,14 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
+import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -95,6 +98,23 @@ public class StatisticsRest {
                 measurementName,
                 bucketName,
                 experimentName
+        );
+    }
+
+    @GetMapping("/bestComputations")
+    public List<DataSeries> getNBestComputations(@RequestParam int n,
+                                                 @RequestParam String fieldName,
+                                                 @RequestParam OptimizationGoal optimizationGoal,
+                                                 @RequestParam OptimizationKind optimizationKind,
+                                                 @RequestParam(required = false) String measurementName,
+                                                 @RequestParam(required = false) String bucketName) {
+        return statisticsService.getNBestComputations(
+                n,
+                fieldName,
+                optimizationGoal,
+                optimizationKind,
+                measurementName,
+                bucketName
         );
     }
 }

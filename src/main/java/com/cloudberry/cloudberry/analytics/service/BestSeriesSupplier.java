@@ -35,8 +35,8 @@ public class BestSeriesSupplier implements BestSeriesApi {
                                                 String fieldName,
                                                 OptimizationGoal optimizationGoal,
                                                 OptimizationKind optimizationKind,
-                                                @Nullable String bucketNameOpt,
-                                                @Nullable String measurementName) {
+                                                @Nullable String measurementName,
+                                                @Nullable String bucketNameOpt) {
         var bucketName = Optional.ofNullable(bucketNameOpt).orElseGet(influxConfig::getDefaultBucketName);
         var fieldRestriction = RestrictionsFactory.hasField(fieldName);
         var restrictions = measurementName != null ?
