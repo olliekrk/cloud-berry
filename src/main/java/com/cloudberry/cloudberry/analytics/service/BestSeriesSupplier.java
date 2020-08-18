@@ -42,37 +42,20 @@ public class BestSeriesSupplier implements BestSeriesApi {
         var restrictions = measurementName != null ?
                 Restrictions.and(RestrictionsFactory.measurement(measurementName), fieldRestriction) : fieldRestriction;
 
-        var bestComputationsIds = switch (optimizationKind) {
-            case FINAL_VALUE -> nBestComputationsByLastValue(n, optimizationGoal, restrictions, bucketName);
-            case AREA_UNDER_CURVE -> nBestComputationsByArea(n, optimizationGoal, restrictions, bucketName);
+        var bestComputationsIdsQuery = switch (optimizationKind) {
+            case FINAL_VALUE -> nBestComputationsByLastValueQuery(n, optimizationGoal, restrictions, bucketName);
+            case AREA_UNDER_CURVE -> nBestComputationsByAreaQuery(n, optimizationGoal, restrictions, bucketName);
         };
+
+        var bestComputationsIds = getComputationsIds(bestComputationsIdsQuery);
 
         return getComputationsSeries(bestComputationsIds, restrictions, bucketName);
     }
 
-    private List<String> nBestComputationsByArea(int n,
-                                                 OptimizationGoal optimizationGoal,
-                                                 Restrictions restrictions,
-                                                 String bucketName) {
-        return List.of(); // todo #38
-    }
-
-    private List<String> nBestComputationsByLastValue(int n,
-                                                      OptimizationGoal optimizationGoal,
-                                                      Restrictions restrictions,
-                                                      String bucketName) {
-        var isDescendingBetter = optimizationGoal.equals(OptimizationGoal.MAX);
-        var bestComputationsIdsQuery = groupByComputationIdQuery(bucketName, restrictions)
-                .last()
-                .keep(Set.of(Columns.VALUE, CommonTags.COMPUTATION_ID))
-                .group() // actually ungroups the data back into 1 table
-                .sort(Set.of(Columns.VALUE), isDescendingBetter)
-                .limit(n)
-                .keep(CommonTags.COMPUTATION_ID);
-
+    private List<String> getComputationsIds(Flux fluxQuery) {
         return influxClient
                 .getQueryApi()
-                .query(bestComputationsIdsQuery.toString())
+                .query(fluxQuery.toString())
                 .stream()
                 .flatMap(table -> table.getRecords().stream())
                 .map(record -> (String) record.getValueByKey(CommonTags.COMPUTATION_ID))
@@ -100,6 +83,34 @@ public class BestSeriesSupplier implements BestSeriesApi {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    private static Flux nBestComputationsByAreaQuery(int n,
+                                                     OptimizationGoal optimizationGoal,
+                                                     Restrictions restrictions,
+                                                     String bucketName) {
+        var isDescendingBetter = optimizationGoal.equals(OptimizationGoal.MAX);
+        return groupByComputationIdQuery(bucketName, restrictions)
+                .keep(Set.of(Columns.TIME, Columns.VALUE, CommonTags.COMPUTATION_ID))
+                .integral() // gets integral from each group
+                .group() // ungroups the data back into 1 table
+                .sort(Set.of(Columns.VALUE), isDescendingBetter)
+                .limit(n)
+                .keep(CommonTags.COMPUTATION_ID);
+    }
+
+    private static Flux nBestComputationsByLastValueQuery(int n,
+                                                          OptimizationGoal optimizationGoal,
+                                                          Restrictions restrictions,
+                                                          String bucketName) {
+        var isDescendingBetter = optimizationGoal.equals(OptimizationGoal.MAX);
+        return groupByComputationIdQuery(bucketName, restrictions)
+                .last() // gets last value from each group
+                .keep(Set.of(Columns.VALUE, CommonTags.COMPUTATION_ID))
+                .group() // ungroups the data back into 1 table
+                .sort(Set.of(Columns.VALUE), isDescendingBetter)
+                .limit(n)
+                .keep(CommonTags.COMPUTATION_ID);
     }
 
     private static Flux groupByComputationIdQuery(String bucketName,
