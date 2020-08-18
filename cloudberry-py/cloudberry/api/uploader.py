@@ -22,9 +22,11 @@ class FileUploader(CloudberryApi):
 class AgeUploadDetails(UploadDetails):
     def __init__(self,
                  headers_keys=None,
-                 headers_measurements=None) -> None:
+                 headers_measurements=None,
+                 configuration_name=None) -> None:
         self.headers_keys = headers_keys
         self.headers_measurements = headers_measurements
+        self.configuration_name = configuration_name
 
 
 class AgeFileUploader(FileUploader):
@@ -32,11 +34,18 @@ class AgeFileUploader(FileUploader):
     def upload_file(self, file_path: str, experiment_name: str, details: AgeUploadDetails) -> str:
         with open(file_path, 'rb') as file:
             url = f'{self.config.base_url()}/raw/ageFile/{experiment_name}'
-            r = requests.post(url, files={
-                'file': file,
-                'headersKeys': (None, json.dumps(details.headers_keys), 'application/json'),
-                'headersMeasurements': (None, json.dumps(details.headers_measurements), 'application/json')
-            })
+            params = {}
+            if details.configuration_name is not None:
+                params['configurationName'] = details.configuration_name
+            r = requests.post(
+                url,
+                files={
+                    'file': file,
+                    'headersKeys': (None, json.dumps(details.headers_keys), 'application/json'),
+                    'headersMeasurements': (None, json.dumps(details.headers_measurements), 'application/json')
+                },
+                params=params
+            )
             return r.json()
 
 
@@ -63,10 +72,12 @@ class CsvFileUploader(FileUploader):
                 params['computationId'] = details.computation_id
             if details.measurement_name is not None:
                 params['measurementName'] = details.measurement_name
-            r = requests.post(url,
-                              files={
-                                  'file': file,
-                                  'tagsNames': (None, json.dumps(details.tags_names), 'application/json'),
-                              },
-                              params=params)
+            r = requests.post(
+                url,
+                files={
+                    'file': file,
+                    'tagsNames': (None, json.dumps(details.tags_names), 'application/json'),
+                },
+                params=params
+            )
             return r.json()
