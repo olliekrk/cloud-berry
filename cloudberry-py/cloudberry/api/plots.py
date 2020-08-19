@@ -64,7 +64,7 @@ class DataSeriesPlots:
         max_hex = 256
 
         def rgb_scaled(v):
-            return float(v % max_hex) / (max_hex - 1)
+            return min(float(v % max_hex) / (max_hex - 1), 1)
 
         series_name_hash: int = hash(series.series_name) % max_hex ** 3
         red = rgb_scaled(series_name_hash)

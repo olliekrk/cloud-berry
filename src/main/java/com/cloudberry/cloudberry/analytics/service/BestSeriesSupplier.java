@@ -5,7 +5,9 @@ import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -66,7 +68,12 @@ public class BestSeriesSupplier implements BestSeriesApi {
                                                    Restrictions restrictions,
                                                    String bucketName) {
         var query = groupByComputationIdQuery(bucketName, restrictions)
-                .filter(RestrictionsFactory.tagIn(CommonTags.COMPUTATION_ID, computationsIds));
+                .filter(RestrictionsFactory.tagIn(CommonTags.COMPUTATION_ID, computationsIds))
+                .pivot(
+                        Set.of(CommonTags.COMPUTATION_ID, InfluxDefaults.Columns.TIME),
+                        Set.of(InfluxDefaults.Columns.FIELD),
+                        InfluxDefaults.Columns.VALUE
+                );
 
         return influxClient
                 .getQueryApi()

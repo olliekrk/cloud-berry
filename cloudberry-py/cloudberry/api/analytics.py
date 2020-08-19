@@ -68,8 +68,8 @@ class Analytics(CloudberryApi):
         params = Analytics._append_db_params({
             'n': n,
             'fieldName': field_name,
-            'optimizationGoal': goal,
-            'optimizationKind': kind
+            'optimizationGoal': goal.name,
+            'optimizationKind': kind.name
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.get(url=url, params=params))
 
