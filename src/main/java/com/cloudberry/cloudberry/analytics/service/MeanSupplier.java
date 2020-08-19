@@ -27,10 +27,10 @@ public class MeanSupplier implements MeanApi {
 
     private final static String MEAN_SERIES_NAME = "mean";
 
-    public DataSeries mean(String comparedField,
+    public DataSeries mean(String fieldName,
                            List<DataSeries> series,
                            @Nullable String seriesSuffix) {
-        var timeSeries = ListSyntax.mapped(series, s -> extractTimeAndComparedField(s, comparedField));
+        var timeSeries = ListSyntax.mapped(series, s -> extractTimeAndfieldName(s, fieldName));
         var joinedSeries = ListSyntax.flatMapped(timeSeries, MeanSupplier::alignToStartAtZero);
         var intervalCount = ListSyntax.averageLengthCeil(timeSeries);
         var intervalEnd = joinedSeries.stream().map(Pair::getKey).max(Long::compareTo).orElse(0L);
@@ -57,8 +57,8 @@ public class MeanSupplier implements MeanApi {
 
                         Map<String, Object> meanPoint = Map.of(
                                 InfluxDefaults.Columns.TIME, Instant.ofEpochMilli((long) ((start + end) / 2.)),
-                                comparedField, bucketMean,
-                                standardDeviationFieldName(comparedField), bucketStd
+                                fieldName, bucketMean,
+                                standardDeviationFieldName(fieldName), bucketStd
                         );
                         return Stream.of(meanPoint);
                     } else {
@@ -80,15 +80,15 @@ public class MeanSupplier implements MeanApi {
         return ListSyntax.mapped(series, pair -> Pair.of(pair.getKey() - minTime, pair.getValue()));
     }
 
-    private static List<Pair<Long, Double>> extractTimeAndComparedField(DataSeries series, String comparedField) {
+    private static List<Pair<Long, Double>> extractTimeAndfieldName(DataSeries series, String fieldName) {
         return series.getData()
                 .stream()
-                .filter(data -> data.containsKey(InfluxDefaults.Columns.TIME) && data.containsKey(comparedField))
+                .filter(data -> data.containsKey(InfluxDefaults.Columns.TIME) && data.containsKey(fieldName))
                 .map(data -> Try.of(() -> {
                     var timestamp = (Instant) data.get(InfluxDefaults.Columns.TIME);
-                    var value = (Double) data.get(comparedField);
+                    var value = (Double) data.get(fieldName);
                     return Pair.of(timestamp.toEpochMilli(), value);
-                }).getOrElseThrow(a -> new FieldNotNumericException(comparedField)))
+                }).getOrElseThrow(a -> new FieldNotNumericException(fieldName)))
                 .collect(Collectors.toList());
     }
 

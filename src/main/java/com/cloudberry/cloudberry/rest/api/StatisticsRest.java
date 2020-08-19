@@ -23,7 +23,7 @@ public class StatisticsRest {
     private final StatisticsService statisticsService;
 
     @PostMapping("/compare/computations")
-    public List<DataSeries> getComputationsByIds(@RequestParam String comparedField,
+    public List<DataSeries> getComputationsByIds(@RequestParam String fieldName,
                                                  @RequestParam(required = false) String measurementName,
                                                  @RequestParam(required = false) String bucketName,
                                                  @RequestBody List<String> computationIdsHex
@@ -33,7 +33,7 @@ public class StatisticsRest {
             throw new InvalidComputationIdException(computationIdsHex);
 
         return statisticsService.getComputationsByIds(
-                comparedField,
+                fieldName,
                 measurementName,
                 bucketName,
                 computationIds,
@@ -42,7 +42,7 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/computations/all")
-    public List<DataSeries> getComputationsByConfigurationId(@RequestParam String comparedField,
+    public List<DataSeries> getComputationsByConfigurationId(@RequestParam String fieldName,
                                                              @RequestParam(required = false) String measurementName,
                                                              @RequestParam(required = false) String bucketName,
                                                              @RequestParam String configurationIdHex
@@ -53,7 +53,7 @@ public class StatisticsRest {
                 .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
 
         return statisticsService.getComputationsByConfigurationId(
-                comparedField,
+                fieldName,
                 measurementName,
                 bucketName,
                 configurationId,
@@ -62,7 +62,7 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/configurations")
-    public List<DataSeries> getConfigurationsMeansByIds(@RequestParam String comparedField,
+    public List<DataSeries> getConfigurationsMeansByIds(@RequestParam String fieldName,
                                                         @RequestParam(required = false) String measurementName,
                                                         @RequestParam(required = false) String bucketName,
                                                         @RequestBody List<String> configurationIdsHex
@@ -76,7 +76,7 @@ public class StatisticsRest {
             throw new InvalidConfigurationIdException(configurationIdsHex);
 
         return statisticsService.getConfigurationsMeansByIds(
-                comparedField,
+                fieldName,
                 measurementName,
                 bucketName,
                 configurationIds
@@ -84,13 +84,13 @@ public class StatisticsRest {
     }
 
     @PostMapping("/compare/configurations/all")
-    public List<DataSeries> getConfigurationsMeansByExperimentName(@RequestParam String comparedField,
+    public List<DataSeries> getConfigurationsMeansByExperimentName(@RequestParam String fieldName,
                                                                    @RequestParam(required = false) String measurementName,
                                                                    @RequestParam(required = false) String bucketName,
                                                                    @RequestParam String experimentName
     ) {
         return statisticsService.getConfigurationsMeansByExperimentName(
-                comparedField,
+                fieldName,
                 measurementName,
                 bucketName,
                 experimentName
@@ -115,18 +115,18 @@ public class StatisticsRest {
     }
 
     @PostMapping("/computations/averageStddev")
-    public List<DataSeries> computationsAverageAndStddev(@RequestParam String fieldName,
-                                                         @RequestParam Long interval,
-                                                         @RequestParam ChronoUnit unit,
-                                                         @RequestParam(required = false) String measurementName,
-                                                         @RequestParam(required = false) String bucketName,
-                                                         @RequestBody List<String> computationIdsHex
+    public List<DataSeries> getAverageAndStddevOfComputations(@RequestParam String fieldName,
+                                                              @RequestParam Long interval,
+                                                              @RequestParam ChronoUnit unit,
+                                                              @RequestParam(required = false) String measurementName,
+                                                              @RequestParam(required = false) String bucketName,
+                                                              @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
         var computationIds = getValidIds(computationIdsHex);
         if (computationIds.isEmpty())
             throw new InvalidComputationIdException(computationIdsHex);
 
-        return statisticsService.computationsAverageAndStddev(
+        return statisticsService.getAverageAndStddevOfComputations(
                 fieldName,
                 interval,
                 unit,

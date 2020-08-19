@@ -1,5 +1,5 @@
 from .backend import CloudberryConfig
-from .model import DataPoint, DataSeries, OptimizationGoal, OptimizationKind
+from .model import DataPoint, DataSeries, OptimizationGoal, OptimizationKind, TimeUnit
 from .analytics import Analytics
 from .buckets import Buckets
 from .data import DataFilters, Data

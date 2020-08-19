@@ -7,6 +7,7 @@ from .model import DataSeries
 DEFAULT_PLOT_SIZE = (15, 5)
 DEFAULT_PLOT_COLOR = 'red'
 ERROR_COLOR_RGB = (1, 0, 0)
+ERROR_LINE_WIDTH = .5
 
 
 class DataSeriesPlots:
@@ -30,6 +31,7 @@ class DataSeriesPlots:
                       yerr=y_errors,
                       label=self.series.series_name,
                       ecolor=ERROR_COLOR_RGB,
+                      elinewidth=ERROR_LINE_WIDTH,
                       color=DataSeriesPlots._get_series_color(self.series))
 
         plt.show()
@@ -55,6 +57,7 @@ class DataSeriesPlots:
                           yerr=y_errors,
                           label=ds.series_name,
                           ecolor=ERROR_COLOR_RGB,
+                          elinewidth=ERROR_LINE_WIDTH,
                           color=DataSeriesPlots._get_series_color(ds))
         axes.legend()
         return axes

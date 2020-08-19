@@ -1,8 +1,9 @@
 import requests
+import pandas as pd
 from typing import List
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
-from .model import DataSeries, OptimizationGoal, OptimizationKind
+from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit
 
 
 class Analytics(CloudberryApi):
@@ -13,46 +14,46 @@ class Analytics(CloudberryApi):
 
     def compare_computations(self,
                              computation_ids: List[str],
-                             compared_field: str,
+                             field_name: str,
                              measurement_name: str = None,
                              bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/computations'
         params = Analytics._append_db_params({
-            'comparedField': compared_field
+            'fieldName': field_name
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.post(url=url, params=params, json=computation_ids))
 
     def compare_computations_for_configuration(self,
                                                configuration_id: str,
-                                               compared_field: str,
+                                               field_name: str,
                                                measurement_name: str = None,
                                                bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/computations/all'
         params = Analytics._append_db_params({
-            'comparedField': compared_field,
+            'fieldName': field_name,
             'configurationIdHex': configuration_id
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.post(url=url, params=params))
 
     def compare_configurations(self,
                                configuration_ids: list,
-                               compared_field: str,
+                               field_name: str,
                                measurement_name: str = None,
                                bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/configurations'
         params = Analytics._append_db_params({
-            'comparedField': compared_field
+            'fieldName': field_name
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.post(url=url, params=params, json=configuration_ids))
 
     def compare_configurations_for_experiment(self,
                                               experiment_name: str,
-                                              compared_field: str,
+                                              field_name: str,
                                               measurement_name: str = None,
                                               bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/compare/configurations/all'
         params = Analytics._append_db_params({
-            'comparedField': compared_field,
+            'fieldName': field_name,
             'experimentName': experiment_name
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.post(url=url, params=params))
@@ -72,6 +73,36 @@ class Analytics(CloudberryApi):
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.get(url=url, params=params))
+
+    def avg_and_stddev_for_computations(self,
+                                        computation_ids: List[str],
+                                        field_name: str,
+                                        interval: int,
+                                        time_unit: TimeUnit,
+                                        measurement_name: str = None,
+                                        bucket_name: str = None) -> DataSeries:
+        url = f'{self.base_url}/computations/averageStddev'
+        params = Analytics._append_db_params({
+            'fieldName': field_name,
+            'interval': interval,
+            'unit': time_unit.name
+        }, measurement_name, bucket_name)
+
+        # todo: simplify code below?
+        series = Analytics._wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            json=computation_ids
+        ))
+
+        def get_series(name):
+            return list(filter(lambda s: s.series_name == name, series))[0] \
+                .as_data_frame \
+                .rename(columns={field_name: name}) \
+                .drop(columns=['series_name'])
+
+        merged_data = pd.merge(get_series('AVG'), get_series('STDDEV'), on='_time').T.to_dict().values()
+        return DataSeries(field_name, merged_data)
 
     @staticmethod
     def _wrap_series_request(request_lambda) -> List[DataSeries]:

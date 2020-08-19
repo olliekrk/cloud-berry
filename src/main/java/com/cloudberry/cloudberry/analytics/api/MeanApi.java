@@ -10,7 +10,7 @@ public interface MeanApi {
 
     // TODO: 19.08.2020 : refactor StatisticsService to get mean data from influx, not to compute everything in memory
     // todo: this signature may/must change
-    DataSeries mean(String comparedField,
+    DataSeries mean(String fieldName,
                     List<DataSeries> series,
                     @Nullable String seriesSuffix);
 

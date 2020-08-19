@@ -31,7 +31,7 @@ public class StatisticsService {
     private final MetadataService metadataService;
     private final InfluxDataAccessor influxDataAccessor;
 
-    public List<DataSeries> getComputationsByIds(String comparedField,
+    public List<DataSeries> getComputationsByIds(String fieldName,
                                                  @Nullable String measurementName,
                                                  @Nullable String bucketName,
                                                  List<ObjectId> computationIds,
@@ -43,22 +43,22 @@ public class StatisticsService {
                 .collect(Collectors.toList());
 
         if (computeMean) {
-            return ListSyntax.with(computationSeries, analytics.getMeanApi().mean(comparedField, computationSeries, null));
+            return ListSyntax.with(computationSeries, analytics.getMeanApi().mean(fieldName, computationSeries, null));
         } else {
             return computationSeries;
         }
     }
 
-    public List<DataSeries> getComputationsByConfigurationId(String comparedField,
+    public List<DataSeries> getComputationsByConfigurationId(String fieldName,
                                                              @Nullable String measurementName,
                                                              @Nullable String bucketName,
                                                              ObjectId configurationId,
                                                              boolean computeMean) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        return getComputationsByIds(comparedField, measurementName, bucketName, computationIds, computeMean);
+        return getComputationsByIds(fieldName, measurementName, bucketName, computationIds, computeMean);
     }
 
-    public List<DataSeries> getConfigurationsMeansByIds(String comparedField,
+    public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
                                                         @Nullable String measurementName,
                                                         @Nullable String bucketName,
                                                         List<ObjectId> configurationIds) {
@@ -66,23 +66,23 @@ public class StatisticsService {
                 .stream()
                 .map(configurationId -> {
                     var series = getComputationsByConfigurationId(
-                            comparedField,
+                            fieldName,
                             measurementName,
                             bucketName,
                             configurationId,
                             false
                     );
-                    return analytics.getMeanApi().mean(comparedField, series, configurationId.toHexString());
+                    return analytics.getMeanApi().mean(fieldName, series, configurationId.toHexString());
                 })
                 .collect(Collectors.toList());
     }
 
-    public List<DataSeries> getConfigurationsMeansByExperimentName(String comparedField,
+    public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,
                                                                    @Nullable String measurementName,
                                                                    @Nullable String bucketName,
                                                                    String experimentName) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return getConfigurationsMeansByIds(comparedField, measurementName, bucketName, configurationIds);
+        return getConfigurationsMeansByIds(fieldName, measurementName, bucketName, configurationIds);
     }
 
     private DataSeries getComputationSeries(@Nullable String measurementName,
@@ -116,24 +116,24 @@ public class StatisticsService {
                 );
     }
 
-    public List<DataSeries> computationsAverageAndStddev(String fieldName,
-                                                         Long interval,
-                                                         ChronoUnit unit,
-                                                         List<ObjectId> computationsIds,
-                                                         @Nullable String measurementName,
-                                                         @Nullable String bucketName) {
+    public List<DataSeries> getAverageAndStddevOfComputations(String fieldName,
+                                                              Long interval,
+                                                              ChronoUnit unit,
+                                                              List<ObjectId> computationsIds,
+                                                              @Nullable String measurementName,
+                                                              @Nullable String bucketName) {
         return List.of(
-                computationsAverage(fieldName, interval, unit, computationsIds, measurementName, bucketName),
-                computationsStddev(fieldName, interval, unit, computationsIds, measurementName, bucketName)
+                getComputationsAverage(fieldName, interval, unit, computationsIds, measurementName, bucketName),
+                getComputationsStddev(fieldName, interval, unit, computationsIds, measurementName, bucketName)
         );
     }
 
-    private DataSeries computationsAverage(String fieldName,
-                                           Long interval,
-                                           ChronoUnit unit,
-                                           List<ObjectId> computationsIds,
-                                           @Nullable String measurementName,
-                                           @Nullable String bucketName) {
+    private DataSeries getComputationsAverage(String fieldName,
+                                              Long interval,
+                                              ChronoUnit unit,
+                                              List<ObjectId> computationsIds,
+                                              @Nullable String measurementName,
+                                              @Nullable String bucketName) {
         return analytics
                 .getMovingAverageApi()
                 .timedMovingAvgSeries(
@@ -146,12 +146,12 @@ public class StatisticsService {
                 );
     }
 
-    private DataSeries computationsStddev(String fieldName,
-                                          Long interval,
-                                          ChronoUnit unit,
-                                          List<ObjectId> computationsIds,
-                                          @Nullable String measurementName,
-                                          @Nullable String bucketName) {
+    private DataSeries getComputationsStddev(String fieldName,
+                                             Long interval,
+                                             ChronoUnit unit,
+                                             List<ObjectId> computationsIds,
+                                             @Nullable String measurementName,
+                                             @Nullable String bucketName) {
         return analytics
                 .getMovingAverageApi()
                 .timedMovingStdSeries(
