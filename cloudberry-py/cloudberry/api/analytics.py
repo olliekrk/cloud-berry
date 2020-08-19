@@ -64,7 +64,7 @@ class Analytics(CloudberryApi):
                             kind: OptimizationKind,
                             measurement_name: str = None,
                             bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/bestComputations'
+        url = f'{self.base_url}/computations/best'
         params = Analytics._append_db_params({
             'n': n,
             'fieldName': field_name,

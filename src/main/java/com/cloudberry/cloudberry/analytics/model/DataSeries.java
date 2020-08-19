@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.analytics.model;
 
 import lombok.Value;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +13,12 @@ public class DataSeries {
 
     List<Map<String, Object>> data;
 
-
     public boolean nonEmpty() {
         return !this.data.isEmpty();
+    }
+
+    public static DataSeries empty(String seriesName){
+        return new DataSeries(seriesName, Collections.emptyList());
     }
 
 }

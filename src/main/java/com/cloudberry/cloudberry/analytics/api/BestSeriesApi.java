@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface BestSeriesApi {
 
-    List<DataSeries> nBestSeriesForField(int n,
-                                         String fieldName,
-                                         OptimizationGoal optimizationGoal,
-                                         OptimizationKind optimizationKind,
-                                         @Nullable String measurementName,
-                                         @Nullable String bucketName);
+    List<DataSeries> nBestSeries(int n,
+                                 String fieldName,
+                                 OptimizationGoal optimizationGoal,
+                                 OptimizationKind optimizationKind,
+                                 @Nullable String measurementNameOpt,
+                                 @Nullable String bucketNameOpt);
 
 }

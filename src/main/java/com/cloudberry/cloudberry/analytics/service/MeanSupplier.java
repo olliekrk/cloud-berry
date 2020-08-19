@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Deprecated(since = "19.08.2020 - in favour of MovingAverageSupplier")
 public class MeanSupplier implements MeanApi {
 
     private final static String MEAN_SERIES_NAME = "mean";

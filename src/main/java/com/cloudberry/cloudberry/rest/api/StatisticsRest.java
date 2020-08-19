@@ -8,9 +8,9 @@ import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,11 +28,7 @@ public class StatisticsRest {
                                                  @RequestParam(required = false) String bucketName,
                                                  @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = computationIdsHex.stream()
-                .filter(ObjectId::isValid)
-                .map(ObjectId::new)
-                .collect(Collectors.toList());
-
+        var computationIds = getValidIds(computationIdsHex);
         if (computationIds.isEmpty())
             throw new InvalidComputationIdException(computationIdsHex);
 
@@ -101,7 +97,7 @@ public class StatisticsRest {
         );
     }
 
-    @GetMapping("/bestComputations")
+    @GetMapping("/computations/best")
     public List<DataSeries> getNBestComputations(@RequestParam int n,
                                                  @RequestParam String fieldName,
                                                  @RequestParam OptimizationGoal optimizationGoal,
@@ -116,5 +112,34 @@ public class StatisticsRest {
                 measurementName,
                 bucketName
         );
+    }
+
+    @PostMapping("/computations/averageStddev")
+    public List<DataSeries> computationsAverageAndStddev(@RequestParam String fieldName,
+                                                         @RequestParam Long interval,
+                                                         @RequestParam ChronoUnit unit,
+                                                         @RequestParam(required = false) String measurementName,
+                                                         @RequestParam(required = false) String bucketName,
+                                                         @RequestBody List<String> computationIdsHex
+    ) throws InvalidComputationIdException {
+        var computationIds = getValidIds(computationIdsHex);
+        if (computationIds.isEmpty())
+            throw new InvalidComputationIdException(computationIdsHex);
+
+        return statisticsService.computationsAverageAndStddev(
+                fieldName,
+                interval,
+                unit,
+                computationIds,
+                measurementName,
+                bucketName
+        );
+    }
+
+    private static List<ObjectId> getValidIds(List<String> rawIds) {
+        return rawIds.stream()
+                .filter(ObjectId::isValid)
+                .map(ObjectId::new)
+                .collect(Collectors.toList());
     }
 }

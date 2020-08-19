@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,11 +106,59 @@ public class StatisticsService {
                                                  String bucketName) {
         return analytics
                 .getBestSeriesApi()
-                .nBestSeriesForField(
+                .nBestSeries(
                         n,
                         fieldName,
                         optimizationGoal,
                         optimizationKind,
+                        measurementName,
+                        bucketName
+                );
+    }
+
+    public List<DataSeries> computationsAverageAndStddev(String fieldName,
+                                                         Long interval,
+                                                         ChronoUnit unit,
+                                                         List<ObjectId> computationsIds,
+                                                         @Nullable String measurementName,
+                                                         @Nullable String bucketName) {
+        return List.of(
+                computationsAverage(fieldName, interval, unit, computationsIds, measurementName, bucketName),
+                computationsStddev(fieldName, interval, unit, computationsIds, measurementName, bucketName)
+        );
+    }
+
+    private DataSeries computationsAverage(String fieldName,
+                                           Long interval,
+                                           ChronoUnit unit,
+                                           List<ObjectId> computationsIds,
+                                           @Nullable String measurementName,
+                                           @Nullable String bucketName) {
+        return analytics
+                .getMovingAverageApi()
+                .timedMovingAvgSeries(
+                        fieldName,
+                        interval,
+                        unit,
+                        computationsIds,
+                        measurementName,
+                        bucketName
+                );
+    }
+
+    private DataSeries computationsStddev(String fieldName,
+                                          Long interval,
+                                          ChronoUnit unit,
+                                          List<ObjectId> computationsIds,
+                                          @Nullable String measurementName,
+                                          @Nullable String bucketName) {
+        return analytics
+                .getMovingAverageApi()
+                .timedMovingStdSeries(
+                        fieldName,
+                        interval,
+                        unit,
+                        computationsIds,
                         measurementName,
                         bucketName
                 );

@@ -5,7 +5,6 @@ import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
-import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
@@ -33,16 +32,16 @@ public class BestSeriesSupplier implements BestSeriesApi {
     private final InfluxDBClient influxClient;
 
     @Override
-    public List<DataSeries> nBestSeriesForField(int n,
-                                                String fieldName,
-                                                OptimizationGoal optimizationGoal,
-                                                OptimizationKind optimizationKind,
-                                                @Nullable String measurementName,
-                                                @Nullable String bucketNameOpt) {
+    public List<DataSeries> nBestSeries(int n,
+                                        String fieldName,
+                                        OptimizationGoal optimizationGoal,
+                                        OptimizationKind optimizationKind,
+                                        @Nullable String measurementNameOpt,
+                                        @Nullable String bucketNameOpt) {
         var bucketName = Optional.ofNullable(bucketNameOpt).orElseGet(influxConfig::getDefaultBucketName);
         var fieldRestriction = RestrictionsFactory.hasField(fieldName);
-        var restrictions = measurementName != null ?
-                Restrictions.and(RestrictionsFactory.measurement(measurementName), fieldRestriction) : fieldRestriction;
+        var restrictions = measurementNameOpt == null ? fieldRestriction :
+                Restrictions.and(RestrictionsFactory.measurement(measurementNameOpt), fieldRestriction);
 
         var bestComputationsIdsQuery = switch (optimizationKind) {
             case FINAL_VALUE -> nBestComputationsByLastValueQuery(n, optimizationGoal, restrictions, bucketName);
@@ -67,7 +66,7 @@ public class BestSeriesSupplier implements BestSeriesApi {
     private List<DataSeries> getComputationsSeries(List<String> computationsIds,
                                                    Restrictions restrictions,
                                                    String bucketName) {
-        var query = groupByComputationIdQuery(bucketName, restrictions)
+        var query = initialQuery(bucketName, restrictions)
                 .filter(RestrictionsFactory.tagIn(CommonTags.COMPUTATION_ID, computationsIds))
                 .pivot(
                         Set.of(CommonTags.COMPUTATION_ID, InfluxDefaults.Columns.TIME),
@@ -92,12 +91,21 @@ public class BestSeriesSupplier implements BestSeriesApi {
                 .collect(Collectors.toList());
     }
 
+    private static Flux initialQuery(String bucketName,
+                                     Restrictions restrictions) {
+        return Flux
+                .from(bucketName)
+                .range(Instant.EPOCH)
+                .filter(restrictions)
+                .groupBy(CommonTags.COMPUTATION_ID);
+    }
+
     private static Flux nBestComputationsByAreaQuery(int n,
                                                      OptimizationGoal optimizationGoal,
                                                      Restrictions restrictions,
                                                      String bucketName) {
         var isDescendingBetter = optimizationGoal.equals(OptimizationGoal.MAX);
-        return groupByComputationIdQuery(bucketName, restrictions)
+        return initialQuery(bucketName, restrictions)
                 .keep(Set.of(Columns.TIME, Columns.VALUE, CommonTags.COMPUTATION_ID))
                 .integral() // gets integral from each group
                 .group() // ungroups the data back into 1 table
@@ -111,22 +119,13 @@ public class BestSeriesSupplier implements BestSeriesApi {
                                                           Restrictions restrictions,
                                                           String bucketName) {
         var isDescendingBetter = optimizationGoal.equals(OptimizationGoal.MAX);
-        return groupByComputationIdQuery(bucketName, restrictions)
+        return initialQuery(bucketName, restrictions)
                 .last() // gets last value from each group
                 .keep(Set.of(Columns.VALUE, CommonTags.COMPUTATION_ID))
                 .group() // ungroups the data back into 1 table
                 .sort(Set.of(Columns.VALUE), isDescendingBetter)
                 .limit(n)
                 .keep(Set.of(CommonTags.COMPUTATION_ID));
-    }
-
-    private static Flux groupByComputationIdQuery(String bucketName,
-                                                  Restrictions restrictions) {
-        return Flux
-                .from(bucketName)
-                .range(Instant.EPOCH)
-                .filter(restrictions)
-                .groupBy(CommonTags.COMPUTATION_ID);
     }
 
 }
