@@ -12,6 +12,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 abstract class ApiSupplier {
 
@@ -42,6 +43,10 @@ abstract class ApiSupplier {
             var computationId = (String) recordsHead.getValueByKey(CommonTags.COMPUTATION_ID);
             return Optional.of(new DataSeries(computationId, ListSyntax.mapped(records, FluxRecord::getValues)));
         }
+    }
+
+    protected static Stream<Instant> tableToTime(FluxTable fluxTable) {
+        return fluxTable.getRecords().stream().map(FluxRecord::getTime);
     }
 
 }

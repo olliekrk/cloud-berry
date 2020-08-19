@@ -3,13 +3,10 @@ package com.cloudberry.cloudberry.service.api;
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
-import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
-import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,8 +35,10 @@ public class StatisticsService {
                                                  @Nullable String bucketName,
                                                  List<ObjectId> computationIds,
                                                  boolean computeMean) {
-        var computationSeries = analytics.getSeriesApi().computationsSeries(computationIds, measurementName, bucketName);
-        var intervalNanos = getAverageNanoInterval(computationSeries);
+        var computationSeries = analytics.getSeriesApi()
+                .computationsSeries(computationIds, measurementName, bucketName);
+        var intervalNanos = analytics.getSeriesApi()
+                .averageIntervalNanos(fieldName, computationIds, measurementName, bucketName);
 
         if (computeMean) {
             var avgSeries = getComputationsAverage(
@@ -74,8 +72,8 @@ public class StatisticsService {
                 .stream()
                 .map(configurationId -> {
                     var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-                    var computationSeries = analytics.getSeriesApi().computationsSeries(computationIds, measurementName, bucketName);
-                    var intervalNanos = getAverageNanoInterval(computationSeries);
+                    var intervalNanos = analytics.getSeriesApi()
+                            .averageIntervalNanos(fieldName, computationIds, measurementName, bucketName);
 
                     return getComputationsAverage(
                             fieldName,
@@ -103,8 +101,7 @@ public class StatisticsService {
                                                  OptimizationKind optimizationKind,
                                                  String measurementName,
                                                  String bucketName) {
-        return analytics
-                .getBestSeriesApi()
+        return analytics.getBestSeriesApi()
                 .nBestSeries(
                         n,
                         fieldName,
@@ -133,8 +130,7 @@ public class StatisticsService {
                                               List<ObjectId> computationsIds,
                                               @Nullable String measurementName,
                                               @Nullable String bucketName) {
-        return analytics
-                .getMovingAverageApi()
+        return analytics.getMovingAverageApi()
                 .timedMovingAvgSeries(
                         fieldName,
                         interval,
@@ -151,8 +147,7 @@ public class StatisticsService {
                                              List<ObjectId> computationsIds,
                                              @Nullable String measurementName,
                                              @Nullable String bucketName) {
-        return analytics
-                .getMovingAverageApi()
+        return analytics.getMovingAverageApi()
                 .timedMovingStdSeries(
                         fieldName,
                         interval,
@@ -163,32 +158,4 @@ public class StatisticsService {
                 );
     }
 
-    private static long getAverageNanoInterval(List<DataSeries> series) {
-        var averageSeriesSize = Math.ceil(getAverageSeriesDuration(series));
-        var seriesTimeBounds = getSeriesTotalDuration(series);
-        return (long) Math.floor(seriesTimeBounds.toNanos() / Math.max(1, averageSeriesSize));
-    }
-
-    private static double getAverageSeriesDuration(List<DataSeries> series) {
-        return series
-                .stream()
-                .map(DataSeries::getData)
-                .map(List::size)
-                .collect(Collectors.averagingInt(Integer::intValue));
-    }
-
-    private static Duration getSeriesTotalDuration(List<DataSeries> series) {
-        var stats = series
-                .stream()
-                .flatMap(s -> s.getData().stream())
-                .map(map -> (Instant) map.getOrDefault(Columns.TIME, null))
-                .filter(Objects::nonNull)
-                .map(Instant::toEpochMilli)
-                .collect(Collectors.summarizingLong(Long::longValue));
-
-        return Duration.between(
-                Instant.ofEpochMilli(stats.getMin()),
-                Instant.ofEpochMilli(stats.getMax())
-        );
-    }
 }
