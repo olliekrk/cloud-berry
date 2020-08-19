@@ -17,7 +17,7 @@ class Analytics(CloudberryApi):
                              field_name: str,
                              measurement_name: str = None,
                              bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/computations'
+        url = f'{self.base_url}/computations/comparison'
         params = Analytics._append_db_params({
             'fieldName': field_name
         }, measurement_name, bucket_name)
@@ -28,7 +28,7 @@ class Analytics(CloudberryApi):
                                                field_name: str,
                                                measurement_name: str = None,
                                                bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/computations/all'
+        url = f'{self.base_url}/computations/comparison/forConfiguration'
         params = Analytics._append_db_params({
             'fieldName': field_name,
             'configurationIdHex': configuration_id
@@ -40,7 +40,7 @@ class Analytics(CloudberryApi):
                                field_name: str,
                                measurement_name: str = None,
                                bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/configurations'
+        url = f'{self.base_url}/configurations/comparison'
         params = Analytics._append_db_params({
             'fieldName': field_name
         }, measurement_name, bucket_name)
@@ -51,7 +51,7 @@ class Analytics(CloudberryApi):
                                               field_name: str,
                                               measurement_name: str = None,
                                               bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/compare/configurations/all'
+        url = f'{self.base_url}/configurations/comparison/forExperiment'
         params = Analytics._append_db_params({
             'fieldName': field_name,
             'experimentName': experiment_name

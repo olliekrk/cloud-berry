@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MovingAverageSupplier implements MovingAverageApi {
+public class MovingAverageSupplier extends ApiSupplier implements MovingAverageApi {
     private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
     private static final String AVG_SERIES_NAME = "AVG";
@@ -41,10 +41,13 @@ public class MovingAverageSupplier implements MovingAverageApi {
                                            List<ObjectId> computationsIds,
                                            @Nullable String measurementNameOpt,
                                            @Nullable String bucketNameOpt) {
-        var bucketName = Optional.ofNullable(bucketNameOpt).orElseGet(influxConfig::getDefaultBucketName);
+        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
         var timeInterval = new TimeInterval(interval, chronoUnit);
+        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
+        var restrictions = measurementNameOpt == null ? fieldRestriction :
+                Restrictions.and(fieldRestriction, RestrictionsFactory.measurement(measurementNameOpt));
 
-        var query = initialQuery(fieldName, bucketName, measurementNameOpt)
+        var query = epochQuery(bucketName, restrictions)
                 .keep(Set.of(Columns.TIME, Columns.VALUE))
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .keep(Set.of(Columns.TIME, Columns.VALUE));
@@ -59,30 +62,19 @@ public class MovingAverageSupplier implements MovingAverageApi {
                                            List<ObjectId> computationsIds,
                                            @Nullable String measurementNameOpt,
                                            @Nullable String bucketNameOpt) {
-        var bucketName = Optional.ofNullable(bucketNameOpt).orElseGet(influxConfig::getDefaultBucketName);
+        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
         var timeInterval = new TimeInterval(interval, chronoUnit);
+        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
+        var restrictions = measurementNameOpt == null ? fieldRestriction :
+                Restrictions.and(fieldRestriction, RestrictionsFactory.measurement(measurementNameOpt));
 
-        var query = initialQuery(fieldName, bucketName, measurementNameOpt)
-                .groupBy(InfluxDefaults.CommonTags.COMPUTATION_ID)
+        var query = epochQueryByComputationId(bucketName, restrictions)
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .groupBy(Columns.TIME)
                 .stddev()
                 .group(); // ungroup
 
         return queryTimeValueSeries(query, STDDEV_SERIES_NAME, fieldName);
-    }
-
-    private static Flux initialQuery(String fieldName,
-                                     String bucketName,
-                                     @Nullable String measurementNameOpt) {
-        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
-        var restrictions = measurementNameOpt == null ? fieldRestriction :
-                Restrictions.and(fieldRestriction, RestrictionsFactory.measurement(measurementNameOpt));
-
-        return Flux
-                .from(bucketName)
-                .range(Instant.EPOCH)
-                .filter(restrictions);
     }
 
     /**

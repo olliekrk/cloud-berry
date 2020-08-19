@@ -17,6 +17,10 @@ public class DataSeries {
         return !this.data.isEmpty();
     }
 
+    public DataSeries renamed(String newSeriesName){
+        return new DataSeries(newSeriesName, data);
+    }
+
     public static DataSeries empty(String seriesName){
         return new DataSeries(seriesName, Collections.emptyList());
     }

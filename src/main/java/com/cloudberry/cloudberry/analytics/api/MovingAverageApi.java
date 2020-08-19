@@ -4,7 +4,6 @@ import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 
-import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 

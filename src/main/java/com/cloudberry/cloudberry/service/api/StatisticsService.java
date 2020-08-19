@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
@@ -15,9 +16,12 @@ import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Map.of;
@@ -29,21 +33,25 @@ public class StatisticsService {
 
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
-    private final InfluxDataAccessor influxDataAccessor;
 
     public List<DataSeries> getComputationsByIds(String fieldName,
                                                  @Nullable String measurementName,
                                                  @Nullable String bucketName,
                                                  List<ObjectId> computationIds,
                                                  boolean computeMean) {
-        var computationSeries = computationIds
-                .stream()
-                .map(id -> getComputationSeries(measurementName, bucketName, id))
-                .filter(DataSeries::nonEmpty)
-                .collect(Collectors.toList());
+        var computationSeries = analytics.getSeriesApi().computationsSeries(computationIds, measurementName, bucketName);
+        var intervalNanos = getAverageNanoInterval(computationSeries);
 
         if (computeMean) {
-            return ListSyntax.with(computationSeries, analytics.getMeanApi().mean(fieldName, computationSeries, null));
+            var avgSeries = getComputationsAverage(
+                    fieldName,
+                    intervalNanos,
+                    ChronoUnit.NANOS,
+                    computationIds,
+                    measurementName,
+                    bucketName
+            );
+            return ListSyntax.with(computationSeries, avgSeries);
         } else {
             return computationSeries;
         }
@@ -65,14 +73,18 @@ public class StatisticsService {
         return configurationIds
                 .stream()
                 .map(configurationId -> {
-                    var series = getComputationsByConfigurationId(
+                    var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+                    var computationSeries = analytics.getSeriesApi().computationsSeries(computationIds, measurementName, bucketName);
+                    var intervalNanos = getAverageNanoInterval(computationSeries);
+
+                    return getComputationsAverage(
                             fieldName,
+                            intervalNanos,
+                            ChronoUnit.NANOS,
+                            computationIds,
                             measurementName,
-                            bucketName,
-                            configurationId,
-                            false
-                    );
-                    return analytics.getMeanApi().mean(fieldName, series, configurationId.toHexString());
+                            bucketName
+                    ).renamed(String.format("configuration_%s", configurationId.toHexString()));
                 })
                 .collect(Collectors.toList());
     }
@@ -83,19 +95,6 @@ public class StatisticsService {
                                                                    String experimentName) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         return getConfigurationsMeansByIds(fieldName, measurementName, bucketName, configurationIds);
-    }
-
-    private DataSeries getComputationSeries(@Nullable String measurementName,
-                                            @Nullable String bucketName,
-                                            ObjectId computationId) {
-        var computationIdHex = computationId.toHexString();
-        var records = influxDataAccessor.findData(
-                bucketName,
-                measurementName,
-                Collections.emptyMap(),
-                of(InfluxDefaults.CommonTags.COMPUTATION_ID, computationIdHex));
-
-        return new DataSeries(computationIdHex, ListSyntax.mapped(records, FluxRecord::getValues));
     }
 
     public List<DataSeries> getNBestComputations(int n,
@@ -162,5 +161,34 @@ public class StatisticsService {
                         measurementName,
                         bucketName
                 );
+    }
+
+    private static long getAverageNanoInterval(List<DataSeries> series) {
+        var averageSeriesSize = Math.ceil(getAverageSeriesDuration(series));
+        var seriesTimeBounds = getSeriesTotalDuration(series);
+        return (long) Math.floor(seriesTimeBounds.toNanos() / Math.max(1, averageSeriesSize));
+    }
+
+    private static double getAverageSeriesDuration(List<DataSeries> series) {
+        return series
+                .stream()
+                .map(DataSeries::getData)
+                .map(List::size)
+                .collect(Collectors.averagingInt(Integer::intValue));
+    }
+
+    private static Duration getSeriesTotalDuration(List<DataSeries> series) {
+        var stats = series
+                .stream()
+                .flatMap(s -> s.getData().stream())
+                .map(map -> (Instant) map.getOrDefault(Columns.TIME, null))
+                .filter(Objects::nonNull)
+                .map(Instant::toEpochMilli)
+                .collect(Collectors.summarizingLong(Long::longValue));
+
+        return Duration.between(
+                Instant.ofEpochMilli(stats.getMin()),
+                Instant.ofEpochMilli(stats.getMax())
+        );
     }
 }
