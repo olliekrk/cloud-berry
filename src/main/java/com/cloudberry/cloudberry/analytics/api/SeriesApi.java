@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface SeriesApi {
 
-    List<DataSeries> computationsSeries(List<ObjectId> computationsIds,
+    List<DataSeries> computationsSeries(String fieldName,
+                                        List<ObjectId> computationsIds,
                                         @Nullable String measurementNameOpt,
                                         @Nullable String bucketNameOpt);
 

@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -29,21 +30,25 @@ public class SeriesSupplier extends ApiSupplier implements SeriesApi {
     private final InfluxDBClient influxClient;
 
     @Override
-    public List<DataSeries> computationsSeries(List<ObjectId> computationsIds,
+    public List<DataSeries> computationsSeries(String fieldName,
+                                               List<ObjectId> computationsIds,
                                                @Nullable String measurementNameOpt,
                                                @Nullable String bucketNameOpt) {
         var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
+        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
         var tagRestriction = RestrictionsFactory
                 .tagIn(CommonTags.COMPUTATION_ID, ListSyntax.mapped(computationsIds, ObjectId::toHexString));
         var restrictions = measurementNameOpt == null ?
-                tagRestriction : Restrictions.and(RestrictionsFactory.measurement(measurementNameOpt), tagRestriction);
+                Restrictions.and(fieldRestriction, tagRestriction) :
+                Restrictions.and(RestrictionsFactory.measurement(measurementNameOpt), fieldRestriction, tagRestriction);
 
         var query = epochQuery(bucketName, restrictions)
                 .pivot(
                         Set.of(CommonTags.COMPUTATION_ID, Columns.TIME),
                         Set.of(Columns.FIELD),
                         Columns.VALUE
-                );
+                )
+                .drop(InfluxDefaults.EXCLUDED_COLUMNS);
 
         return influxClient
                 .getQueryApi()

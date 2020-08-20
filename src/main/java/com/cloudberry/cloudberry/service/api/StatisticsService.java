@@ -1,26 +1,20 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
-import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static java.util.Map.of;
 
 @Slf4j
 @Service
@@ -36,7 +30,7 @@ public class StatisticsService {
                                                  List<ObjectId> computationIds,
                                                  boolean computeMean) {
         var computationSeries = analytics.getSeriesApi()
-                .computationsSeries(computationIds, measurementName, bucketName);
+                .computationsSeries(fieldName, computationIds, measurementName, bucketName);
         var intervalNanos = analytics.getSeriesApi()
                 .averageIntervalNanos(fieldName, computationIds, measurementName, bucketName);
 

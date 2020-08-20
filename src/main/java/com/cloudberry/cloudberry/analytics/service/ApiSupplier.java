@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics.service;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
@@ -12,6 +12,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 abstract class ApiSupplier {
@@ -40,13 +41,22 @@ abstract class ApiSupplier {
             return Optional.empty();
         } else {
             var recordsHead = records.get(0);
+            var data = records
+                    .stream()
+                    .peek(ApiSupplier::filterOutInfluxColumns)
+                    .map(FluxRecord::getValues)
+                    .collect(Collectors.toList());
             var computationId = (String) recordsHead.getValueByKey(CommonTags.COMPUTATION_ID);
-            return Optional.of(new DataSeries(computationId, ListSyntax.mapped(records, FluxRecord::getValues)));
+            return Optional.of(new DataSeries(computationId, data));
         }
     }
 
     protected static Stream<Instant> tableToTime(FluxTable fluxTable) {
         return fluxTable.getRecords().stream().map(FluxRecord::getTime);
+    }
+
+    protected static void filterOutInfluxColumns(FluxRecord record) {
+        record.getValues().keySet().removeAll(InfluxDefaults.EXCLUDED_COLUMNS);
     }
 
 }
