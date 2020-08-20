@@ -1,30 +1,31 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
-import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
-import com.cloudberry.cloudberry.parsing.service.LogsImporter;
+import com.cloudberry.cloudberry.analytics.model.DataPoint;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
-import com.cloudberry.cloudberry.analytics.model.DataPoint;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
+import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
+import com.cloudberry.cloudberry.parsing.service.LogsImporter;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.util.FileSystemUtils;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.influxdb.query.FluxRecord;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
+
+import static java.lang.String.format;
 
 @Slf4j
 @Service
@@ -39,24 +40,21 @@ public class RawDataService {
     private String defaultMeasurementName;
     public static final String rawDataSeriesName = "raw_data";
 
-    public void saveData(@Nullable String bucketName,
-                         @Nullable String measurementNameOpt,
+    public void saveData(OptionalQueryFields optionalQueryFields,
                          List<DataPoint> dataPoints) {
-        var measurementName = Optional.ofNullable(measurementNameOpt).orElse(defaultMeasurementName);
+        var measurementName = optionalQueryFields.getMeasurementNameOptional().orElse(defaultMeasurementName);
         var influxDataPoints = ListSyntax.mapped(dataPoints,
                 p -> pointBuilder.buildPoint(measurementName, p.getTime(), p.getFields(), p.getTags())
         );
 
-        log.info(String.format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(), measurementName));
-        influxDataWriter.writePoints(bucketName, influxDataPoints);
+        log.info(format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(), measurementName));
+        influxDataWriter.writePoints(optionalQueryFields.getBucketNameOptional().orElse(null), influxDataPoints);
     }
 
-    public DataSeries findData(@Nullable String bucketName,
-                               @Nullable String measurementName,
+    public DataSeries findData(OptionalQueryFields optionalQueryFields,
                                DataFilters filters) {
         var records = influxDataAccessor.findData(
-                bucketName,
-                measurementName,
+                optionalQueryFields,
                 filters.getFieldFilters(),
                 filters.getTagFilters()
         );
@@ -65,12 +63,10 @@ public class RawDataService {
         return new DataSeries(rawDataSeriesName, data);
     }
 
-    public void deleteData(@Nullable String bucketName,
-                           @Nullable String measurementName,
+    public void deleteData(OptionalQueryFields optionalQueryFields,
                            DataFilters filters) {
         influxDataEvictor.deleteData(
-                bucketName,
-                measurementName,
+                optionalQueryFields,
                 filters.getTagFilters()
         );
     }

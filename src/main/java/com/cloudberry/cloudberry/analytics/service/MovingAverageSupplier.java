@@ -2,33 +2,25 @@ package com.cloudberry.cloudberry.analytics.service;
 
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.IntervalTime;
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
-import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
-import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.query.FluxRecord;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.properties.TimeInterval;
-import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MovingAverageSupplier extends ApiSupplier implements MovingAverageApi {
+public class MovingAverageSupplier implements MovingAverageApi {
     private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
     private static final String AVG_SERIES_NAME = "AVG";
@@ -36,18 +28,14 @@ public class MovingAverageSupplier extends ApiSupplier implements MovingAverageA
 
     @Override
     public DataSeries timedMovingAvgSeries(String fieldName,
-                                           Long interval,
-                                           ChronoUnit chronoUnit,
-                                           List<ObjectId> computationsIds,
-                                           @Nullable String measurementNameOpt,
-                                           @Nullable String bucketNameOpt) {
-        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
-        var timeInterval = new TimeInterval(interval, chronoUnit);
-        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
-        var restrictions = measurementNameOpt == null ? fieldRestriction :
-                Restrictions.and(fieldRestriction, RestrictionsFactory.measurement(measurementNameOpt));
+                                           IntervalTime intervalTime,
+                                           List<ObjectId> computationsIds, // nie powinno byc gdzies uzyte? todo fix
+                                           OptionalQueryFields optionalQueryFields) {
+        var bucketName = ApiSupplier.bucketNameOrDefault(optionalQueryFields.getBucketNameOptional(), influxConfig);
+        var timeInterval = intervalTime.toTimeInterval();
+        var restrictions = ApiSupplier.getRestrictions(fieldName, optionalQueryFields.getMeasurementNameOptional());
 
-        var query = epochQuery(bucketName, restrictions)
+        var query = ApiSupplier.epochQuery(bucketName, restrictions)
                 .keep(Set.of(Columns.TIME, Columns.VALUE))
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .keep(Set.of(Columns.TIME, Columns.VALUE));
@@ -57,18 +45,14 @@ public class MovingAverageSupplier extends ApiSupplier implements MovingAverageA
 
     @Override
     public DataSeries timedMovingStdSeries(String fieldName,
-                                           Long interval,
-                                           ChronoUnit chronoUnit,
-                                           List<ObjectId> computationsIds,
-                                           @Nullable String measurementNameOpt,
-                                           @Nullable String bucketNameOpt) {
-        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
-        var timeInterval = new TimeInterval(interval, chronoUnit);
-        var fieldRestriction = RestrictionsFactory.hasField(fieldName);
-        var restrictions = measurementNameOpt == null ? fieldRestriction :
-                Restrictions.and(fieldRestriction, RestrictionsFactory.measurement(measurementNameOpt));
+                                           IntervalTime intervalTime,
+                                           List<ObjectId> computationsIds, // nie powinno byc gdzies uzyte? todo fix
+                                           OptionalQueryFields optionalQueryFields) {
+        var bucketName = ApiSupplier.bucketNameOrDefault(optionalQueryFields.getBucketNameOptional(), influxConfig);
+        var timeInterval = intervalTime.toTimeInterval();
+        var restrictions = ApiSupplier.getRestrictions(fieldName, optionalQueryFields.getMeasurementNameOptional());
 
-        var query = epochQueryByComputationId(bucketName, restrictions)
+        var query = ApiSupplier.epochQueryByComputationId(bucketName, restrictions)
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .groupBy(Columns.TIME)
                 .stddev()

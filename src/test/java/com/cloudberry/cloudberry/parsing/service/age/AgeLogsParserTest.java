@@ -1,8 +1,9 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
+import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.util.FilesUtils;
-import lombok.SneakyThrows;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -22,13 +23,8 @@ class AgeLogsParserTest {
     private final AgeLogsParser ageLogsParser = new AgeLogsParser();
 
     @Test
-    @SneakyThrows
     void parseFileReadsXmlProperties() {
-        var ageParsedLogs = ageLogsParser.parseFile(
-                FilesUtils.getFileFromResources(TEST_FILE),
-                new AgeUploadDetails(TEST_FILE_KEYS, null, null),
-                ""
-        );
+        var ageParsedLogs = getAgeParsedLogs(null);
 
         assertEquals(TEST_FILE_CONFIGURATION_NAME, ageParsedLogs.getConfigurationName());
         assertEquals(17, ageParsedLogs.getPoints().size());
@@ -44,27 +40,27 @@ class AgeLogsParserTest {
     }
 
     @Test
-    @SneakyThrows
     void parseFileNoExplicitConfigurationNameReturnsXmlConfigurationName() {
-        var ageParsedLogs = ageLogsParser.parseFile(
-                FilesUtils.getFileFromResources(TEST_FILE),
-                new AgeUploadDetails(TEST_FILE_KEYS, null, null),
-                ""
-        );
+        var ageParsedLogs = getAgeParsedLogs(null);
 
         assertEquals(TEST_FILE_CONFIGURATION_NAME, ageParsedLogs.getConfigurationName());
     }
 
     @Test
-    @SneakyThrows
     void parseFileExplicitConfigurationNameReturnsExplicitConfigurationName() {
         var explicitConfigurationName = "MyExperimentConfiguration1";
-        var ageParsedLogs = ageLogsParser.parseFile(
-                FilesUtils.getFileFromResources(TEST_FILE),
-                new AgeUploadDetails(TEST_FILE_KEYS, null, explicitConfigurationName),
-                ""
-        );
+
+        var ageParsedLogs = getAgeParsedLogs(explicitConfigurationName);
 
         assertEquals(explicitConfigurationName, ageParsedLogs.getConfigurationName());
+    }
+
+    private AgeParsedLogs getAgeParsedLogs(String configurationName) {
+        return Try.of(() ->
+                ageLogsParser.parseFile(
+                        FilesUtils.getFileFromResources(TEST_FILE),
+                        new AgeUploadDetails(TEST_FILE_KEYS, null, configurationName),
+                        "")
+        ).get();
     }
 }

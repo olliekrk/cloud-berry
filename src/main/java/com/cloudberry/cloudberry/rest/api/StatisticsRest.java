@@ -1,10 +1,13 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.OptimizationGoal;
-import com.cloudberry.cloudberry.analytics.model.OptimizationKind;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
+import com.cloudberry.cloudberry.analytics.model.IntervalTime;
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
+import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
+import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -34,8 +37,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByIds(
                 fieldName,
-                measurementName,
-                bucketName,
+                new OptionalQueryFields(measurementName, bucketName),
                 computationIds,
                 true
         );
@@ -52,8 +54,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByConfigurationId(
                 fieldName,
-                measurementName,
-                bucketName,
+                new OptionalQueryFields(measurementName, bucketName),
                 configurationId,
                 true
         );
@@ -69,16 +70,14 @@ public class StatisticsRest {
         return statisticsService.getNBestComputations(
                 n,
                 fieldName,
-                optimizationGoal,
-                optimizationKind,
-                measurementName,
-                bucketName
+                new Optimization(optimizationGoal, optimizationKind),
+                new OptionalQueryFields(measurementName, bucketName)
         );
     }
 
     @PostMapping("/computations/averageStddev")
     public List<DataSeries> getAverageAndStddevOfComputations(@RequestParam String fieldName,
-                                                              @RequestParam Long interval,
+                                                              @RequestParam long interval,
                                                               @RequestParam ChronoUnit unit,
                                                               @RequestParam(required = false) String measurementName,
                                                               @RequestParam(required = false) String bucketName,
@@ -90,11 +89,9 @@ public class StatisticsRest {
 
         return statisticsService.getAverageAndStddevOfComputations(
                 fieldName,
-                interval,
-                unit,
+                new IntervalTime(interval, unit),
                 computationIds,
-                measurementName,
-                bucketName
+                new OptionalQueryFields(measurementName, bucketName)
         );
     }
 
@@ -110,8 +107,7 @@ public class StatisticsRest {
 
         return statisticsService.getConfigurationsMeansByIds(
                 fieldName,
-                measurementName,
-                bucketName,
+                new OptionalQueryFields(measurementName, bucketName),
                 configurationIds
         );
     }
@@ -124,8 +120,7 @@ public class StatisticsRest {
     ) {
         return statisticsService.getConfigurationsMeansByExperimentName(
                 fieldName,
-                measurementName,
-                bucketName,
+                new OptionalQueryFields(measurementName, bucketName),
                 experimentName
         );
     }

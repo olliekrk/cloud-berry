@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.analytics.service;
 
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -13,7 +14,6 @@ import com.influxdb.query.FluxRecord;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -25,24 +25,24 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SeriesSupplier extends ApiSupplier implements SeriesApi {
+public class SeriesSupplier implements SeriesApi {
     private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
 
     @Override
     public List<DataSeries> computationsSeries(String fieldName,
                                                List<ObjectId> computationsIds,
-                                               @Nullable String measurementNameOpt,
-                                               @Nullable String bucketNameOpt) {
-        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
+                                               OptionalQueryFields optionalQueryFields) {
+        var bucketName = ApiSupplier.bucketNameOrDefault(optionalQueryFields.getBucketNameOptional(), influxConfig);
         var fieldRestriction = RestrictionsFactory.hasField(fieldName);
         var tagRestriction = RestrictionsFactory
                 .tagIn(CommonTags.COMPUTATION_ID, ListSyntax.mapped(computationsIds, ObjectId::toHexString));
-        var restrictions = measurementNameOpt == null ?
-                Restrictions.and(fieldRestriction, tagRestriction) :
-                Restrictions.and(RestrictionsFactory.measurement(measurementNameOpt), fieldRestriction, tagRestriction);
+        final var necessaryRestrictions = Restrictions.and(fieldRestriction, tagRestriction);
+        var restrictions = optionalQueryFields.getMeasurementNameOptional()
+                .map(name -> Restrictions.and(RestrictionsFactory.measurement(name), necessaryRestrictions))
+                .orElse(necessaryRestrictions);
 
-        var query = epochQuery(bucketName, restrictions)
+        var query = ApiSupplier.epochQuery(bucketName, restrictions)
                 .pivot(
                         Set.of(CommonTags.COMPUTATION_ID, Columns.TIME),
                         Set.of(Columns.FIELD),
@@ -60,23 +60,23 @@ public class SeriesSupplier extends ApiSupplier implements SeriesApi {
     }
 
     @Override
-    public Long averageIntervalNanos(String fieldName,
+    public long averageIntervalNanos(String fieldName,
                                      List<ObjectId> computationsIds,
-                                     @Nullable String measurementNameOpt,
-                                     @Nullable String bucketNameOpt) {
-        var bucketName = bucketNameOrDefault(bucketNameOpt, influxConfig);
+                                     OptionalQueryFields optionalQueryFields) {
+        var bucketName = ApiSupplier.bucketNameOrDefault(optionalQueryFields.getBucketNameOptional(), influxConfig);
         var tagRestriction = RestrictionsFactory
                 .tagIn(CommonTags.COMPUTATION_ID, ListSyntax.mapped(computationsIds, ObjectId::toHexString));
-        var restrictions = measurementNameOpt == null ?
-                tagRestriction : Restrictions.and(RestrictionsFactory.measurement(measurementNameOpt), tagRestriction);
+        var restrictions = optionalQueryFields.getMeasurementNameOptional()
+                .map(name -> Restrictions.and(RestrictionsFactory.measurement(name), tagRestriction))
+                .orElse(tagRestriction);
 
-        var countsQuery = epochQuery(bucketName, RestrictionsFactory.hasField(fieldName))
+        var countsQuery = ApiSupplier.epochQuery(bucketName, RestrictionsFactory.hasField(fieldName))
                 .filter(restrictions)
                 .keep(Set.of(CommonTags.COMPUTATION_ID, Columns.VALUE))
                 .count()
                 .group(); // ungroup
 
-        var timeQuery = epochQuery(bucketName, RestrictionsFactory.hasField(fieldName))
+        var timeQuery = ApiSupplier.epochQuery(bucketName, RestrictionsFactory.hasField(fieldName))
                 .filter(restrictions)
                 .keep(Set.of(Columns.TIME, Columns.VALUE))
                 .sort(Set.of(Columns.TIME));
