@@ -14,7 +14,7 @@ public class JacksonConfig {
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
-                .registerModule(new JavaTimeModule()) // i.e. to deserialize numbers as java.time.Instant
+                .registerModule(new JavaTimeModule()) // e.g. to deserialize numbers as java.time.Instant
                 .registerModule(new CloudberryJacksonModule()) // custom definitions
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);

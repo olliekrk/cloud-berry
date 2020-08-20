@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.rest.api;
 
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.service.api.FluxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class FluxDataRest {
     private final FluxService fluxService;
 
-    @PostMapping("/query")
-    public String getQueryResult(@RequestBody String rawQuery) {
-        return fluxService.doQuery(rawQuery);
+    @PostMapping("/querySeries")
+    public DataSeries queryForSeries(@RequestBody String rawQuery) {
+        return fluxService.queryForSeries(rawQuery);
     }
 }

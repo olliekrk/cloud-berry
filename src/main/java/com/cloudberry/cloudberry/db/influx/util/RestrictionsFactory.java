@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.db.influx.util;
 
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -43,4 +44,19 @@ public abstract class RestrictionsFactory {
         return fieldRestrictions.length == 0 ? Optional.empty() : Optional.of(Restrictions.or(fieldRestrictions));
     }
 
+    public static Restrictions hasField(String fieldName) {
+        return Restrictions.field().equal(fieldName);
+    }
+
+    public static Restrictions tagEquals(String tagName, String tagValue) {
+        return Restrictions.tag(tagName).equal(tagValue);
+    }
+
+    public static Restrictions tagIn(String tagName, Collection<String> tagValues) {
+        var tagRestrictions = tagValues
+                .stream()
+                .map(tagValue -> tagEquals(tagName, tagValue))
+                .toArray(Restrictions[]::new);
+        return Restrictions.or(tagRestrictions);
+    }
 }

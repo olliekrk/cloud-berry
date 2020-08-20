@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.model.solution;
 
-import com.cloudberry.cloudberry.model.Parametrized;
+import com.cloudberry.cloudberry.common.trait.Parametrized;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

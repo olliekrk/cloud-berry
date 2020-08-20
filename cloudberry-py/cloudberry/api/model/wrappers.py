@@ -17,6 +17,15 @@ class DataSeries:
         self.series_name = series_name
         self.data = data
 
+    def merge_values_with(self,
+                          other_series,
+                          merging_key: str,
+                          new_series_name: str = None):
+        one_df = self.as_data_frame
+        second_df = other_series.as_data_frame
+        result_df = pd.concat([one_df, second_df]).pivot(index=merging_key, columns='series_name')
+        return DataSeries(new_series_name or self.series_name, result_df.to_dict())
+
     @property
     def as_data_frame(self) -> pd.DataFrame:
         df = pd.DataFrame(self.data)

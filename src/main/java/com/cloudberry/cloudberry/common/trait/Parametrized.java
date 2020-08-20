@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.model;
+package com.cloudberry.cloudberry.common.trait;
 
 import java.util.Map;
 import java.util.Optional;

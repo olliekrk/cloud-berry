@@ -1,3 +1,4 @@
 requests~=2.23.0
 pandas~=1.0.3
 matplotlib~=3.2.1
+colorhash~=1.0.2

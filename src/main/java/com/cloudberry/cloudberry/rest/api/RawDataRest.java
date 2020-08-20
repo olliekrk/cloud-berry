@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
-import com.cloudberry.cloudberry.model.statistics.DataPoint;
-import com.cloudberry.cloudberry.model.statistics.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.DataPoint;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;

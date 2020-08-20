@@ -1,7 +1,7 @@
-from .wrappers import DataPoint, DataSeries
+from .backend import CloudberryConfig
+from .model import DataPoint, DataSeries, OptimizationGoal, OptimizationKind, TimeUnit
 from .analytics import Analytics
 from .buckets import Buckets
-from .config import CloudberryConfig
 from .data import DataFilters, Data
 from .metadata import Metadata
 from .plots import DataSeriesPlots

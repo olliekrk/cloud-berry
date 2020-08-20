@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.util.syntax.ListSyntax;
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.Bucket;

@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.model.statistics;
+package com.cloudberry.cloudberry.analytics.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

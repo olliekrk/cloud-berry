@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.db.mongo.data.metadata;
 
-import com.cloudberry.cloudberry.model.Parametrized;
-import com.cloudberry.cloudberry.model.Timed;
+import com.cloudberry.cloudberry.common.trait.Parametrized;
+import com.cloudberry.cloudberry.common.trait.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bson.types.ObjectId;

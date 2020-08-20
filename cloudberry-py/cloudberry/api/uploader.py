@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from .config import CloudberryConfig, CloudberryApi
+from .backend import CloudberryConfig, CloudberryApi
 
 
 class UploadDetails:

@@ -1,9 +1,8 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
-import com.cloudberry.cloudberry.util.syntax.MapSyntax;
-import com.cloudberry.cloudberry.util.syntax.SetSyntax;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
@@ -20,8 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.cloudberry.cloudberry.db.influx.service.InfluxColumns.*;
 
 @Slf4j
 @Service
@@ -52,13 +49,13 @@ public class InfluxDataAccessor {
                 Set.of(InfluxDefaults.Columns.FIELD),
                 InfluxDefaults.Columns.VALUE);
         query = columnRestrictions.<Flux>map(query::filter).orElse(query);
-        query = query.drop(EXCLUDED_COLUMNS);
+        query = query.drop(InfluxDefaults.EXCLUDED_COLUMNS);
 
         return api.query(query.toString())
                 .stream()
                 .map(FluxTable::getRecords)
                 .flatMap(List::stream)
-                .peek(record -> record.getValues().keySet().removeAll(List.of(TABLE, RESULT))) //idk why this doesn't work in query.drop
+                .peek(record -> record.getValues().keySet().removeAll(InfluxDefaults.EXCLUDED_COLUMNS))
                 .collect(Collectors.toList());
     }
 

@@ -2,12 +2,11 @@ package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.OffsetsFactory;
-import com.cloudberry.cloudberry.util.syntax.CollectionSyntax;
+import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.influxdb.client.InfluxDBClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
