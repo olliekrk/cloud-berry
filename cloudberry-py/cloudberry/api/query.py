@@ -1,3 +1,4 @@
+from .model import DataSeries
 from .backend import CloudberryConfig, CloudberryApi
 import requests
 
@@ -8,9 +9,6 @@ class Query(CloudberryApi):
         super().__init__(config)
         self.base_url = f'{config.base_url()}/flux'
 
-    def query(self, raw_query: str, raw=False):
-        r = requests.post(f'{self.base_url}/query', data=raw_query)
-        if raw:
-            return r.content
-        else:
-            return r.json()
+    def query_series(self, raw_query: str) -> DataSeries:
+        r = requests.post(f'{self.base_url}/querySeries', data=raw_query)
+        return DataSeries.from_json(r.json())

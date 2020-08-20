@@ -3,6 +3,7 @@ from typing import List
 import matplotlib.pyplot as plt
 
 from .model import DataSeries
+from colorhash import ColorHash
 
 DEFAULT_PLOT_SIZE = (15, 5)
 DEFAULT_PLOT_COLOR = 'red'
@@ -64,13 +65,5 @@ class DataSeriesPlots:
 
     @staticmethod
     def _get_series_color(series: DataSeries):
-        max_hex = 256
-
-        def rgb_scaled(v):
-            return min(float(v % max_hex) / (max_hex - 1), 1)
-
-        series_name_hash: int = hash(series.series_name) % max_hex ** 3
-        red = rgb_scaled(series_name_hash)
-        green = rgb_scaled(series_name_hash / max_hex)
-        blue = rgb_scaled(series_name_hash / max_hex ** 2)
-        return red, green, blue
+        color = ColorHash(series.series_name)
+        return tuple(map(lambda c: c / 255.0, color.rgb))
