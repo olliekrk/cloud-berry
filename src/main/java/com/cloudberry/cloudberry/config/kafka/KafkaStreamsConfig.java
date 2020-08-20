@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class KafkaStreamsConfig {
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
-    public KafkaStreamsConfiguration kStreamsConfigs(KafkaProperties kafkaProperties,
+    public KafkaStreamsConfiguration wkStreamsConfigs(KafkaProperties kafkaProperties,
                                                      @Value("${spring.application.name}") String applicationName) {
         var properties = new HashMap<String, Object>(kafkaProperties.getProperties());
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());

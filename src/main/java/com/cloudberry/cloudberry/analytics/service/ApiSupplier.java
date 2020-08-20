@@ -12,6 +12,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +53,11 @@ abstract class ApiSupplier {
     }
 
     protected static Stream<Instant> tableToTime(FluxTable fluxTable) {
-        return fluxTable.getRecords().stream().map(FluxRecord::getTime);
+        return tableToSingleValue(fluxTable, FluxRecord::getTime);
+    }
+
+    protected static <T> Stream<T> tableToSingleValue(FluxTable fluxTable, Function<FluxRecord, T> mapper) {
+        return fluxTable.getRecords().stream().map(mapper);
     }
 
     protected static void filterOutInfluxColumns(FluxRecord record) {
