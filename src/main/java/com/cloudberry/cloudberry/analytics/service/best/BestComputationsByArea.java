@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.best;
 
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
-import com.cloudberry.cloudberry.analytics.service.ApiSupplier;
+import com.cloudberry.cloudberry.common.FluxUtils;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
@@ -17,7 +17,7 @@ class BestComputationsByArea extends BestComputations {
                  OptimizationGoal optimizationGoal,
                  Restrictions restrictions,
                  String bucketName) {
-        var preparedFlux = ApiSupplier.epochQueryByComputationId(bucketName, restrictions)
+        var preparedFlux = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .keep(Set.of(TIME, VALUE, COMPUTATION_ID))
                 .integral(); // gets integral from each group
         return makeFluxGreatAgain(preparedFlux, n, optimizationGoal);

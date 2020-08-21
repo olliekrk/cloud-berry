@@ -10,12 +10,10 @@ import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +23,7 @@ public class StatisticsService {
     private static final ChronoUnit INTERVAL_UNIT = ChronoUnit.NANOS;
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
+    private final InfluxUtilService influxUtilService;
 
     public List<DataSeries> getComputationsByIds(String fieldName,
                                                  OptionalQueryFields optionalQueryFields,
@@ -32,10 +31,11 @@ public class StatisticsService {
                                                  boolean computeMean) {
         var computationSeries = analytics.getSeriesApi()
                 .computationsSeries(fieldName, computationIds, optionalQueryFields);
-        var intervalNanos = analytics.getSeriesApi()
-                .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
 
         if (computeMean) {
+            var intervalNanos = influxUtilService
+                    .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
+
             var avgSeries = getComputationsAverage(
                     fieldName,
                     new IntervalTime(intervalNanos, INTERVAL_UNIT),
@@ -59,21 +59,18 @@ public class StatisticsService {
     public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
                                                         OptionalQueryFields optionalQueryFields,
                                                         List<ObjectId> configurationIds) {
-        return configurationIds
-                .stream()
-                .map(configurationId -> {
-                    var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-                    var intervalNanos = analytics.getSeriesApi()
-                            .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
+        return ListSyntax.mapped(configurationIds, configurationId -> {
+            var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+            var intervalNanos = influxUtilService
+                    .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
 
-                    return getComputationsAverage(
-                            fieldName,
-                            new IntervalTime(intervalNanos, INTERVAL_UNIT),
-                            computationIds,
-                            optionalQueryFields
-                    ).renamed(String.format("configuration_%s", configurationId.toHexString()));
-                })
-                .collect(Collectors.toList());
+            return getComputationsAverage(
+                    fieldName,
+                    new IntervalTime(intervalNanos, INTERVAL_UNIT),
+                    computationIds,
+                    optionalQueryFields
+            ).renamed(String.format("configuration_%s", configurationId.toHexString()));
+        });
     }
 
     public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,
@@ -110,26 +107,26 @@ public class StatisticsService {
                                               IntervalTime intervalTime,
                                               List<ObjectId> computationsIds,
                                               OptionalQueryFields optionalQueryFields) {
-        return analytics.getMovingAverageApi()
-                .timedMovingAvgSeries(
+        return analytics.getMovingAverageAvg()
+                .getTimedMovingSeries(
                         fieldName,
                         intervalTime,
                         computationsIds,
                         optionalQueryFields
-                        );
+                );
     }
 
     private DataSeries getComputationsStddev(String fieldName,
                                              IntervalTime intervalTime,
                                              List<ObjectId> computationsIds,
                                              OptionalQueryFields optionalQueryFields) {
-        return analytics.getMovingAverageApi()
-                .timedMovingStdSeries(
+        return analytics.getMovingAverageStd()
+                .getTimedMovingSeries(
                         fieldName,
                         intervalTime,
                         computationsIds,
                         optionalQueryFields
-                        );
+                );
     }
 
 }

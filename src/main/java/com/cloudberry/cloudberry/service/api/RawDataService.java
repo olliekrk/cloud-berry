@@ -48,7 +48,7 @@ public class RawDataService {
         );
 
         log.info(format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(), measurementName));
-        influxDataWriter.writePoints(optionalQueryFields.getBucketNameOptional().orElse(null), influxDataPoints);
+        influxDataWriter.writePoints(optionalQueryFields.getBucketName(), influxDataPoints);
     }
 
     public DataSeries findData(OptionalQueryFields optionalQueryFields,

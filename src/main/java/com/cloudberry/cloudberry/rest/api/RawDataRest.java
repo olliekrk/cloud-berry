@@ -9,6 +9,7 @@ import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
+import com.cloudberry.cloudberry.service.api.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +26,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RawDataRest {
-
+    private final BucketNameResolver bucketNameResolver;
     private final RawDataService rawDataService;
 
     @PostMapping("/save")
     public void saveData(@RequestParam(required = false) String bucketName,
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
-        rawDataService.saveData(new OptionalQueryFields(measurementName, bucketName), dataPoints);
+        rawDataService.saveData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                dataPoints);
     }
 
     @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)

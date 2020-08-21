@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
+import com.cloudberry.cloudberry.service.api.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/statistics")
 @RequiredArgsConstructor
 public class StatisticsRest {
-
+    private final BucketNameResolver bucketNameResolver;
     private final StatisticsService statisticsService;
 
     @PostMapping("/computations/comparison")
@@ -37,7 +38,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByIds(
                 fieldName,
-                new OptionalQueryFields(measurementName, bucketName),
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
                 computationIds,
                 true
         );
@@ -54,7 +55,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByConfigurationId(
                 fieldName,
-                new OptionalQueryFields(measurementName, bucketName),
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
                 configurationId,
                 true
         );
@@ -71,7 +72,7 @@ public class StatisticsRest {
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
-                new OptionalQueryFields(measurementName, bucketName)
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName))
         );
     }
 
@@ -91,7 +92,7 @@ public class StatisticsRest {
                 fieldName,
                 new IntervalTime(interval, unit),
                 computationIds,
-                new OptionalQueryFields(measurementName, bucketName)
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName))
         );
     }
 
@@ -107,7 +108,7 @@ public class StatisticsRest {
 
         return statisticsService.getConfigurationsMeansByIds(
                 fieldName,
-                new OptionalQueryFields(measurementName, bucketName),
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
                 configurationIds
         );
     }
@@ -120,7 +121,7 @@ public class StatisticsRest {
     ) {
         return statisticsService.getConfigurationsMeansByExperimentName(
                 fieldName,
-                new OptionalQueryFields(measurementName, bucketName),
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
                 experimentName
         );
     }

@@ -1,11 +1,13 @@
 package com.cloudberry.cloudberry.analytics.model;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.Optional;
 
 @RequiredArgsConstructor
 public class OptionalQueryFields {
+    @Nullable
     private final String measurementName;
     private final String bucketName;
 
@@ -13,7 +15,7 @@ public class OptionalQueryFields {
         return Optional.ofNullable(measurementName);
     }
 
-    public Optional<String> getBucketNameOptional() {
-        return Optional.ofNullable(bucketName);
+    public String getBucketName() {
+        return bucketName;
     }
 }

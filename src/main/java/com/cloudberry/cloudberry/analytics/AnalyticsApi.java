@@ -3,6 +3,8 @@ package com.cloudberry.cloudberry.analytics;
 import com.cloudberry.cloudberry.analytics.api.BestSeriesApi;
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageAvg;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageStd;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.stereotype.Component;
@@ -16,5 +18,6 @@ import org.springframework.stereotype.Component;
 public class AnalyticsApi {
     SeriesApi seriesApi;
     BestSeriesApi bestSeriesApi;
-    MovingAverageApi movingAverageApi;
+    MovingAverageStd movingAverageStd;
+    MovingAverageAvg movingAverageAvg;
 }

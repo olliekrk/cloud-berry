@@ -9,12 +9,7 @@ import java.util.List;
 
 public interface MovingAverageApi {
 
-    DataSeries timedMovingAvgSeries(String fieldName,
-                                    IntervalTime intervalTime,
-                                    List<ObjectId> computationsIds,
-                                    OptionalQueryFields optionalQueryFields);
-
-    DataSeries timedMovingStdSeries(String fieldName,
+    DataSeries getTimedMovingSeries(String fieldName,
                                     IntervalTime intervalTime,
                                     List<ObjectId> computationsIds,
                                     OptionalQueryFields optionalQueryFields);

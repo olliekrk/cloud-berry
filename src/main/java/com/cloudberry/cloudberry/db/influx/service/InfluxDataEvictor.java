@@ -18,8 +18,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataEvictor {
-    @Value("${influx.buckets.default-logs}")
-    private String defaultBucketName;
     @Value("${spring.influx2.org}")
     private String defaultOrganization;
 
@@ -29,7 +27,7 @@ public class InfluxDataEvictor {
                            Map<String, String> tags) {
         var start = OffsetsFactory.epoch();
         var stop = OffsetsFactory.now();
-        var bucket = optionalQueryFields.getBucketNameOptional().orElse(defaultBucketName);
+        var bucket = optionalQueryFields.getBucketName();
         influxClient.getDeleteApi()
                 .delete(start,
                         stop,
