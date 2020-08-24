@@ -9,11 +9,14 @@ import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,24 +56,34 @@ public class StatisticsService {
                                                              ObjectId configurationId,
                                                              boolean computeMean) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+        if (computationIds.isEmpty()) {
+            return List.of();
+        }
         return getComputationsByIds(fieldName, optionalQueryFields, computationIds, computeMean);
     }
 
     public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
                                                         OptionalQueryFields optionalQueryFields,
                                                         List<ObjectId> configurationIds) {
-        return ListSyntax.mapped(configurationIds, configurationId -> {
-            var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-            var intervalNanos = influxUtilService
-                    .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
+        return configurationIds.stream()
+                .map(configurationId ->
+                        Pair.of(configurationId,
+                                metadataService.findAllComputationIdsForConfiguration(configurationId)))
+                .filter(configurationIdComputationsIds -> !configurationIdComputationsIds.getValue().isEmpty())
+                .map(configurationIdComputationsIds -> {
+                    val computationIds = configurationIdComputationsIds.getValue();
+                    val configurationId = configurationIdComputationsIds.getKey();
+                    val intervalNanos = influxUtilService
+                            .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
 
-            return getComputationsAverage(
-                    fieldName,
-                    new IntervalTime(intervalNanos, INTERVAL_UNIT),
-                    computationIds,
-                    optionalQueryFields
-            ).renamed(String.format("configuration_%s", configurationId.toHexString()));
-        });
+                    return getComputationsAverage(
+                            fieldName,
+                            new IntervalTime(intervalNanos, INTERVAL_UNIT),
+                            computationIds,
+                            optionalQueryFields
+                    ).renamed(String.format("configuration_%s", configurationId.toHexString()));
+                })
+                .collect(Collectors.toList());
     }
 
     public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,

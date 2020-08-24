@@ -42,14 +42,18 @@ public class RawDataRest {
     public DataSeries findData(@RequestParam(required = false) String bucketName,
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
-        return rawDataService.findData(new OptionalQueryFields(measurementName, bucketName), filters);
+        return rawDataService.findData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                filters);
     }
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteData(@RequestParam(required = false) String bucketName,
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
-        rawDataService.deleteData(new OptionalQueryFields(measurementName, bucketName), filters);
+        rawDataService.deleteData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                filters);
     }
 
     @PostMapping(value = "/ageFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

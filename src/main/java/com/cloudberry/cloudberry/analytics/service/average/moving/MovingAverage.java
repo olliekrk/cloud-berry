@@ -3,7 +3,6 @@ package com.cloudberry.cloudberry.analytics.service.average.moving;
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
-import com.cloudberry.cloudberry.analytics.service.RestrictionsGenerator;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;
@@ -54,9 +53,11 @@ public abstract class MovingAverage implements MovingAverageApi {
                 .orElse(DataSeries.empty(seriesName));
     }
 
-    protected Restrictions getRestrictions(OptionalQueryFields optionalQueryFields, List<ObjectId> computationsIds, String fieldName) {
+    protected Restrictions getRestrictions(OptionalQueryFields optionalQueryFields,
+                                           List<ObjectId> computationsIds,
+                                           String fieldName) {
         return optionalQueryFields.getMeasurementNameOptional()
                 .map(name -> getRestrictionsComputationIds(computationsIds, fieldName, name))
-                .orElse(RestrictionsGenerator.getRestrictionsComputationIds(computationsIds, fieldName));
+                .orElse(getRestrictionsComputationIds(computationsIds, fieldName));
     }
 }
