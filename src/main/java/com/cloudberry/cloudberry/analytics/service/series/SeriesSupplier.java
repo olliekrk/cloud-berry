@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +30,10 @@ public class SeriesSupplier implements SeriesApi {
     public List<DataSeries> computationsSeries(String fieldName,
                                                List<ObjectId> computationsIds,
                                                InfluxQueryFields influxQueryFields) {
+        if (computationsIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         var bucketName = influxQueryFields.getBucketName();
         var fieldRestriction = RestrictionsFactory.hasField(fieldName);
         var tagRestriction = RestrictionsFactory

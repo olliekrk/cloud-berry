@@ -114,9 +114,13 @@ class Analytics(CloudberryApi):
         url = f'{self.base_url}/computations/exceedingThresholds'
         params = Analytics._append_db_params({
             'fieldName': field_name,
-            'mode': criteria_mode,
+            'mode': criteria_mode.name,
         }, measurement_name, bucket_name)
-        return Analytics._wrap_series_request(lambda: requests.post(url=url, params=params, json=thresholds))
+        return Analytics._wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            json=thresholds.__dict__
+        ))
 
     @staticmethod
     def _wrap_series_request(request_lambda) -> List[DataSeries]:

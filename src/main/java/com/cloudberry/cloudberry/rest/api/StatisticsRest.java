@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +100,12 @@ public class StatisticsRest {
                                                                @RequestParam CriteriaMode mode,
                                                                @RequestParam(required = false) String measurementName,
                                                                @RequestParam(required = false) String bucketName,
-                                                               @RequestBody Thresholds thresholds) {
+                                                               @RequestBody Thresholds thresholds
+    ) throws InvalidThresholdsException {
+        if (!thresholds.isValid()) {
+            throw new InvalidThresholdsException(thresholds);
+        }
+
         return statisticsService.getComputationsExceedingThresholds(
                 fieldName,
                 thresholds,

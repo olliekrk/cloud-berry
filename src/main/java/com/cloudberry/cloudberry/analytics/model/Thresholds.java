@@ -2,10 +2,12 @@ package com.cloudberry.cloudberry.analytics.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
 import lombok.Value;
 import org.springframework.lang.Nullable;
 
 @Value
+@ToString
 public class Thresholds {
     @Nullable
     Double upper;
