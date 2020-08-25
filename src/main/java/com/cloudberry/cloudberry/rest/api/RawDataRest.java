@@ -2,14 +2,14 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
-import com.cloudberry.cloudberry.service.api.BucketNameResolver;
+import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class RawDataRest {
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
         rawDataService.saveData(
-                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
                 dataPoints);
     }
 
@@ -43,7 +43,7 @@ public class RawDataRest {
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
         return rawDataService.findData(
-                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
                 filters);
     }
 
@@ -52,7 +52,7 @@ public class RawDataRest {
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
         rawDataService.deleteData(
-                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
                 filters);
     }
 

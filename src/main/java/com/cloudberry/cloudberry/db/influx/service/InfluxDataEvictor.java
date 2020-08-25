@@ -1,13 +1,13 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.OffsetsFactory;
 import com.influxdb.client.InfluxDBClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -18,22 +18,20 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataEvictor {
-    @Value("${spring.influx2.org}")
-    private String defaultOrganization;
-
+    private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
 
-    public void deleteData(OptionalQueryFields optionalQueryFields,
+    public void deleteData(InfluxQueryFields influxQueryFields,
                            Map<String, String> tags) {
         var start = OffsetsFactory.epoch();
         var stop = OffsetsFactory.now();
-        var bucket = optionalQueryFields.getBucketName();
+        var bucket = influxQueryFields.getBucketName();
         influxClient.getDeleteApi()
                 .delete(start,
                         stop,
-                        buildDeletePredicate(optionalQueryFields.getMeasurementNameOptional(), tags),
+                        buildDeletePredicate(influxQueryFields.getMeasurementNameOptional(), tags),
                         bucket,
-                        defaultOrganization);
+                        influxConfig.getDefaultOrganization());
     }
 
     private static String buildDeletePredicate(Optional<String> measurementName,

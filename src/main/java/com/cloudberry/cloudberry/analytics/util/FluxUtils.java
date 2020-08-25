@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.common;
+package com.cloudberry.cloudberry.analytics.util;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -14,9 +14,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class FluxUtils {
-    public static Stream<Instant> tableToTime(FluxTable fluxTable) {
-        return fluxTable.getRecords().stream().map(FluxRecord::getTime);
-    }
 
     public static Flux epochQuery(String bucketName,
                                   Restrictions restrictions) {

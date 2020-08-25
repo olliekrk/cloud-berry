@@ -1,12 +1,12 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.Bucket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BucketsService {
-    @Value("${spring.influx2.org}")
-    private String defaultOrganization;
+    private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
 
     public List<String> getBucketNames() {
@@ -29,7 +28,7 @@ public class BucketsService {
         var buckets = bucketsApi();
         if (findBucketByName(bucketName).isEmpty()) {
             log.info("Creating new bucket: " + bucketName);
-            buckets.createBucket(bucketName, defaultOrganization);
+            buckets.createBucket(bucketName, influxConfig.getDefaultOrganization());
         }
     }
 

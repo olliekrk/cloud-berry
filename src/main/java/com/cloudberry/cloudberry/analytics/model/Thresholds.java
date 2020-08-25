@@ -14,7 +14,7 @@ public class Thresholds {
 
     @JsonCreator
     public Thresholds(@Nullable @JsonProperty("upper") Double upper,
-                      @Nullable @JsonProperty("fields") Double lower) {
+                      @Nullable @JsonProperty("lower") Double lower) {
         this.upper = upper;
         this.lower = lower;
     }

@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.db.influx.util.converter.LogsEventToPointConverter;
 import com.cloudberry.cloudberry.kafka.event.Event;
@@ -9,15 +10,13 @@ import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import com.cloudberry.cloudberry.kafka.processing.EventProcessor;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class LogsEventProcessor implements EventProcessor<Event> {
-    @Value("${influx.buckets.default-logs}")
-    private String computationLogsBucketName;
+    private final InfluxConfig influxConfig;
     private final InfluxDataWriter influxDataWriter;
     private final LogsEventToPointConverter logsEventToPointConverter;
 
@@ -33,7 +32,7 @@ public class LogsEventProcessor implements EventProcessor<Event> {
         }
 
         if (point != null) {
-            influxDataWriter.writePoint(computationLogsBucketName, point);
+            influxDataWriter.writePoint(influxConfig.getDefaultBucketName(), point);
         }
     }
 
