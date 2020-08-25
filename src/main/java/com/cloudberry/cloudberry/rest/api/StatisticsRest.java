@@ -11,6 +11,7 @@ import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.temporal.ChronoUnit;
@@ -37,7 +38,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByIds(
                 fieldName,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                getInfluxQueryFields(measurementName, bucketName),
                 computationIds,
                 true
         );
@@ -54,7 +55,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByConfigurationId(
                 fieldName,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                getInfluxQueryFields(measurementName, bucketName),
                 configurationId,
                 true
         );
@@ -71,7 +72,7 @@ public class StatisticsRest {
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName))
+                getInfluxQueryFields(measurementName, bucketName)
         );
     }
 
@@ -91,7 +92,7 @@ public class StatisticsRest {
                 fieldName,
                 new ChronoInterval(interval, unit),
                 computationIds,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName))
+                getInfluxQueryFields(measurementName, bucketName)
         );
     }
 
@@ -110,7 +111,7 @@ public class StatisticsRest {
                 fieldName,
                 thresholds,
                 mode,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName))
+                getInfluxQueryFields(measurementName, bucketName)
         );
     }
 
@@ -126,7 +127,7 @@ public class StatisticsRest {
 
         return statisticsService.getConfigurationsMeansByIds(
                 fieldName,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                getInfluxQueryFields(measurementName, bucketName),
                 configurationIds
         );
     }
@@ -139,9 +140,14 @@ public class StatisticsRest {
     ) {
         return statisticsService.getConfigurationsMeansByExperimentName(
                 fieldName,
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                getInfluxQueryFields(measurementName, bucketName),
                 experimentName
         );
+    }
+
+    private InfluxQueryFields getInfluxQueryFields(@Nullable String measurementName,
+                                                   @Nullable String bucketName) {
+        return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
     }
 
     private static Optional<ObjectId> getValidId(String rawId) {

@@ -47,7 +47,7 @@ public class InfluxDataWriter {
         Try.withResources(influxClient::getWriteApi)
                 .of(writeApi -> {
                     var bucket = Optional.ofNullable(bucketName).orElse(influxConfig.getDefaultBucketName());
-                    bucketsService.createBucket(bucket);
+                    bucketsService.createBucketIfNotExists(bucket);
                     writeApi.writePoints(bucket, influxConfig.getDefaultOrganization(), List.copyOf(points));
                     return null;
                 }).get();
