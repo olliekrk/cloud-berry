@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.service;
 
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
@@ -12,7 +13,6 @@ import io.vavr.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,8 +22,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class LogsMetadataAppender {
-    @Value("${influx.buckets.default-logs}")
-    private String defaultLogsBucketName;
+    private final InfluxConfig influxConfig;
     private final MetadataService metadataService;
 
     public ParsedLogsWithMetadata appendMetadata(ParsedLogs parsedLogs,
@@ -42,7 +41,7 @@ public class LogsMetadataAppender {
                     var computation = new ExperimentComputation(computationId, meta._2.getId(), now);
                     return metadataService.getOrCreateComputation(computation).map(meta::append);
                 })
-                .map(tuple -> new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), tuple._2, tuple._3))
+                .map(tuple -> new ParsedLogsWithMetadata(influxConfig.getDefaultBucketName(), parsedLogs.getPoints(), tuple._2, tuple._3))
                 .block();
     }
 
@@ -69,7 +68,7 @@ public class LogsMetadataAppender {
                     var computationId = meta._3.getId().toHexString();
                     parsedLogs.getPoints().forEach(point -> point.addTag(CommonTags.COMPUTATION_ID, computationId));
                 })
-                .map(tuple -> new ParsedLogsWithMetadata(defaultLogsBucketName, parsedLogs.getPoints(), tuple._2, tuple._3))
+                .map(tuple -> new ParsedLogsWithMetadata(influxConfig.getDefaultBucketName(), parsedLogs.getPoints(), tuple._2, tuple._3))
                 .block();
     }
 

@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.best;
 
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
-import com.cloudberry.cloudberry.common.FluxUtils;
+import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 

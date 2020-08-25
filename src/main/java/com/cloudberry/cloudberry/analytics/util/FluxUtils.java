@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.common;
+package com.cloudberry.cloudberry.analytics.util;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -9,13 +9,11 @@ import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class FluxUtils {
-    public static Stream<Instant> tableToTime(FluxTable fluxTable) {
-        return fluxTable.getRecords().stream().map(FluxRecord::getTime);
-    }
 
     public static Flux epochQuery(String bucketName,
                                   Restrictions restrictions) {
@@ -45,6 +43,14 @@ public final class FluxUtils {
             var computationId = (String) recordsHead.getValueByKey(InfluxDefaults.CommonTags.COMPUTATION_ID);
             return Optional.of(new DataSeries(computationId, data));
         }
+    }
+
+    public static Stream<Instant> tableToTime(FluxTable fluxTable) {
+        return tableToSingleValue(fluxTable, FluxRecord::getTime);
+    }
+
+    public static <T> Stream<T> tableToSingleValue(FluxTable fluxTable, Function<FluxRecord, T> mapper) {
+        return fluxTable.getRecords().stream().map(mapper);
     }
 
     private static void filterOutInfluxColumns(FluxRecord record) {

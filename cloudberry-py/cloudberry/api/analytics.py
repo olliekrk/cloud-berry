@@ -1,9 +1,10 @@
-import requests
-import pandas as pd
 from typing import List
 
+import pandas as pd
+import requests
+
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
-from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit
+from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds
 
 
 class Analytics(CloudberryApi):
@@ -103,6 +104,23 @@ class Analytics(CloudberryApi):
 
         merged_data = pd.merge(get_series('AVG'), get_series('STDDEV'), on='_time').T.to_dict().values()
         return DataSeries(field_name, merged_data)
+
+    def thresholds_exceeding_computations(self,
+                                          field_name: str,
+                                          criteria_mode: CriteriaMode,
+                                          thresholds: Thresholds,
+                                          measurement_name: str = None,
+                                          bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/computations/exceedingThresholds'
+        params = Analytics._append_db_params({
+            'fieldName': field_name,
+            'mode': criteria_mode.name,
+        }, measurement_name, bucket_name)
+        return Analytics._wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            json=thresholds.__dict__
+        ))
 
     @staticmethod
     def _wrap_series_request(request_lambda) -> List[DataSeries]:

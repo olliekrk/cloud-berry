@@ -2,13 +2,13 @@ package com.cloudberry.cloudberry.analytics.service.best;
 
 import com.cloudberry.cloudberry.analytics.api.BestSeriesApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
-import com.cloudberry.cloudberry.analytics.service.RestrictionsGenerator;
+import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
+import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
-import com.cloudberry.cloudberry.common.FluxUtils;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.cloudberry.cloudberry.analytics.service.RestrictionsGenerator.getFieldAndMeasurementNameRestrictions;
+import static com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +31,12 @@ public class BestSeriesSupplier implements BestSeriesApi {
     public List<DataSeries> nBestSeries(int n,
                                         String fieldName,
                                         Optimization optimization,
-                                        OptionalQueryFields optionalQueryFields) {
-        var bucketName = optionalQueryFields.getBucketName();
+                                        InfluxQueryFields influxQueryFields) {
+        var bucketName = influxQueryFields.getBucketName();
 
-        var restrictions = optionalQueryFields.getMeasurementNameOptional()
+        var restrictions = influxQueryFields.getMeasurementNameOptional()
                 .map(name -> getFieldAndMeasurementNameRestrictions(fieldName, name))
-                .orElse(RestrictionsGenerator.getFieldAndMeasurementNameRestrictions(fieldName));
+                .orElse(ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions(fieldName));
 
         var bestComputationsIds = getBestComputationIds(n, optimization, bucketName, restrictions);
 

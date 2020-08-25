@@ -1,9 +1,7 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.IntervalTime;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.*;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
@@ -14,7 +12,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,27 +20,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StatisticsService {
 
-    private static final ChronoUnit INTERVAL_UNIT = ChronoUnit.NANOS;
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
     private final InfluxUtilService influxUtilService;
 
     public List<DataSeries> getComputationsByIds(String fieldName,
-                                                 OptionalQueryFields optionalQueryFields,
+                                                 InfluxQueryFields influxQueryFields,
                                                  List<ObjectId> computationIds,
                                                  boolean computeMean) {
         var computationSeries = analytics.getSeriesApi()
-                .computationsSeries(fieldName, computationIds, optionalQueryFields);
+                .computationsSeries(fieldName, computationIds, influxQueryFields);
 
         if (computeMean) {
             var intervalNanos = influxUtilService
-                    .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
+                    .averageIntervalNanos(fieldName, computationIds, influxQueryFields);
 
             var avgSeries = getComputationsAverage(
                     fieldName,
-                    new IntervalTime(intervalNanos, INTERVAL_UNIT),
+                    ChronoInterval.ofNanos(intervalNanos),
                     computationIds,
-                    optionalQueryFields
+                    influxQueryFields
             );
             return ListSyntax.with(computationSeries, avgSeries);
         } else {
@@ -52,18 +48,18 @@ public class StatisticsService {
     }
 
     public List<DataSeries> getComputationsByConfigurationId(String fieldName,
-                                                             OptionalQueryFields optionalQueryFields,
+                                                             InfluxQueryFields influxQueryFields,
                                                              ObjectId configurationId,
                                                              boolean computeMean) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
         if (computationIds.isEmpty()) {
             return List.of();
         }
-        return getComputationsByIds(fieldName, optionalQueryFields, computationIds, computeMean);
+        return getComputationsByIds(fieldName, influxQueryFields, computationIds, computeMean);
     }
 
     public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
-                                                        OptionalQueryFields optionalQueryFields,
+                                                        InfluxQueryFields influxQueryFields,
                                                         List<ObjectId> configurationIds) {
         return configurationIds.stream()
                 .map(configurationId ->
@@ -74,71 +70,78 @@ public class StatisticsService {
                     val computationIds = configurationIdComputationsIds.getValue();
                     val configurationId = configurationIdComputationsIds.getKey();
                     val intervalNanos = influxUtilService
-                            .averageIntervalNanos(fieldName, computationIds, optionalQueryFields);
+                            .averageIntervalNanos(fieldName, computationIds, influxQueryFields);
 
                     return getComputationsAverage(
                             fieldName,
-                            new IntervalTime(intervalNanos, INTERVAL_UNIT),
+                            ChronoInterval.ofNanos(intervalNanos),
                             computationIds,
-                            optionalQueryFields
+                            influxQueryFields
                     ).renamed(String.format("configuration_%s", configurationId.toHexString()));
                 })
                 .collect(Collectors.toList());
     }
 
     public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,
-                                                                   OptionalQueryFields optionalQueryFields,
+                                                                   InfluxQueryFields influxQueryFields,
                                                                    String experimentName) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return getConfigurationsMeansByIds(fieldName, optionalQueryFields, configurationIds);
+        return getConfigurationsMeansByIds(fieldName, influxQueryFields, configurationIds);
     }
 
     public List<DataSeries> getNBestComputations(int n,
                                                  String fieldName,
                                                  Optimization optimization,
-                                                 OptionalQueryFields optionalQueryFields) {
+                                                 InfluxQueryFields influxQueryFields) {
         return analytics.getBestSeriesApi()
                 .nBestSeries(
                         n,
                         fieldName,
                         optimization,
-                        optionalQueryFields
+                        influxQueryFields
                 );
     }
 
     public List<DataSeries> getAverageAndStddevOfComputations(String fieldName,
-                                                              IntervalTime intervalTime,
+                                                              ChronoInterval chronoInterval,
                                                               List<ObjectId> computationsIds,
-                                                              OptionalQueryFields optionalQueryFields) {
+                                                              InfluxQueryFields influxQueryFields) {
         return List.of(
-                getComputationsAverage(fieldName, intervalTime, computationsIds, optionalQueryFields),
-                getComputationsStddev(fieldName, intervalTime, computationsIds, optionalQueryFields)
+                getComputationsAverage(fieldName, chronoInterval, computationsIds, influxQueryFields),
+                getComputationsStddev(fieldName, chronoInterval, computationsIds, influxQueryFields)
         );
     }
 
+    public List<DataSeries> getComputationsExceedingThresholds(String fieldName,
+                                                               Thresholds thresholds,
+                                                               CriteriaMode mode,
+                                                               InfluxQueryFields influxQueryFields) {
+        return analytics.getThresholdsApi().thresholdsExceedingSeries(fieldName, thresholds, mode, influxQueryFields);
+    }
+
     private DataSeries getComputationsAverage(String fieldName,
-                                              IntervalTime intervalTime,
+                                              ChronoInterval chronoInterval,
                                               List<ObjectId> computationsIds,
-                                              OptionalQueryFields optionalQueryFields) {
+                                              InfluxQueryFields influxQueryFields) {
         return analytics.getMovingAverageAvg()
                 .getTimedMovingSeries(
                         fieldName,
-                        intervalTime,
+                        chronoInterval,
                         computationsIds,
-                        optionalQueryFields
+                        influxQueryFields
                 );
     }
 
     private DataSeries getComputationsStddev(String fieldName,
-                                             IntervalTime intervalTime,
+                                             ChronoInterval chronoInterval,
                                              List<ObjectId> computationsIds,
-                                             OptionalQueryFields optionalQueryFields) {
+                                             InfluxQueryFields influxQueryFields) {
         return analytics.getMovingAverageStd()
                 .getTimedMovingSeries(
                         fieldName,
-                        intervalTime,
+                        chronoInterval,
                         computationsIds,
-                        optionalQueryFields
+                        influxQueryFields
                 );
     }
 

@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class OptionalQueryFields {
+public class InfluxQueryFields {
     @Nullable
     private final String measurementName;
     private final String bucketName;

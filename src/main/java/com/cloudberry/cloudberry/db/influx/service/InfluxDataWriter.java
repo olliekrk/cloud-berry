@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.influxdb.client.InfluxDBClient;
@@ -7,7 +8,6 @@ import com.influxdb.client.write.Point;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +19,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataWriter {
-    @Value("${influx.buckets.default-logs}")
-    private String defaultLogsBucketName;
-    @Value("${spring.influx2.org}")
-    private String defaultOrganization;
-
-    private final BucketsService bucketsService;
+    private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
+    private final BucketsService bucketsService;
 
     public <M> void writeMeasurement(M measurement) {
         Try.withResources(influxClient::getWriteApi)
@@ -50,9 +46,9 @@ public class InfluxDataWriter {
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
         Try.withResources(influxClient::getWriteApi)
                 .of(writeApi -> {
-                    var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
+                    var bucket = Optional.ofNullable(bucketName).orElse(influxConfig.getDefaultBucketName());
                     bucketsService.createBucket(bucket);
-                    writeApi.writePoints(bucket, defaultOrganization, List.copyOf(points));
+                    writeApi.writePoints(bucket, influxConfig.getDefaultOrganization(), List.copyOf(points));
                     return null;
                 }).get();
     }

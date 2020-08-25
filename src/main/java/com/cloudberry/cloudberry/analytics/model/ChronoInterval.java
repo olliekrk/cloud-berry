@@ -6,11 +6,15 @@ import lombok.Value;
 import java.time.temporal.ChronoUnit;
 
 @Value
-public class IntervalTime {
+public class ChronoInterval {
     long interval;
     ChronoUnit chronoUnit;
 
-    public TimeInterval toTimeInterval() {
+    public static ChronoInterval ofNanos(long nanos) {
+        return new ChronoInterval(nanos, ChronoUnit.NANOS);
+    }
+
+    public TimeInterval asInfluxInterval() {
         return new TimeInterval(interval, chronoUnit);
     }
 }

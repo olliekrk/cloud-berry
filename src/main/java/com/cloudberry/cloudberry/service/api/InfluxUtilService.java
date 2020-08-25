@@ -1,10 +1,10 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
-import com.cloudberry.cloudberry.common.FluxUtils;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
@@ -29,11 +29,11 @@ public class InfluxUtilService {
      */
     public long averageIntervalNanos(String fieldName,
                                      List<ObjectId> computationsIds,
-                                     OptionalQueryFields optionalQueryFields) {
-        var bucketName = optionalQueryFields.getBucketName();
+                                     InfluxQueryFields influxQueryFields) {
+        var bucketName = influxQueryFields.getBucketName();
         var tagRestriction = RestrictionsFactory
                 .tagIn(InfluxDefaults.CommonTags.COMPUTATION_ID, ListSyntax.mapped(computationsIds, ObjectId::toHexString));
-        var restrictions = optionalQueryFields.getMeasurementNameOptional()
+        var restrictions = influxQueryFields.getMeasurementNameOptional()
                 .map(name -> Restrictions.and(RestrictionsFactory.measurement(name), tagRestriction))
                 .orElse(tagRestriction);
 

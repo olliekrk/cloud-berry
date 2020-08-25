@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
+import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.IntervalTime;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
-import com.cloudberry.cloudberry.common.FluxUtils;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;
 import org.bson.types.ObjectId;
@@ -21,13 +21,13 @@ public class MovingAverageStd extends MovingAverage {
 
     @Override
     public DataSeries getTimedMovingSeries(String fieldName,
-                                           IntervalTime intervalTime,
+                                           ChronoInterval intervalTime,
                                            List<ObjectId> computationsIds,
-                                           OptionalQueryFields optionalQueryFields) {
-        var bucketName = optionalQueryFields.getBucketName();
-        var restrictions = getRestrictions(optionalQueryFields, computationsIds, fieldName);
+                                           InfluxQueryFields influxQueryFields) {
+        var bucketName = influxQueryFields.getBucketName();
+        var restrictions = getRestrictions(influxQueryFields, computationsIds, fieldName);
 
-        var timeInterval = intervalTime.toTimeInterval();
+        var timeInterval = intervalTime.asInfluxInterval();
 
         var query = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .expression(timedMovingAverageFluxRaw(timeInterval))

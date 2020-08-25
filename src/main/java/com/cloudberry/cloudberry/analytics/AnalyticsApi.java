@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics;
 
 import com.cloudberry.cloudberry.analytics.api.BestSeriesApi;
-import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
+import com.cloudberry.cloudberry.analytics.api.ThresholdsApi;
 import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageAvg;
 import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageStd;
 import lombok.RequiredArgsConstructor;
@@ -20,4 +20,5 @@ public class AnalyticsApi {
     BestSeriesApi bestSeriesApi;
     MovingAverageStd movingAverageStd;
     MovingAverageAvg movingAverageAvg;
+    ThresholdsApi thresholdsApi;
 }

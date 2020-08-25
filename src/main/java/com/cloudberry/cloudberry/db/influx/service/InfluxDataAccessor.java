@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 public class InfluxDataAccessor {
     private final InfluxDBClient influxClient;
 
-    public List<FluxRecord> findData(OptionalQueryFields optionalQueryFields,
+    public List<FluxRecord> findData(InfluxQueryFields influxQueryFields,
                                      Map<String, Object> fields,
                                      Map<String, String> tags) {
-        var bucket = optionalQueryFields.getBucketName();
+        var bucket = influxQueryFields.getBucketName();
 
-        var measurementRestriction = optionalQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement);
+        var measurementRestriction = influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement);
         var columnRestrictions = RestrictionsFactory.everyColumn(fields);
         var tagRestrictions = RestrictionsFactory.everyTag(tags);
         var tagNames = tags.keySet();

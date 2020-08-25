@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;
@@ -15,7 +15,7 @@ import org.bson.types.ObjectId;
 import java.util.List;
 import java.util.Map;
 
-import static com.cloudberry.cloudberry.analytics.service.RestrictionsGenerator.getRestrictionsComputationIds;
+import static com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory.getRestrictionsComputationIds;
 
 @RequiredArgsConstructor
 public abstract class MovingAverage implements MovingAverageApi {
@@ -53,10 +53,10 @@ public abstract class MovingAverage implements MovingAverageApi {
                 .orElse(DataSeries.empty(seriesName));
     }
 
-    protected Restrictions getRestrictions(OptionalQueryFields optionalQueryFields,
+    protected Restrictions getRestrictions(InfluxQueryFields influxQueryFields,
                                            List<ObjectId> computationsIds,
                                            String fieldName) {
-        return optionalQueryFields.getMeasurementNameOptional()
+        return influxQueryFields.getMeasurementNameOptional()
                 .map(name -> getRestrictionsComputationIds(computationsIds, fieldName, name))
                 .orElse(getRestrictionsComputationIds(computationsIds, fieldName));
     }

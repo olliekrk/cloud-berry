@@ -2,8 +2,9 @@ package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
@@ -19,7 +20,6 @@ import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,25 +36,24 @@ public class RawDataService {
     private final InfluxDataEvictor influxDataEvictor;
     private final InfluxDataAccessor influxDataAccessor;
     private final LogsImporter logsImporter;
-    @Value("${influx.measurements.default-measurement-name}")
-    private String defaultMeasurementName;
+    private final InfluxConfig influxConfig;
     public static final String rawDataSeriesName = "raw_data";
 
-    public void saveData(OptionalQueryFields optionalQueryFields,
+    public void saveData(InfluxQueryFields influxQueryFields,
                          List<DataPoint> dataPoints) {
-        var measurementName = optionalQueryFields.getMeasurementNameOptional().orElse(defaultMeasurementName);
+        var measurementName = influxQueryFields.getMeasurementNameOptional().orElse(influxConfig.getDefaultMeasurementName());
         var influxDataPoints = ListSyntax.mapped(dataPoints,
                 p -> pointBuilder.buildPoint(measurementName, p.getTime(), p.getFields(), p.getTags())
         );
 
         log.info(format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(), measurementName));
-        influxDataWriter.writePoints(optionalQueryFields.getBucketName(), influxDataPoints);
+        influxDataWriter.writePoints(influxQueryFields.getBucketName(), influxDataPoints);
     }
 
-    public DataSeries findData(OptionalQueryFields optionalQueryFields,
+    public DataSeries findData(InfluxQueryFields influxQueryFields,
                                DataFilters filters) {
         var records = influxDataAccessor.findData(
-                optionalQueryFields,
+                influxQueryFields,
                 filters.getFieldFilters(),
                 filters.getTagFilters()
         );
@@ -63,10 +62,10 @@ public class RawDataService {
         return new DataSeries(rawDataSeriesName, data);
     }
 
-    public void deleteData(OptionalQueryFields optionalQueryFields,
+    public void deleteData(InfluxQueryFields influxQueryFields,
                            DataFilters filters) {
         influxDataEvictor.deleteData(
-                optionalQueryFields,
+                influxQueryFields,
                 filters.getTagFilters()
         );
     }

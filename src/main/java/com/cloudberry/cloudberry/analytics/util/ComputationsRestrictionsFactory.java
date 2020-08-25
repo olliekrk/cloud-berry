@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.service;
+package com.cloudberry.cloudberry.analytics.util;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -9,7 +9,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 
-public final class RestrictionsGenerator {
+public final class ComputationsRestrictionsFactory {
 
     public static Restrictions getRestrictionsComputationIds(List<ObjectId> computationsIds,
                                                              String fieldName,
