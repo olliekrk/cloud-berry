@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
 import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -9,14 +10,11 @@ import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,19 +22,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataAccessor {
-    @Value("${influx.buckets.default-logs}")
-    private String defaultLogsBucketName;
-
     private final InfluxDBClient influxClient;
 
-    public List<FluxRecord> findData(@Nullable String bucketName,
-                                     @Nullable String measurementName,
+    public List<FluxRecord> findData(OptionalQueryFields optionalQueryFields,
                                      Map<String, Object> fields,
                                      Map<String, String> tags) {
-        var bucket = Optional.ofNullable(bucketName).orElse(defaultLogsBucketName);
-        var api = influxClient.getQueryApi();
+        var bucket = optionalQueryFields.getBucketName();
 
-        var measurementRestriction = Optional.ofNullable(measurementName).map(RestrictionsFactory::measurement);
+        var measurementRestriction = optionalQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement);
         var columnRestrictions = RestrictionsFactory.everyColumn(fields);
         var tagRestrictions = RestrictionsFactory.everyTag(tags);
         var tagNames = tags.keySet();
@@ -51,12 +44,12 @@ public class InfluxDataAccessor {
         query = columnRestrictions.<Flux>map(query::filter).orElse(query);
         query = query.drop(InfluxDefaults.EXCLUDED_COLUMNS);
 
-        return api.query(query.toString())
+        return influxClient.getQueryApi()
+                .query(query.toString())
                 .stream()
                 .map(FluxTable::getRecords)
                 .flatMap(List::stream)
                 .peek(record -> record.getValues().keySet().removeAll(InfluxDefaults.EXCLUDED_COLUMNS))
                 .collect(Collectors.toList());
     }
-
 }

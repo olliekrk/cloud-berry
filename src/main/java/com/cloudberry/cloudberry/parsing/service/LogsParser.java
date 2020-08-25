@@ -17,11 +17,12 @@ public interface LogsParser<D extends UploadDetails> {
     ParsedLogs parseFile(File file, D details, String defaultMeasurementName) throws IOException;
 
     default Instant parseTime(@Nullable String timeValue) {
-        try {
-            return Optional.ofNullable(timeValue).map(Long::parseLong).map(Instant::ofEpochMilli).orElse(Instant.EPOCH);
-        } catch (NumberFormatException e) {
-            return Instant.EPOCH;
-        }
+        return Try.of(
+                () -> Optional.ofNullable(timeValue)
+                        .map(Long::parseLong)
+                        .map(Instant::ofEpochMilli)
+                        .orElse(Instant.EPOCH)
+        ).getOrElse(() -> Instant.EPOCH);
     }
 
     default Object parseField(String value) {

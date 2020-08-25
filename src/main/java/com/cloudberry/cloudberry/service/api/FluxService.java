@@ -2,12 +2,13 @@ package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.domain.Query;
 import com.influxdb.query.FluxRecord;
-import com.influxdb.query.FluxTable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

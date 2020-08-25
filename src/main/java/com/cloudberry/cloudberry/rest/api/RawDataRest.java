@@ -1,13 +1,15 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.OptionalQueryFields;
+import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
+import com.cloudberry.cloudberry.service.api.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,28 +26,34 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RawDataRest {
-
+    private final BucketNameResolver bucketNameResolver;
     private final RawDataService rawDataService;
 
     @PostMapping("/save")
     public void saveData(@RequestParam(required = false) String bucketName,
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
-        rawDataService.saveData(bucketName, measurementName, dataPoints);
+        rawDataService.saveData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                dataPoints);
     }
 
     @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)
     public DataSeries findData(@RequestParam(required = false) String bucketName,
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
-        return rawDataService.findData(bucketName, measurementName, filters);
+        return rawDataService.findData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                filters);
     }
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteData(@RequestParam(required = false) String bucketName,
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
-        rawDataService.deleteData(bucketName, measurementName, filters);
+        rawDataService.deleteData(
+                new OptionalQueryFields(measurementName, bucketNameResolver.getBucketName(bucketName)),
+                filters);
     }
 
     @PostMapping(value = "/ageFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

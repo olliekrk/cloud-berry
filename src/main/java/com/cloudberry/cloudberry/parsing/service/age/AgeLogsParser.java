@@ -1,12 +1,12 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
+import com.cloudberry.cloudberry.common.syntax.ArraySyntax;
+import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsParser;
 import com.cloudberry.cloudberry.util.XmlUtils;
-import com.cloudberry.cloudberry.common.syntax.ArraySyntax;
-import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

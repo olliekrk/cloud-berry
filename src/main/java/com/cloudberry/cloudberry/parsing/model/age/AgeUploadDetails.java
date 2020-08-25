@@ -1,8 +1,6 @@
 package com.cloudberry.cloudberry.parsing.model.age;
 
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 import org.springframework.lang.Nullable;
 

@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.model;
+package com.cloudberry.cloudberry.analytics.model.optimization;
 
 public enum OptimizationKind {
     FINAL_VALUE,

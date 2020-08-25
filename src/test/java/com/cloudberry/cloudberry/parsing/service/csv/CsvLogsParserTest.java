@@ -5,13 +5,14 @@ import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.util.FilesUtils;
 import com.influxdb.client.write.Point;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CsvLogsParserTest {
     private final CsvLogsParser csvLogsParser = new CsvLogsParser();
@@ -27,7 +28,7 @@ public class CsvLogsParserTest {
         var result = csvLogsParser.parseFile(file, details, "");
         var points = result.getPoints();
 
-        Assertions.assertEquals(1, points.size());
+        assertEquals(1, points.size());
 
         // 16.08.20:  influx point can be only accessed with reflection api
         Point samplePoint = result.getPoints().get(0);
@@ -35,14 +36,14 @@ public class CsvLogsParserTest {
         Map<String, Object> fields = (Map<String, Object>) ReflectionTestUtils.getField(samplePoint, "fields");
         Number time = (Number) ReflectionTestUtils.getField(samplePoint, "time");
 
-        Assertions.assertNotNull(tags);
-        Assertions.assertNotNull(fields);
-        Assertions.assertNotNull(time);
-        Assertions.assertEquals(tagsNames.size() + 1, tags.size()); // +1 for computation id tag
-        Assertions.assertTrue(tagsNames.stream().allMatch(tags::containsKey));
-        Assertions.assertTrue(tags.containsKey(InfluxDefaults.CommonTags.COMPUTATION_ID));
-        Assertions.assertTrue(tagsNames.stream().noneMatch(fields::containsKey));
-        Assertions.assertEquals(1234567e6, time.longValue()); // reads from file as millis, stores as nano
+        assertNotNull(tags);
+        assertNotNull(fields);
+        assertNotNull(time);
+        assertEquals(tagsNames.size() + 1, tags.size()); // +1 for computation id tag
+        assertTrue(tagsNames.stream().allMatch(tags::containsKey));
+        assertTrue(tags.containsKey(InfluxDefaults.CommonTags.COMPUTATION_ID));
+        assertTrue(tagsNames.stream().noneMatch(fields::containsKey));
+        assertEquals(1234567e6, time.longValue()); // reads from file as millis, stores as nano
     }
 
 }

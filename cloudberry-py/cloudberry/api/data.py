@@ -2,8 +2,8 @@ from typing import List
 
 import requests
 
-from .model import DataPoint, DataSeries
 from .backend import CloudberryConfig, CloudberryApi
+from .model import DataPoint, DataSeries
 
 
 class DataFilters:
