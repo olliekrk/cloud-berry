@@ -11,42 +11,40 @@ import java.util.List;
 
 public final class ComputationsRestrictionsFactory {
 
-    public static Restrictions getRestrictionsComputationIds(List<ObjectId> computationsIds,
-                                                             String fieldName,
-                                                             @NonNull String measurementName) {
-        return getRestrictionsComputationIdsWithOther(
-                computationsIds,
-                getFieldAndMeasurementNameRestrictions(fieldName, measurementName));
+    public static Restrictions getComputationsRestrictions(List<ObjectId> computationsIds,
+                                                           String fieldName,
+                                                           @NonNull String measurementName) {
+        return Restrictions.and(
+                getFieldRestrictions(fieldName),
+                getMeasurementNameRestriction(measurementName),
+                getComputationIdRestriction(computationsIds));
     }
 
-    public static Restrictions getRestrictionsComputationIds(List<ObjectId> computationsIds, String fieldName) {
-        return getRestrictionsComputationIdsWithOther(
-                computationsIds,
-                getFieldAndMeasurementNameRestrictions(fieldName));
-    }
-
-    private static Restrictions getRestrictionsComputationIdsWithOther(List<ObjectId> computationsIds,
-                                                                       Restrictions restrictions) {
-        var computationIdRestriction = getComputationIdRestriction(computationsIds);
-        return Restrictions.and(computationIdRestriction, restrictions);
-    }
-
-    private static Restrictions getComputationIdRestriction(List<ObjectId> computationsIds) {
-        return RestrictionsFactory
-                .tagIn(
-                        InfluxDefaults.CommonTags.COMPUTATION_ID,
-                        ListSyntax.mapped(computationsIds, ObjectId::toHexString));
-    }
-
-    public static Restrictions getFieldAndMeasurementNameRestrictions(String fieldName) {
-        return RestrictionsFactory.hasField(fieldName);
+    public static Restrictions getComputationsRestrictions(List<ObjectId> computationsIds, String fieldName) {
+        return Restrictions.and(
+                getFieldRestrictions(fieldName),
+                getComputationIdRestriction(computationsIds));
     }
 
     public static Restrictions getFieldAndMeasurementNameRestrictions(String fieldName,
                                                                       @NonNull String measurementName) {
         return Restrictions.and(
-                getFieldAndMeasurementNameRestrictions(fieldName),
-                RestrictionsFactory.measurement(measurementName)
-        );
+                getFieldRestrictions(fieldName),
+                getMeasurementNameRestriction(measurementName));
     }
+
+    public static Restrictions getComputationIdRestriction(List<ObjectId> computationsIds) {
+        return RestrictionsFactory.tagIn(
+                InfluxDefaults.CommonTags.COMPUTATION_ID,
+                ListSyntax.mapped(computationsIds, ObjectId::toHexString));
+    }
+
+    public static Restrictions getFieldRestrictions(String fieldName) {
+        return RestrictionsFactory.hasField(fieldName);
+    }
+
+    public static Restrictions getMeasurementNameRestriction(String measurementName) {
+        return RestrictionsFactory.measurement(measurementName);
+    }
+
 }

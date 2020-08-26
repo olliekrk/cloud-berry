@@ -1,3 +1,4 @@
+from .anomaly import *
 from .criteria import *
 from .optimization import *
 from .thresholds import *

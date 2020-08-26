@@ -15,6 +15,14 @@ import java.util.stream.Stream;
 
 public final class FluxUtils {
 
+    public interface Imports {
+        String math = "import \"math\"";
+    }
+
+    public interface FluxMappers {
+        String absValue = "({r with _value: math.abs(x: r._value)})";
+    }
+
     public static Flux epochQuery(String bucketName,
                                   Restrictions restrictions) {
         return Flux

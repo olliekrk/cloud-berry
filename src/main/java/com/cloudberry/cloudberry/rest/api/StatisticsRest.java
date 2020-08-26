@@ -7,17 +7,15 @@ import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
+import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/statistics")
@@ -32,7 +30,7 @@ public class StatisticsRest {
                                                  @RequestParam(required = false) String bucketName,
                                                  @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = getValidIds(computationIdsHex);
+        var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
         if (computationIds.isEmpty())
             throw new InvalidComputationIdException(computationIdsHex);
 
@@ -50,7 +48,7 @@ public class StatisticsRest {
                                                              @RequestParam(required = false) String bucketName,
                                                              @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
-        var configurationId = getValidId(configurationIdHex)
+        var configurationId = RestParametersUtil.getValidId(configurationIdHex)
                 .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
 
         return statisticsService.getComputationsByConfigurationId(
@@ -84,7 +82,7 @@ public class StatisticsRest {
                                                               @RequestParam(required = false) String bucketName,
                                                               @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = getValidIds(computationIdsHex);
+        var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
         if (computationIds.isEmpty())
             throw new InvalidComputationIdException(computationIdsHex);
 
@@ -121,7 +119,7 @@ public class StatisticsRest {
                                                         @RequestParam(required = false) String bucketName,
                                                         @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
-        var configurationIds = getValidIds(configurationIdsHex);
+        var configurationIds = RestParametersUtil.getValidIds(configurationIdsHex);
         if (configurationIds.isEmpty())
             throw new InvalidConfigurationIdException(configurationIdsHex);
 
@@ -148,18 +146,5 @@ public class StatisticsRest {
     private InfluxQueryFields getInfluxQueryFields(@Nullable String measurementName,
                                                    @Nullable String bucketName) {
         return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
-    }
-
-    private static Optional<ObjectId> getValidId(String rawId) {
-        return Optional.of(rawId)
-                .filter(ObjectId::isValid)
-                .map(ObjectId::new);
-    }
-
-    private static List<ObjectId> getValidIds(List<String> rawIds) {
-        return rawIds.stream()
-                .filter(ObjectId::isValid)
-                .map(ObjectId::new)
-                .collect(Collectors.toList());
     }
 }

@@ -6,10 +6,10 @@ import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
+import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
-import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
@@ -35,10 +35,9 @@ public class ThresholdsSupplier implements ThresholdsApi {
                                                       CriteriaMode mode,
                                                       InfluxQueryFields influxQueryFields) {
         var bucketName = influxQueryFields.getBucketName();
-        var restrictions = Restrictions.and(Stream.of(
-                RestrictionsFactory.hasField(fieldName),
-                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement).orElse(null)
-        ).filter(Objects::nonNull).toArray(Restrictions[]::new));
+        var restrictions = influxQueryFields.getMeasurementNameOptional()
+                .map(name -> ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions(fieldName, name))
+                .orElse(ComputationsRestrictionsFactory.getFieldRestrictions(fieldName));
 
         var idsQuery = switch (mode) {
             case ANY -> anyValueOverThresholdQuery(thresholds, bucketName, restrictions);

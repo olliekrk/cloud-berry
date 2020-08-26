@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.analytics;
 
-import com.cloudberry.cloudberry.analytics.api.AmplitudesApi;
+import com.cloudberry.cloudberry.analytics.api.AnomaliesApi;
 import com.cloudberry.cloudberry.analytics.api.BestSeriesApi;
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.api.ThresholdsApi;
@@ -22,5 +22,5 @@ public class AnalyticsApi {
     MovingAverageStd movingAverageStd;
     MovingAverageAvg movingAverageAvg;
     ThresholdsApi thresholdsApi;
-    AmplitudesApi amplitudesApi;
+    AnomaliesApi anomaliesApi;
 }

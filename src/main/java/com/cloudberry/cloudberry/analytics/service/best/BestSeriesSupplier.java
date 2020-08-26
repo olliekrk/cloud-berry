@@ -36,7 +36,7 @@ public class BestSeriesSupplier implements BestSeriesApi {
 
         var restrictions = influxQueryFields.getMeasurementNameOptional()
                 .map(name -> getFieldAndMeasurementNameRestrictions(fieldName, name))
-                .orElse(ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions(fieldName));
+                .orElse(ComputationsRestrictionsFactory.getFieldRestrictions(fieldName));
 
         var bestComputationsIds = getBestComputationIds(n, optimization, bucketName, restrictions);
 

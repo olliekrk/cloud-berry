@@ -1,4 +1,5 @@
 from .analytics import Analytics
+from .anomalies import Anomalies
 from .backend import CloudberryConfig
 from .buckets import Buckets
 from .data import *
