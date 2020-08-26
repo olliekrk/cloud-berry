@@ -19,7 +19,7 @@ public class BucketsRest {
 
     @PostMapping("{bucketName}")
     public void createBucket(@PathVariable("bucketName") String bucketName) {
-        bucketsService.createBucket(bucketName);
+        bucketsService.createBucketIfNotExists(bucketName);
     }
 
     @DeleteMapping("{bucketName}")

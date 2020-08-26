@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.common.syntax;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,10 @@ public abstract class ListSyntax {
     }
 
     public static <E, R> List<R> flatMapped(Collection<E> collection, Function<E, ? extends Collection<R>> mapper) {
+        return collection.stream().flatMap(s -> mapper.apply(s).stream()).collect(Collectors.toList());
+    }
+
+    public static <E, R> List<R> flatMappedOpt(Collection<E> collection, Function<E, Optional<R>> mapper) {
         return collection.stream().flatMap(s -> mapper.apply(s).stream()).collect(Collectors.toList());
     }
 

@@ -24,12 +24,12 @@ public class BucketsService {
         return ListSyntax.mapped(buckets.findBuckets(), Bucket::getName);
     }
 
-    public void createBucket(String bucketName) {
+    public String createBucketIfNotExists(String bucketName) {
         var buckets = bucketsApi();
-        if (findBucketByName(bucketName).isEmpty()) {
+        return findBucketByName(bucketName).orElseGet(() -> {
             log.info("Creating new bucket: " + bucketName);
-            buckets.createBucket(bucketName, influxConfig.getDefaultOrganization());
-        }
+            return buckets.createBucket(bucketName, influxConfig.getDefaultOrganization());
+        }).getName();
     }
 
     public void deleteBucket(String bucketName) {
