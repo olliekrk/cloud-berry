@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.anomalies.AnomalyReport;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidComputationIdException;
+import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.AnomaliesService;

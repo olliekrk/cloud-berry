@@ -23,6 +23,7 @@ public class Experiment implements Parametrized<String, Object> {
     @With
     @Indexed
     private String name;
+    @With
     private Map<String, Object> parameters;
     private Instant time;
 

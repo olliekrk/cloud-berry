@@ -18,7 +18,7 @@ public abstract class MapSyntax {
         return Arrays.stream(maps)
                 .map(Map::entrySet)
                 .flatMap(Set::stream)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v, v2) -> v2));
     }
 
     public static <K, V, R> Map<K, R> zippedArrays(K[] keys, V[] values, Function<V, R> valuesMapper) {

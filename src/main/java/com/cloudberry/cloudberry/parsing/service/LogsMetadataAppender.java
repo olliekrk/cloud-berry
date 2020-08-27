@@ -29,9 +29,9 @@ public class LogsMetadataAppender {
                                                  String experimentName,
                                                  ObjectId configurationId,
                                                  ObjectId computationId) {
-        var now = Instant.now();
+        final var now = Instant.now();
         return metadataService
-                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+                .getOrCreateExperiment(new Experiment(now, experimentName, Map.of()))
                 .map(Tuple::of)
                 .flatMap(meta -> {
                     var configuration = new ExperimentConfiguration(configurationId, meta._1.getId(), null, Map.of(), now);
@@ -48,11 +48,10 @@ public class LogsMetadataAppender {
     public ParsedLogsWithMetadata appendMetadata(AgeParsedLogs parsedLogs, String experimentName) {
         var now = Instant.now();
         return metadataService
-                .getOrCreateExperiment(new Experiment(new ObjectId(), experimentName, Map.of(), now))
+                .getOrCreateExperiment(new Experiment(now, experimentName, Map.of()))
                 .map(Tuple::of)
                 .flatMap(meta -> {
                     var configuration = new ExperimentConfiguration(
-                            new ObjectId(),
                             meta._1.getId(),
                             parsedLogs.getConfigurationName(),
                             parsedLogs.getConfigurationParameters(),
@@ -61,7 +60,7 @@ public class LogsMetadataAppender {
                     return metadataService.getOrCreateConfiguration(configuration).map(meta::append);
                 })
                 .flatMap(meta -> {
-                    var computation = new ExperimentComputation(new ObjectId(), meta._2.getId(), now);
+                    var computation = new ExperimentComputation(meta._2.getId(), now);
                     return metadataService.getOrCreateComputation(computation).map(meta::append);
                 })
                 .doOnNext(meta -> {

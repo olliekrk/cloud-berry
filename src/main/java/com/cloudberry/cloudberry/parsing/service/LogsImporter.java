@@ -30,9 +30,9 @@ public class LogsImporter {
     public ObjectId importAgeFile(File file,
                                   String experimentName,
                                   AgeUploadDetails uploadDetails) throws IOException {
-        var parsedData =
+        final var parsedData =
                 ageLogsParser.parseFile(file, uploadDetails, influxConfig.getDefaultMeasurementName());
-        var parsedDataWithMetadata =
+        final var parsedDataWithMetadata =
                 logsMetadataAppender.appendMetadata(parsedData, experimentName);
         influxDataWriter.writePoints(parsedDataWithMetadata.getBucketName(), parsedDataWithMetadata.getPoints());
         return parsedDataWithMetadata.getExperimentComputation().getId();
@@ -41,9 +41,9 @@ public class LogsImporter {
     public ObjectId importCsvFile(File file,
                                   String experimentName,
                                   CsvUploadDetails uploadDetails) throws IOException {
-        var parsedData =
+        final var parsedData =
                 csvLogsParser.parseFile(file, uploadDetails, influxConfig.getDefaultMeasurementName());
-        var parsedDataWithMetadata =
+        final var parsedDataWithMetadata =
                 logsMetadataAppender.appendMetadata(
                         parsedData,
                         experimentName,
