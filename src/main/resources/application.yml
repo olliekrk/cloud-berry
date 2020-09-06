@@ -33,6 +33,7 @@ influx:
   organization-name: cloudberry
   buckets:
     default-logs: cloudberry-logs
+    default-metrics: cloudberry-metrics
   measurements:
     default-measurement-name: cloudberry-default
 
@@ -66,8 +67,8 @@ spring:
 spring:
   profiles: olgierd
   influx2:
-    org: 0644ffa3c1907000
-    token: b68m1aeMpUm7_NkMuJG6MDNO3xblHTdJSju2psBfTRRfqVBrwsUpw_sfx3qlgaLEo5xzqsmVtKb3ogGTYcHv7g==
+    org: 06452c8f4af4d000
+    token: M9YLkww4dbxApd2UXj8vK053oP8oHgBsYkXABZl7MUHekXnTJrrGeUGacCMDyLMVXmrKLyw7_ay5unQi_ET89g==
 
 ---
 

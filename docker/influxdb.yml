@@ -1,5 +1,8 @@
 version: '2'
 
+networks:
+  monitoring:
+
 services:
   influxdb-cb:
     image: quay.io/influxdb/influxdb:2.0.0-beta
@@ -10,8 +13,24 @@ services:
     volumes:
       - /data/influxdb/cloudberry/data:/var/lib/influxdb # data
       - /data/influxdb/cloudberry/config:/etc/influxdb # configs
+    networks:
+      - monitoring
     command: --reporting-disabled
     environment:
-      INFLUXDB_DB: cloudberry
       INFLUXDB_ADMIN_USER: root
       INFLUXDB_ADMIN_PASSWORD: ziemniak
+  telegraf-cb:
+    image: telegraf:latest
+    hostname: telegraf-cb
+    container_name: telegraf-cb
+    restart: always
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - monitoring
+    environment:
+      USER: root
+      TELEGRAF_INFLUX_URL: http://influxdb-cb:9999
+      TELEGRAF_INFLUX_ORGANIZATION: "cloudberry"
+      TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry-metrics"
+      TELEGRAF_INFLUX_TOKEN: 0IqKvaJigMNAuN-7_DV2H5MkYYmyhI7VaXsm-Burs-SXYY1ECNVBtqmhs_PFozm6NQ8mT4ElE07OIxMWxQ0Uhg==

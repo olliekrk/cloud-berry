@@ -31,13 +31,11 @@ def influxVersion = "1.11.0"
 def apacheCommonsLangVersion = "3.10"
 def apacheCommonsMathVersion = "3.6.1"
 def apacheCommonsCsvVersion = "1.8"
-def micrometerVersion = "1.5.4"
 
 dependencies {
     // SPRING
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
-    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
 
     // MONGODB
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
@@ -60,8 +58,7 @@ dependencies {
     implementation "io.vavr:vavr:0.10.2"
 
     // METRICS
-    implementation "io.micrometer:micrometer-registry-influx:$micrometerVersion"
-    implementation "io.micrometer:micrometer-core:$micrometerVersion"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
 
     // KAFKA
     implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
