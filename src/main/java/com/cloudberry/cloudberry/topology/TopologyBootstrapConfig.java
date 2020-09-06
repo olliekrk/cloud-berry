@@ -1,8 +1,10 @@
-package com.cloudberry.cloudberry.topology.service.bootstrap;
+package com.cloudberry.cloudberry.topology;
 
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
+import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyBootstrapper;
+import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyInitializer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;

@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
@@ -39,11 +40,14 @@ public class TopologyInitializer {
         var topology = new Topology(ObjectId.get(), DEFAULT_TOPOLOGY_NAME, new HashMap<>());
         var initTopicName = KafkaTopics.Generic.COMPUTATION_TOPIC;
         var rootNode = new RootNode("root", initTopicName);
+        var counterNode = new CounterNode("counter", initTopicName, "topology.events.total");
         var sinkNode = new SinkNode("sink", initTopicName, influxConfig.getDefaultBucketName());
         topology.addVertex(rootNode);
+        topology.addVertex(counterNode);
         topology.addVertex(sinkNode);
-        topology.addEdge(rootNode, sinkNode);
-        return Pair.of(topology, List.of(rootNode, sinkNode));
+        topology.addEdge(rootNode, counterNode);
+        topology.addEdge(counterNode, sinkNode);
+        return Pair.of(topology, List.of(rootNode, counterNode, sinkNode));
     }
 
     private Topology saveTopology(Topology topology) {

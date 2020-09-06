@@ -31,8 +31,19 @@ def influxVersion = "1.11.0"
 def apacheCommonsLangVersion = "3.10"
 def apacheCommonsMathVersion = "3.6.1"
 def apacheCommonsCsvVersion = "1.8"
+def micrometerVersion = "1.5.4"
 
 dependencies {
+    // SPRING
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+
+    // MONGODB
+    implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive:$springBootVersion"
+
+    // INFLUXDB
     implementation "com.influxdb:influxdb-client:$influxVersion"
     implementation "com.influxdb:influxdb-client-java:$influxVersion"
     implementation "com.influxdb:influxdb-client-core:$influxVersion"
@@ -41,18 +52,24 @@ dependencies {
     implementation "com.influxdb:flux-dsl:$influxVersion"
     implementation "org.influxdb:influxdb-java:2.20"
 
-    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    implementation "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
-    implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive:$springBootVersion"
-    implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
-    implementation "org.apache.kafka:kafka-streams:$apacheKafkaVersion"
-    implementation "org.apache.kafka:kafka-clients:$apacheKafkaVersion"
-    implementation "io.vavr:vavr:0.10.2"
+    // UTIL
     implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"
     implementation "org.apache.commons:commons-math3:$apacheCommonsMathVersion"
     implementation "org.apache.commons:commons-csv:$apacheCommonsCsvVersion"
     implementation "org.jgrapht:jgrapht-core:1.5.0"
+    implementation "io.vavr:vavr:0.10.2"
+
+    // METRICS
+    implementation "io.micrometer:micrometer-registry-influx:$micrometerVersion"
+    implementation "io.micrometer:micrometer-core:$micrometerVersion"
+
+    // KAFKA
+    implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"
+    implementation "org.apache.kafka:kafka-streams:$apacheKafkaVersion"
+    implementation "org.apache.kafka:kafka-clients:$apacheKafkaVersion"
+    testImplementation "org.springframework.kafka:spring-kafka-test:$springKafkaVersion"
+    testImplementation "org.apache.kafka:kafka-clients:$apacheKafkaVersion"
+    testImplementation "org.apache.kafka:kafka_2.12:$apacheKafkaVersion"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {
@@ -60,9 +77,6 @@ dependencies {
     }
     testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0"
     testImplementation "io.projectreactor:reactor-test:3.3.4.RELEASE"
-    testImplementation "org.springframework.kafka:spring-kafka-test:$springKafkaVersion"
-    testImplementation "org.apache.kafka:kafka-clients:$apacheKafkaVersion"
-    testImplementation "org.apache.kafka:kafka_2.12:$apacheKafkaVersion"
     testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
     testImplementation group: 'com.github.fakemongo', name: 'fongo', version: '2.1.1'
 }

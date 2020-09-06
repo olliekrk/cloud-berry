@@ -2,12 +2,14 @@ package com.cloudberry.cloudberry.topology.service.bootstrap;
 
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.processing.processor.ComputationEventProcessor;
+import com.cloudberry.cloudberry.metrics.MetricsProvider;
 import com.cloudberry.cloudberry.topology.exception.InvalidRootNodeException;
 import com.cloudberry.cloudberry.topology.exception.NodeNotFoundException;
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
-import com.cloudberry.cloudberry.topology.exception.bootstrap.MissingStreamException;
+import com.cloudberry.cloudberry.topology.exception.bootstrap.MissingBootstrappingLogicException;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
@@ -29,6 +31,7 @@ import java.util.Optional;
 public class TopologyBootstrapper {
     private final TopologyNodeService topologyNodeService;
     private final ComputationEventProcessor computationEventProcessor;
+    private final MetricsProvider metricsProvider;
 
     private final StreamsBuilder kStreamsBuilder;
     private final KafkaStreamsConfiguration kStreamsConfiguration;
@@ -69,10 +72,17 @@ public class TopologyBootstrapper {
         } else if (node instanceof SinkNode) {
             var sinkNode = (SinkNode) node;
             var inputTopic = sinkNode.getInputTopicName();
-            var stream = Optional
-                    .ofNullable(context.getStream(inputTopic))
-                    .orElseThrow(() -> new MissingStreamException(inputTopic));
+            var stream = context.getStreamOrThrow(inputTopic);
             stream.foreach((_key, event) -> computationEventProcessor.process(event, sinkNode.getOutputBucketName()));
+            context.removeStream(inputTopic);
+        } else if (node instanceof CounterNode) {
+            var counterNode = (CounterNode) node;
+            var inputTopic = counterNode.getInputTopicName();
+            var stream = context.getStreamOrThrow(inputTopic);
+            stream = stream.peek((_key, event) -> metricsProvider.getCounter(counterNode.getCounterName()).increment());
+            context.addStream(inputTopic, stream);
+        } else {
+            throw new MissingBootstrappingLogicException(node);
         }
     }
 

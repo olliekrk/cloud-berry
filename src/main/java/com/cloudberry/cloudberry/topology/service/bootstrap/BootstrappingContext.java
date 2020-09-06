@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.topology.service.bootstrap;
 
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
+import com.cloudberry.cloudberry.topology.exception.bootstrap.MissingStreamException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import lombok.Data;
 import org.apache.kafka.streams.kstream.KStream;
@@ -10,6 +11,7 @@ import org.jgrapht.graph.DefaultEdge;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Data
 public class BootstrappingContext {
@@ -33,5 +35,15 @@ public class BootstrappingContext {
 
     public KStream<String, ComputationEvent> getStream(String inputTopic) {
         return streams.get(inputTopic);
+    }
+
+    public KStream<String, ComputationEvent> getStreamOrThrow(String inputTopic) {
+        return Optional
+                .ofNullable(getStream(inputTopic))
+                .orElseThrow(() -> new MissingStreamException(inputTopic));
+    }
+
+    public void removeStream(String inputTopic) {
+        streams.remove(inputTopic);
     }
 }
