@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -31,15 +32,18 @@ public class ExperimentService {
     public Mono<Experiment> getOrCreateExperiment(Experiment experiment) {
         return experimentsRepository
                 .findById(experiment.getId())
-                .switchIfEmpty(
-                        experimentsRepository.findAllByName(experiment.getName())
-                                .filter(existing -> existing.getParameters().equals(experiment.getParameters()))
-                                .limitRequest(1)
-                                .next()
-                )
-                .doOnNext(next1 -> log.info("Existing experiment " + next1.getId() + " was found"))
-                .switchIfEmpty(experimentsRepository.save(experiment))
-                .doOnNext(next -> log.info("Created new experiment " + next.getId()));
+                .switchIfEmpty(experimentsRepository
+                        .findAllByNameAndParameters(experiment.getName(), experiment.getParameters())
+                        .limitRequest(1)
+                        .next())
+                .doOnNext(next -> log.info("Existing experiment {} was found", next.getId()))
+                .switchIfEmpty(saveNewExperiment(experiment));
+    }
+
+    @NotNull
+    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
+        log.info("Created new experiment " + experiment.getId());
+        return experimentsRepository.save(experiment);
     }
 
     public Experiment update(ObjectId experimentId,
@@ -47,15 +51,17 @@ public class ExperimentService {
                              @Nullable Map<String, Object> newParams,
                              boolean overrideParams) {
         return experimentsRepository.findById(experimentId)
-                .doOnNext(experiment -> {
+                .map(experiment -> {
                     val prevParams = experiment.getParameters();
-                    val updatedExperiment = experiment
+                    return experiment
                             .withName(name != null ? name : experiment.getName())
                             .withParameters(newParams != null
                                     ? getNewParamsMap(newParams, prevParams, overrideParams)
                                     : prevParams);
-                    experimentsRepository.save(updatedExperiment);
-                }).block();
+                })
+                .flatMap(experimentsRepository::save)
+                .doOnNext(experiment -> log.info("Experiment {} updated", experiment))
+                .block();
     }
 
     private Map<String, Object> getNewParamsMap(Map<String, Object> newParams,

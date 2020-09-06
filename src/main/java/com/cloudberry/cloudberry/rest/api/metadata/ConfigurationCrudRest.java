@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/metadata/configuration", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = CrudRestConst.ENDPOINT_PREFIX + "/configuration", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ConfigurationCrudRest {
     private final ConfigurationService configurationService;

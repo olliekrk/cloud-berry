@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/metadata/experiment", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = CrudRestConst.ENDPOINT_PREFIX + "/experiment", consumes = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ExperimentCrudRest {
     private final ExperimentService experimentService;
@@ -48,11 +48,12 @@ public class ExperimentCrudRest {
     @PutMapping("/update")
     Experiment update(@RequestParam String experimentIdHex,
                       @RequestParam(required = false) String name,
-                      @RequestParam(defaultValue = "false") boolean appendParams,
-                      @RequestBody(required = false) Map<String, Object> parameters) throws InvalidExperimentIdException {
+                      @RequestParam(defaultValue = "false") boolean overrideParams,
+                      @RequestBody(required = false) Map<String, Object> parameters
+    ) throws InvalidExperimentIdException {
         val experimentId = RestParametersUtil.getValidId(experimentIdHex)
                 .orElseThrow(() -> new InvalidExperimentIdException(List.of(experimentIdHex)));
 
-        return experimentService.update(experimentId, name, parameters, appendParams);
+        return experimentService.update(experimentId, name, parameters, overrideParams);
     }
 }
