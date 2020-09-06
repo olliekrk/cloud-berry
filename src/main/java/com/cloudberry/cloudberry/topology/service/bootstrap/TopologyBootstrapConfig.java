@@ -19,6 +19,7 @@ public class TopologyBootstrapConfig {
 
     @Bean
     public KafkaStreams kafkaStreams() {
+        topologyInitializer.purgeDefaults();
         var topology = topologyService
                 .findAny()
                 .filter(Topology::isValid)

@@ -50,8 +50,8 @@ public class Topology {
     }
 
     public boolean isValid() {
-//        var graph = constructGraph();
         // todo
+//        var graph = constructGraph();
         return true;
     }
 
@@ -72,6 +72,10 @@ public class Topology {
 
     public void addVertex(TopologyNode node) {
         edges.putIfAbsent(node.getId(), Set.of());
+    }
+
+    public Set<ObjectId> getVertices() {
+        return edges.keySet();
     }
 
     public DefaultDirectedGraph<ObjectId, DefaultEdge> constructGraph() {

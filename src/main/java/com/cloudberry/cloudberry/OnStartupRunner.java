@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Component
@@ -31,6 +30,14 @@ public class OnStartupRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // good place for quick dev testing
+        sendComputationEvents();
+    }
+
+    private void sendComputationEvents() {
+        IntStream.range(0, 10)
+                .boxed()
+                .map(i -> new ComputationEvent(Instant.now(), "bootstrapping-streams-test", Map.of("attempt", 1, "eventNumber", i), Map.of()))
+                .forEach(event -> kafkaTemplate.send(KafkaTopics.Generic.COMPUTATION_TOPIC, event));
     }
 
     private void sendSampleProblem(ObjectId computationId) {

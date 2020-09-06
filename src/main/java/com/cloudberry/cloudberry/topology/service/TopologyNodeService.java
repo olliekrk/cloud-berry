@@ -26,4 +26,8 @@ public class TopologyNodeService {
     public Optional<TopologyNode> getNodeById(ObjectId id) {
         return topologyNodeRepository.findById(id);
     }
+
+    public void removeByIds(List<ObjectId> ids) {
+        topologyNodeRepository.removeAllByIdIn(ids);
+    }
 }

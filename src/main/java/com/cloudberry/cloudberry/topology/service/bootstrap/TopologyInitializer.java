@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.topology.service.bootstrap;
 
 
 import com.cloudberry.cloudberry.AppConstants;
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
 import com.cloudberry.cloudberry.topology.model.Topology;
@@ -42,7 +43,7 @@ public class TopologyInitializer {
         topology.addVertex(rootNode);
         topology.addVertex(sinkNode);
         topology.addEdge(rootNode, sinkNode);
-        return Pair.of(topology, List.of(rootNode));
+        return Pair.of(topology, List.of(rootNode, sinkNode));
     }
 
     private Topology saveTopology(Topology topology) {
@@ -53,4 +54,9 @@ public class TopologyInitializer {
         return this.topologyNodeService.saveAll(nodes);
     }
 
+    public void purgeDefaults() {
+        var defaultTopologies = topologyService.findByName(DEFAULT_TOPOLOGY_NAME);
+        topologyService.removeByIds(ListSyntax.mapped(defaultTopologies, Topology::getId));
+        topologyNodeService.removeByIds(ListSyntax.flatMapped(defaultTopologies, Topology::getVertices));
+    }
 }
