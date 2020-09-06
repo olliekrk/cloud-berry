@@ -2,9 +2,7 @@ package com.cloudberry.cloudberry.config.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
-import org.apache.kafka.streams.kstream.KStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +20,7 @@ import java.util.HashMap;
 public class KafkaStreamsConfig {
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
-    public KafkaStreamsConfiguration wkStreamsConfigs(KafkaProperties kafkaProperties,
+    public KafkaStreamsConfiguration kStreamsConfigs(KafkaProperties kafkaProperties,
                                                      @Value("${spring.application.name}") String applicationName) {
         var properties = new HashMap<String, Object>(kafkaProperties.getProperties());
         properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
@@ -32,12 +30,12 @@ public class KafkaStreamsConfig {
         return new KafkaStreamsConfiguration(properties);
     }
 
-    @Bean
-    public KStream<String, Object> kStream(StreamsBuilder kStreamBuilder) {
-        KStream<String, Object> stream = kStreamBuilder.stream(KafkaTopics.Logs.WORKPLACE_TOPIC);
-        // how to use: provide processors implementation
-        stream.foreach((_key, value) -> log.info("KStream with WorkplaceEvent: " + value));
-        return stream;
-    }
+//    @Bean
+//    public KStream<String, Object> kStream(StreamsBuilder kStreamBuilder) {
+//        KStream<String, Object> stream = kStreamBuilder.stream(KafkaTopics.Logs.WORKPLACE_TOPIC);
+//         how to use: provide processors implementation
+//        stream.foreach((_key, value) -> log.info("KStream with WorkplaceEvent: " + value));
+//        return stream;
+//    }
 
 }
