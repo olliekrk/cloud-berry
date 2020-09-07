@@ -20,9 +20,8 @@ public class ComputationService {
         return computationsRepository.findAll().collectList().block();
     }
 
-    public List<ObjectId> findAllComputationIdsForConfiguration(ObjectId configurationId) {
+    public List<ExperimentComputation> findAllComputationsForConfigurationId(ObjectId configurationId) {
         return computationsRepository.findAllByConfigurationId(configurationId)
-                .map(ExperimentComputation::getId)
                 .collectList()
                 .block();
     }

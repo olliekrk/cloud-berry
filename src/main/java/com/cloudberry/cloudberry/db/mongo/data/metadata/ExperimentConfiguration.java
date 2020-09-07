@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.common.trait.Parametrized;
 import com.cloudberry.cloudberry.common.trait.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -14,8 +15,9 @@ import java.time.Instant;
 import java.util.Map;
 
 @Data
-@Document
+@NoArgsConstructor
 @AllArgsConstructor
+@Document
 public class ExperimentConfiguration implements Parametrized<String, Object>, Timed {
     @Id
     private ObjectId id;
@@ -34,3 +36,5 @@ public class ExperimentConfiguration implements Parametrized<String, Object>, Ti
         this.time = time;
     }
 }
+
+

@@ -21,7 +21,10 @@ public class MetadataService {
     private final ComputationService computationService;
 
     public List<ObjectId> findAllComputationIdsForConfiguration(ObjectId configurationId) {
-        return computationService.findAllComputationIdsForConfiguration(configurationId);
+        return computationService.findAllComputationsForConfigurationId(configurationId)
+                .stream()
+                .map(ExperimentComputation::getId)
+                .collect(Collectors.toList());
     }
 
     public List<ObjectId> findAllConfigurationIdsForExperiment(String experimentName) {

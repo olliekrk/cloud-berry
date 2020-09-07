@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import org.bson.types.ObjectId;
@@ -16,11 +16,7 @@ public class ExperimentServiceGetOrCreateTest extends ExperimentServiceTestBase 
     void findExisting() {
         experimentsRepository.save(TEST_EXPERIMENT_1).block();
 
-        var foundExperiment = experimentService.getOrCreateExperiment(TEST_EXPERIMENT_1).block();
-        var latterExperiment = experimentsRepository.findById(TEST_EXPERIMENT_1.getId()).block();
-
-        assertEquals(TEST_EXPERIMENT_1, foundExperiment);
-        assertEquals(TEST_EXPERIMENT_1, latterExperiment);
+        getOrCreateAndCompare();
     }
 
     @Test
@@ -50,6 +46,10 @@ public class ExperimentServiceGetOrCreateTest extends ExperimentServiceTestBase 
         var previousExperiment = experimentsRepository.findById(TEST_EXPERIMENT_1.getId()).block();
         assertNull(previousExperiment);
 
+        getOrCreateAndCompare();
+    }
+
+    private void getOrCreateAndCompare() {
         var foundExperiment = experimentService.getOrCreateExperiment(TEST_EXPERIMENT_1).block();
         var latterExperiment = experimentsRepository.findById(TEST_EXPERIMENT_1.getId()).block();
 

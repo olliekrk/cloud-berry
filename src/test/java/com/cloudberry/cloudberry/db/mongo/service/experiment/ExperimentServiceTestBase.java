@@ -1,8 +1,9 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
 import com.cloudberry.cloudberry.EmbeddedMongoTest;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentsRepository;
+import com.cloudberry.cloudberry.db.mongo.service.ExperimentService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ public abstract class ExperimentServiceTestBase {
 
     @Autowired
     protected ExperimentService experimentService;
+
     @Autowired
     protected ExperimentsRepository experimentsRepository;
 
