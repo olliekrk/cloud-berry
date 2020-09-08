@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Flux;
 
-public interface ConfigurationsRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
+public interface ConfigurationRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
     Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
 
     Flux<ExperimentConfiguration> findAllByConfigurationFileName(String configurationFileName);

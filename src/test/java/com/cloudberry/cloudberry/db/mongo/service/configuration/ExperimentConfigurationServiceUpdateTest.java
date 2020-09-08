@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.experiment;
+package com.cloudberry.cloudberry.db.mongo.service.configuration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ExperimentServiceUpdateTest extends ExperimentServiceTestBase {
+public class ExperimentConfigurationServiceUpdateTest extends ExperimentConfigurationServiceTestBase {
 
     private static Stream<Arguments> provideParameters() {
         return Stream.of(
@@ -27,25 +27,27 @@ public class ExperimentServiceUpdateTest extends ExperimentServiceTestBase {
     @BeforeEach
     void saveTestExperiment() {
         super.cleanDatabase();
-        experimentRepository.save(TEST_EXPERIMENT_1).block();
+        configurationRepository.save(TEST_CONFIGURATION).block();
     }
 
     @Test
     void updateName() {
-        final String newName = "new name";
+        final String newFileName = "new name";
 
-        var updatedExperiment = experimentService.update(TEST_EXPERIMENT_1.getId(), newName, null, false);
+        var updatedExperiment = experimentConfigurationService
+                .update(TEST_CONFIGURATION.getId(), newFileName, null, false);
 
-        assertEquals(TEST_EXPERIMENT_1.withName(newName), updatedExperiment);
+        assertEquals(TEST_CONFIGURATION.withConfigurationFileName(newFileName), updatedExperiment);
         assertExperimentInDatabase(updatedExperiment);
     }
 
     @ParameterizedTest
     @MethodSource("provideParameters")
     void updateParams(boolean overrideParams, Map<String, Object> newParameters, Map<String, Object> expectedParameters) {
-        var updatedExperiment = experimentService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams);
+        var updatedConfiguration = experimentConfigurationService
+                .update(TEST_CONFIGURATION.getId(), null, newParameters, overrideParams);
 
-        assertEquals(expectedParameters, updatedExperiment.getParameters());
-        assertExperimentInDatabase(updatedExperiment);
+        assertEquals(expectedParameters, updatedConfiguration.getParameters());
+        assertExperimentInDatabase(updatedConfiguration);
     }
 }

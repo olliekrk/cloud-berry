@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ExperimentRepositoryTests {
 
     @Autowired
-    ExperimentsRepository experimentsRepository;
+    ExperimentRepository experimentRepository;
 
     @Test
     @DisplayName("it should not change ID on experiment name modification")
     public void noIdChangeOnUpdateTest() {
-        var experiment = experimentsRepository.save(newTestExperiment())
+        var experiment = experimentRepository.save(newTestExperiment())
                 .block();
-        var modifiedExperiment = experimentsRepository.save(experiment.withName(experiment.getName() + "_modified"))
+        var modifiedExperiment = experimentRepository.save(experiment.withName(experiment.getName() + "_modified"))
                 .block();
 
         assertNotNull(experiment.getId());
@@ -37,8 +37,8 @@ public class ExperimentRepositoryTests {
     @Test
     @DisplayName("it should generate subsequent IDs on insert")
     public void subsequentIdGenerationTest() {
-        var experiment = experimentsRepository.save(newTestExperiment()).block();
-        var experimentNext = experimentsRepository.save(newTestExperiment()).block();
+        var experiment = experimentRepository.save(newTestExperiment()).block();
+        var experimentNext = experimentRepository.save(newTestExperiment()).block();
 
         assertNotNull(experiment.getId());
         assertNotNull(experimentNext.getId());

@@ -20,7 +20,7 @@ public class ExperimentServiceFindByNameTest extends ExperimentServiceTestBase {
 
     @Test
     void findByNameSingle() {
-        experimentsRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2)).blockLast();
+        experimentRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2)).blockLast();
 
         final var experiments = experimentService.findByName(EXPERIMENT_NAME_1);
 
@@ -30,7 +30,7 @@ public class ExperimentServiceFindByNameTest extends ExperimentServiceTestBase {
     @Test
     void findByNameMultiple() {
         final var additionalExperiment = new Experiment(ObjectId.get(), EXPERIMENT_NAME_1, Map.of(), Instant.ofEpochMilli(10));
-        experimentsRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2, additionalExperiment)).blockLast();
+        experimentRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2, additionalExperiment)).blockLast();
 
         var experiments = experimentService.findByName(EXPERIMENT_NAME_1);
 

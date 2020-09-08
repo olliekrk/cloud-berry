@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.common.trait.Timed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -24,7 +25,9 @@ public class ExperimentConfiguration implements Parametrized<String, Object>, Ti
     @Indexed
     private ObjectId experimentId;
     @Nullable
+    @With
     private String configurationFileName;
+    @With
     private Map<String, Object> parameters;
     private Instant time;
 

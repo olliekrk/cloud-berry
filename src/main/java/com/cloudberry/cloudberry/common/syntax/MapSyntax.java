@@ -21,6 +21,12 @@ public abstract class MapSyntax {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v, v2) -> v2));
     }
 
+    public static <K, V> Map<K, V> getNewParamsMap(Map<K, V> newParams,
+                                                   Map<K, V> prevParams,
+                                                   boolean overrideParams) {
+        return overrideParams ? newParams : merged(prevParams, newParams);
+    }
+
     public static <K, V, R> Map<K, R> zippedArrays(K[] keys, V[] values, Function<V, R> valuesMapper) {
         return IntStream.range(0, keys.length)
                 .boxed()

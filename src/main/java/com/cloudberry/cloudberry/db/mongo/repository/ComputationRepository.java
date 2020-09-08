@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.Collection;
 
-public interface ComputationsRepository extends ReactiveSortingRepository<ExperimentComputation, ObjectId> {
+public interface ComputationRepository extends ReactiveSortingRepository<ExperimentComputation, ObjectId> {
 
     Flux<ExperimentComputation> findAllByConfigurationId(ObjectId configurationId);
 

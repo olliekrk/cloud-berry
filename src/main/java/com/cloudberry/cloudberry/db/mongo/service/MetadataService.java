@@ -16,19 +16,19 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MetadataService {
-    private final ConfigurationService configurationService;
+    private final ExperimentConfigurationService experimentConfigurationService;
     private final ExperimentService experimentService;
-    private final ComputationService computationService;
+    private final ExperimentComputationService experimentComputationService;
 
     public List<ObjectId> findAllComputationIdsForConfiguration(ObjectId configurationId) {
-        return computationService.findAllComputationsForConfigurationId(configurationId)
+        return experimentComputationService.findAllComputationsForConfigurationId(configurationId)
                 .stream()
                 .map(ExperimentComputation::getId)
                 .collect(Collectors.toList());
     }
 
     public List<ObjectId> findAllConfigurationIdsForExperiment(String experimentName) {
-        return configurationService.findAllForExperimentName(experimentName)
+        return experimentConfigurationService.findAllForExperimentName(experimentName)
                 .stream()
                 .map(ExperimentConfiguration::getId)
                 .collect(Collectors.toList());
@@ -39,10 +39,10 @@ public class MetadataService {
     }
 
     public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
-        return configurationService.getOrCreateConfiguration(configuration);
+        return experimentConfigurationService.getOrCreateConfiguration(configuration);
     }
 
     public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
-        return computationService.getOrCreateComputation(computation);
+        return experimentComputationService.getOrCreateComputation(computation);
     }
 }

@@ -6,10 +6,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ComputationServiceFindAllTest extends ComputationServiceTestBase {
+public class ExperimentComputationServiceFindAllTest extends ExperimentComputationServiceTestBase {
     @Test
     void findAllEmpty() {
-        var computations = computationService.findAll();
+        var computations = experimentComputationService.findAll();
 
         assertEquals(List.of(), computations);
     }
@@ -18,7 +18,7 @@ public class ComputationServiceFindAllTest extends ComputationServiceTestBase {
     void findAll() {
         saveAllInRepository();
 
-        var foundComputations = computationService.findAll();
+        var foundComputations = experimentComputationService.findAll();
 
         assertEquals(ALL_COMPUTATIONS, foundComputations);
     }

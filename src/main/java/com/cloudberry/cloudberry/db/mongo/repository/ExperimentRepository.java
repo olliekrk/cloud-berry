@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
-public interface ExperimentsRepository extends ReactiveSortingRepository<Experiment, ObjectId> {
+public interface ExperimentRepository extends ReactiveSortingRepository<Experiment, ObjectId> {
 
     Flux<Experiment> findAllByName(String name);
 

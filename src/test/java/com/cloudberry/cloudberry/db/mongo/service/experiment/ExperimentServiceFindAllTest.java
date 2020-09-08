@@ -1,11 +1,8 @@
 package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
-import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,7 +18,7 @@ class ExperimentServiceFindAllTest extends ExperimentServiceTestBase {
     @Test
     void findAll() {
         final var experiments = List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2);
-        experimentsRepository.saveAll(experiments).blockLast();
+        experimentRepository.saveAll(experiments).blockLast();
 
         var foundExperiments = experimentService.findAll();
 
@@ -31,10 +28,10 @@ class ExperimentServiceFindAllTest extends ExperimentServiceTestBase {
     @Test
     void findAllAfterRemove() {
         final var experiments = List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2);
-        experimentsRepository.saveAll(experiments).blockLast();
-        experimentsRepository.saveAll(experiments).blockLast();
+        experimentRepository.saveAll(experiments).blockLast();
+        experimentRepository.saveAll(experiments).blockLast();
 
-        experimentsRepository.delete(TEST_EXPERIMENT_2).block();
+        experimentRepository.delete(TEST_EXPERIMENT_2).block();
         var foundExperiments = experimentService.findAll();
 
         assertEquals(List.of(TEST_EXPERIMENT_1), foundExperiments);

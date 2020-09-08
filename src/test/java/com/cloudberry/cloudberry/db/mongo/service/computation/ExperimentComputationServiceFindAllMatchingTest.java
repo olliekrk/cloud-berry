@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ComputationServiceFindAllMatchingTest extends ComputationServiceTestBase {
+public class ExperimentComputationServiceFindAllMatchingTest extends ExperimentComputationServiceTestBase {
 
     private static Stream<Arguments> provideParameters() {
         return Stream.of(
@@ -25,7 +25,7 @@ public class ComputationServiceFindAllMatchingTest extends ComputationServiceTes
     void findMatching(ObjectId configurationId, List<ExperimentComputation> expectedComputations) {
         saveAllInRepository();
 
-        var foundComputations = computationService.findAllComputationsForConfigurationId(configurationId);
+        var foundComputations = experimentComputationService.findAllComputationsForConfigurationId(configurationId);
 
         Assertions.assertEquals(expectedComputations, foundComputations);
     }
