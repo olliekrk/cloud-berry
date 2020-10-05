@@ -33,3 +33,4 @@ out/
 
 ### Jupyter notebook checkpoints
 .ipynb_checkpoints
+/logs/
