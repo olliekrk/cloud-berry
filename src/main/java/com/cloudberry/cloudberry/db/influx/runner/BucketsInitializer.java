@@ -16,6 +16,5 @@ public class BucketsInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         bucketsService.createBucketIfNotExists(influxConfig.getDefaultBucketName());
-        bucketsService.createBucketIfNotExists(influxConfig.getDefaultBucketName());
     }
 }

@@ -67,8 +67,8 @@ spring:
 spring:
   profiles: olgierd
   influx2:
-    org: 06452c8f4af4d000
-    token: M9YLkww4dbxApd2UXj8vK053oP8oHgBsYkXABZl7MUHekXnTJrrGeUGacCMDyLMVXmrKLyw7_ay5unQi_ET89g==
+    org: 66fb4172c944fe08
+    token: m8m8olbdS7PQUNf4MxK7BOvIjG01iGe7FyoP0RXcHNeQXA9xeV2Lo9fr2qXxhrFuyvKNo8D4jqhLyPgZ9Q7Q2Q==
 
 ---
 

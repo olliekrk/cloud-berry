@@ -39,9 +39,9 @@ public class TopologyBootstrapConfig {
             streams = topologyBootstrapper.configureStreams(topology);
             streams.start();
         } catch (TopologyException e) {
-            log.error("Bootstrapping has failed due to a topology exception: " + e);
+            log.error("Bootstrapping has failed due to a topology exception:", e);
         } catch (Throwable e) {
-            log.error("Bootstrapping has failed due to an unknown reason: " + e);
+            log.error("Bootstrapping has failed due to an unknown exception:", e);
         }
         return streams;
     }
