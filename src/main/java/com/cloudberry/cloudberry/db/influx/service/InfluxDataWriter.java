@@ -20,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InfluxDataWriter {
     private final InfluxConfig influxConfig;
+    private final InfluxPropertiesService influxPropertiesService;
     private final InfluxDBClient influxClient;
     private final BucketsService bucketsService;
 
@@ -46,7 +47,7 @@ public class InfluxDataWriter {
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
         Try.withResources(influxClient::getWriteApi)
                 .of(writeApi -> {
-                    var bucket = Optional.ofNullable(bucketName).orElse(influxConfig.getDefaultBucketName());
+                    var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
                     bucketsService.createBucketIfNotExists(bucket);
                     writeApi.writePoints(bucket, influxConfig.getDefaultOrganization(), List.copyOf(points));
                     return null;
