@@ -23,6 +23,7 @@ spring:
       host: localhost
       port: 27017
       database: cloudberry
+      auto-index-creation: false
   influx2:
     url: http://localhost:9999/
     username: root
