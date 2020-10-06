@@ -69,21 +69,26 @@ public class RawDataRest {
     @PostMapping(value = "/csvFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ObjectId uploadCsvFile(@PathVariable String experimentName,
                                   @RequestPart MultipartFile file,
-                                  @RequestPart(required = false) List<String> tags,
+                                  @RequestPart(name = "tags", required = false) List<String> tagsParam,
+                                  @RequestPart(name = "headers", required = false) List<String> headersParam,
                                   @RequestParam String configurationId,
                                   @RequestParam(required = false) String computationId,
-                                  @RequestParam(required = false) String measurementName) throws RestException {
+                                  @RequestParam(required = false) String measurementName,
+                                  @RequestParam(defaultValue = "false") String hasHeaders) throws RestException {
+
         if (!ObjectId.isValid(configurationId))
             throw new InvalidConfigurationIdException(List.of(configurationId));
 
         if (computationId != null && !ObjectId.isValid(computationId))
             throw new InvalidComputationIdException(List.of(computationId));
 
+        var firstRecordAsHeaders = hasHeaders.equals("true");
         var uploadDetails = new CsvUploadDetails(
-                tags == null ? List.of() : tags,
+                tagsParam == null ? List.of() : tagsParam,
                 new ObjectId(configurationId),
                 computationId == null ? new ObjectId() : new ObjectId(computationId),
-                measurementName
+                measurementName,
+                firstRecordAsHeaders || headersParam == null ? null : headersParam
         );
         return rawDataService.uploadCsvFile(file, experimentName, uploadDetails);
     }
