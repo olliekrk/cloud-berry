@@ -2,11 +2,10 @@ package com.cloudberry.cloudberry.rest.api.metadata;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.service.ExperimentComputationService;
+import com.cloudberry.cloudberry.rest.api.IdDispatcher;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
-import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,22 +30,17 @@ public class ComputationCrudRest {
     @GetMapping(value = "/byConfigurationId")
     List<ExperimentComputation> getByConfigurationId(@RequestParam String configurationIdHex)
             throws InvalidConfigurationIdException {
-        val configurationId = getConfigurationId(configurationIdHex);
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
         return experimentComputationService.findAllComputationsForConfigurationId(configurationId);
     }
 
     @PostMapping("/create")
     ExperimentComputation create(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
-        val configurationId = getConfigurationId(configurationIdHex);
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
         val now = Instant.now();
         val computation = new ExperimentComputation(configurationId, now);
         return experimentComputationService.getOrCreateComputation(computation).block();
     }
 
-    private ObjectId getConfigurationId(@RequestParam String configurationIdHex)
-            throws InvalidConfigurationIdException {
-        return RestParametersUtil.getValidId(configurationIdHex)
-                .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
-    }
 }

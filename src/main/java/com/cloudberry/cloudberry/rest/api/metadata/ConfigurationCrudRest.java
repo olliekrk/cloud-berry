@@ -2,9 +2,9 @@ package com.cloudberry.cloudberry.rest.api.metadata;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.service.ExperimentConfigurationService;
+import com.cloudberry.cloudberry.rest.api.IdDispatcher;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdException;
-import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.MediaType;
@@ -47,8 +47,7 @@ public class ConfigurationCrudRest {
                                         @RequestParam(required = false) String configurationFileName,
                                         @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
-        val experimentId = RestParametersUtil.getValidId(experimentIdHex)
-                .orElseThrow(() -> new InvalidExperimentIdException(List.of(experimentIdHex)));
+        val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
         val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
         val now = Instant.now();
         val experimentConfiguration =
@@ -62,8 +61,7 @@ public class ConfigurationCrudRest {
                                    @RequestParam(defaultValue = "false") boolean overrideParams,
                                    @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidConfigurationIdException {
-        val configurationId = RestParametersUtil.getValidId(configurationIdHex)
-                .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
+        val configurationId = IdDispatcher.getConfigurationId((configurationIdHex));
 
         return experimentConfigurationService
                 .update(configurationId, configurationFileName, parameters, overrideParams);

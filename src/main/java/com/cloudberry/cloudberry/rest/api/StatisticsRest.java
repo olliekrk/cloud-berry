@@ -1,18 +1,27 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.analytics.model.*;
+import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
+import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
+import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
-import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
-import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -30,9 +39,7 @@ public class StatisticsRest {
                                                  @RequestParam(required = false) String bucketName,
                                                  @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
-        if (computationIds.isEmpty())
-            throw new InvalidComputationIdException(computationIdsHex);
+        var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
 
         return statisticsService.getComputationsByIds(
                 fieldName,
@@ -48,8 +55,7 @@ public class StatisticsRest {
                                                              @RequestParam(required = false) String bucketName,
                                                              @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
-        var configurationId = RestParametersUtil.getValidId(configurationIdHex)
-                .orElseThrow(() -> new InvalidConfigurationIdException(List.of(configurationIdHex)));
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
         return statisticsService.getComputationsByConfigurationId(
                 fieldName,
@@ -82,9 +88,7 @@ public class StatisticsRest {
                                                               @RequestParam(required = false) String bucketName,
                                                               @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
-        if (computationIds.isEmpty())
-            throw new InvalidComputationIdException(computationIdsHex);
+        var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
 
         return statisticsService.getAverageAndStddevOfComputations(
                 fieldName,
@@ -119,9 +123,7 @@ public class StatisticsRest {
                                                         @RequestParam(required = false) String bucketName,
                                                         @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
-        var configurationIds = RestParametersUtil.getValidIds(configurationIdsHex);
-        if (configurationIds.isEmpty())
-            throw new InvalidConfigurationIdException(configurationIdsHex);
+        val configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
 
         return statisticsService.getConfigurationsMeansByIds(
                 fieldName,
@@ -132,7 +134,8 @@ public class StatisticsRest {
 
     @PostMapping("/configurations/comparison/forExperiment")
     public List<DataSeries> getConfigurationsMeansByExperimentName(@RequestParam String fieldName,
-                                                                   @RequestParam(required = false) String measurementName,
+                                                                   @RequestParam(required = false)
+                                                                           String measurementName,
                                                                    @RequestParam(required = false) String bucketName,
                                                                    @RequestParam String experimentName
     ) {

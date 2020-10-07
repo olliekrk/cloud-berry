@@ -6,16 +6,23 @@ import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.dto.DataFilters;
+import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
-import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.service.BucketNameResolver;
 import com.cloudberry.cloudberry.service.api.RawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -71,13 +78,12 @@ public class RawDataRest {
                                   @RequestPart MultipartFile file,
                                   @RequestPart(name = "tags", required = false) List<String> tagsParam,
                                   @RequestPart(name = "headers", required = false) List<String> headersParam,
-                                  @RequestParam String configurationId,
+                                  @RequestParam String configurationIdHex,
                                   @RequestParam(required = false) String computationId,
                                   @RequestParam(required = false) String measurementName,
                                   @RequestParam(defaultValue = "false") String hasHeaders) throws RestException {
 
-        if (!ObjectId.isValid(configurationId))
-            throw new InvalidConfigurationIdException(List.of(configurationId));
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
         if (computationId != null && !ObjectId.isValid(computationId))
             throw new InvalidComputationIdException(List.of(computationId));
@@ -85,7 +91,7 @@ public class RawDataRest {
         var firstRecordAsHeaders = hasHeaders.equals("true");
         var uploadDetails = new CsvUploadDetails(
                 tagsParam == null ? List.of() : tagsParam,
-                new ObjectId(configurationId),
+                configurationId,
                 computationId == null ? new ObjectId() : new ObjectId(computationId),
                 measurementName,
                 firstRecordAsHeaders || headersParam == null ? null : headersParam

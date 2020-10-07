@@ -2,8 +2,8 @@ package com.cloudberry.cloudberry.rest.api.metadata;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.service.ExperimentService;
+import com.cloudberry.cloudberry.rest.api.IdDispatcher;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdException;
-import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.MediaType;
@@ -51,8 +51,7 @@ public class ExperimentCrudRest {
                       @RequestParam(defaultValue = "false") boolean overrideParams,
                       @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
-        val experimentId = RestParametersUtil.getValidId(experimentIdHex)
-                .orElseThrow(() -> new InvalidExperimentIdException(List.of(experimentIdHex)));
+        val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
 
         return experimentService.update(experimentId, name, parameters, overrideParams);
     }
