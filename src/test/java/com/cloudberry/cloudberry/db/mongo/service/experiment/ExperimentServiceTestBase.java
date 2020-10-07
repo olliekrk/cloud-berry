@@ -21,8 +21,10 @@ abstract class ExperimentServiceTestBase {
     protected static final String EXPERIMENT_NAME_2 = "experiment_test_2";
     protected static final Map<String, Object> EXPERIMENT_PARAMS_1 = Map.of("price", 3000);
     protected static final Map<String, Object> EXPERIMENT_PARAMS_2 = Map.of("param", 1);
-    protected static final Experiment TEST_EXPERIMENT_1 = new Experiment(ObjectId.get(), EXPERIMENT_NAME_1, EXPERIMENT_PARAMS_1, ofEpochMilli(100));
-    protected static final Experiment TEST_EXPERIMENT_2 = new Experiment(ObjectId.get(), EXPERIMENT_NAME_2, EXPERIMENT_PARAMS_2, ofEpochMilli(200));
+    protected static final Experiment TEST_EXPERIMENT_1 =
+            new Experiment(ObjectId.get(), EXPERIMENT_NAME_1, EXPERIMENT_PARAMS_1, ofEpochMilli(100));
+    protected static final Experiment TEST_EXPERIMENT_2 =
+            new Experiment(ObjectId.get(), EXPERIMENT_NAME_2, EXPERIMENT_PARAMS_2, ofEpochMilli(200));
 
     @Autowired
     protected ExperimentService experimentService;

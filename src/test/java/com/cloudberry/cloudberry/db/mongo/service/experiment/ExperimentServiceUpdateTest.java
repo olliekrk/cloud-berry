@@ -42,8 +42,10 @@ public class ExperimentServiceUpdateTest extends ExperimentServiceTestBase {
 
     @ParameterizedTest
     @MethodSource("provideParameters")
-    void updateParams(boolean overrideParams, Map<String, Object> newParameters, Map<String, Object> expectedParameters) {
-        var updatedExperiment = experimentService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams);
+    void updateParams(boolean overrideParams, Map<String, Object> newParameters,
+                      Map<String, Object> expectedParameters) {
+        var updatedExperiment =
+                experimentService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams);
 
         assertEquals(expectedParameters, updatedExperiment.getParameters());
         assertExperimentInDatabase(updatedExperiment);

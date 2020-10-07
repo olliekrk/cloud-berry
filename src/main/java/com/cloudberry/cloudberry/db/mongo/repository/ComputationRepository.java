@@ -5,10 +5,10 @@ import org.bson.types.ObjectId;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Flux;
 
-import java.util.Collection;
-
 public interface ComputationRepository extends ReactiveSortingRepository<ExperimentComputation, ObjectId> {
 
     Flux<ExperimentComputation> findAllByConfigurationId(ObjectId configurationId);
+
+    Flux<Void> deleteByConfigurationId(ObjectId configurationId);
 
 }

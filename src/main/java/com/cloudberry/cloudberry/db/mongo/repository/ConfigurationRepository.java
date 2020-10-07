@@ -9,4 +9,7 @@ public interface ConfigurationRepository extends ReactiveSortingRepository<Exper
     Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
 
     Flux<ExperimentConfiguration> findAllByConfigurationFileName(String configurationFileName);
+
+    Flux<Void> deleteByExperimentId(ObjectId experimentId);
+
 }

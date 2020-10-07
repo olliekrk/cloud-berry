@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.db.mongo.service.computation;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import org.bson.types.ObjectId;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -9,6 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ExperimentComputationServiceFindAllMatchingTest extends ExperimentComputationServiceTestBase {
 
@@ -27,6 +30,6 @@ public class ExperimentComputationServiceFindAllMatchingTest extends ExperimentC
 
         var foundComputations = experimentComputationService.findAllComputationsForConfigurationId(configurationId);
 
-        Assertions.assertEquals(expectedComputations, foundComputations);
+        assertThat(foundComputations, Matchers.containsInAnyOrder(expectedComputations.toArray()));
     }
 }

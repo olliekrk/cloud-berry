@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.db.mongo.service;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.repository.ComputationRepository;
+import com.cloudberry.cloudberry.db.mongo.service.deletion.ComputationDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExperimentComputationService {
     private final ComputationRepository computationRepository;
+    private final ComputationDeletionService computationDeletionService;
 
     public List<ExperimentComputation> findAll() {
         return computationRepository.findAll().collectList().block();
@@ -29,8 +31,14 @@ public class ExperimentComputationService {
     public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
         return computationRepository
                 .findById(computation.getId())
-                .doOnNext(next -> log.info("Existing computation " + next.getId() + " was found"))
+                .doOnNext(experimentComputation ->
+                        log.info("Existing computation " + experimentComputation.getId() + " was found"))
                 .switchIfEmpty(computationRepository.save(computation))
-                .doOnNext(next -> log.info("Created new computation " + next.getId()));
+                .doOnNext(
+                        experimentComputation -> log.info("Created new computation " + experimentComputation.getId()));
+    }
+
+    public void deleteById(ObjectId computationId) {
+        computationDeletionService.deleteComputationById(computationId).blockLast();
     }
 }

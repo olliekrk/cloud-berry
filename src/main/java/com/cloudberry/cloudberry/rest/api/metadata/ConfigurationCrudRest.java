@@ -8,7 +8,9 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdE
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,6 +67,13 @@ public class ConfigurationCrudRest {
 
         return experimentConfigurationService
                 .update(configurationId, configurationFileName, parameters, overrideParams);
+    }
+
+    @DeleteMapping("/deleteById")
+    void deleteComputation(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
+
+        experimentConfigurationService.deleteById(configurationId);
     }
 
 }

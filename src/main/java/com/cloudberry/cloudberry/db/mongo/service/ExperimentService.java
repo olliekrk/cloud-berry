@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.db.mongo.service;
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
+import com.cloudberry.cloudberry.db.mongo.service.deletion.ExperimentDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -22,6 +23,8 @@ import java.util.function.Function;
 public class ExperimentService {
     private final ExperimentRepository experimentRepository;
 
+    private final ExperimentDeletionService experimentDeletionService;
+
     public List<Experiment> findAll() {
         return experimentRepository.findAll().collectList().block();
     }
@@ -39,6 +42,10 @@ public class ExperimentService {
                         .next())
                 .doOnNext(next -> log.info("Existing experiment {} was found", next.getId()))
                 .switchIfEmpty(saveNewExperiment(experiment));
+    }
+
+    public void deleteById(ObjectId experimentId) {
+        experimentDeletionService.deleteExperimentById(experimentId).blockLast();
     }
 
     @NotNull

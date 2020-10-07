@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.repository.ConfigurationRepository;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
+import com.cloudberry.cloudberry.db.mongo.service.deletion.ConfigurationDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -22,8 +23,10 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class ExperimentConfigurationService {
-    private final ConfigurationRepository configurationRepository;
     private final ExperimentRepository experimentRepository;
+    private final ConfigurationRepository configurationRepository;
+
+    private final ConfigurationDeletionService configurationDeletionService;
 
     public List<ExperimentConfiguration> findAll() {
         return configurationRepository.findAll().collectList().block();
@@ -64,6 +67,10 @@ public class ExperimentConfigurationService {
                 .flatMap(configurationRepository::save)
                 .doOnNext(experiment -> log.info("Experiment configuration {} updated", experiment))
                 .block();
+    }
+
+    public void deleteById(ObjectId configurationId) {
+        configurationDeletionService.deleteConfigurationById(configurationId).blockLast();
     }
 
     @NotNull
