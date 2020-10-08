@@ -49,7 +49,7 @@ public class InfluxDataWriter {
                 .of(writeApi -> {
                     var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
                     bucketsService.createBucketIfNotExists(bucket);
-                    writeApi.writePoints(bucket, influxConfig.getDefaultOrganization(), List.copyOf(points));
+                    writeApi.writePoints(bucket, influxConfig.getDefaultOrganizationId(), List.copyOf(points));
                     return null;
                 }).get();
     }

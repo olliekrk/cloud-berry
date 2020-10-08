@@ -31,7 +31,7 @@ public class InfluxDataRemover {
                 stop,
                 buildDeletePredicate(influxQueryFields.getMeasurementNameOptional(), tags),
                 bucket,
-                influxConfig.getDefaultOrganization()
+                influxConfig.getDefaultOrganizationId()
         );
     }
 

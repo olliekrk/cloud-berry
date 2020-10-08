@@ -28,7 +28,7 @@ public class BucketsService {
         var buckets = bucketsApi();
         return findBucketByName(bucketName).orElseGet(() -> {
             log.info("Creating new bucket: " + bucketName);
-            return buckets.createBucket(bucketName, influxConfig.getDefaultOrganization());
+            return buckets.createBucket(bucketName, influxConfig.getDefaultOrganizationId());
         }).getName();
     }
 
