@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   influxdb-cb:
@@ -8,10 +8,11 @@ services:
     ports:
       - 9999:9999
     volumes:
-      - /data/influxdb/cloudberry/data:/var/lib/influxdb # data
-      - /data/influxdb/cloudberry/config:/etc/influxdb # configs
-    command: --reporting-disabled
+      - /data/cloudberry/influxdbv2:/root/.influxdbv2 # configs (token, organization, user, password)
+    command: --reporting-disabled --engine-path /root/.influxdbv2_engine
     environment:
-      INFLUXDB_DB: cloudberry
+      INFLUXDB_DEFAULT_ORG: cloudberry
+      INFLUXDB_DEFAULT_BUCKET: cloudberry_logs
       INFLUXDB_ADMIN_USER: root
       INFLUXDB_ADMIN_PASSWORD: ziemniak
+      INFLUXDB_ADMIN_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='

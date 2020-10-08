@@ -17,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InfluxDataEvictor {
+public class InfluxDataRemover {
     private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
 
@@ -26,12 +26,13 @@ public class InfluxDataEvictor {
         var start = OffsetsFactory.epoch();
         var stop = OffsetsFactory.now();
         var bucket = influxQueryFields.getBucketName();
-        influxClient.getDeleteApi()
-                .delete(start,
-                        stop,
-                        buildDeletePredicate(influxQueryFields.getMeasurementNameOptional(), tags),
-                        bucket,
-                        influxConfig.getDefaultOrganization());
+        influxClient.getDeleteApi().delete(
+                start,
+                stop,
+                buildDeletePredicate(influxQueryFields.getMeasurementNameOptional(), tags),
+                bucket,
+                influxConfig.getDefaultOrganization()
+        );
     }
 
     private static String buildDeletePredicate(Optional<String> measurementName,
