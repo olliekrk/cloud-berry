@@ -1,7 +1,6 @@
-from typing import List
-
 import pandas as pd
 import requests
+from typing import List
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
 from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds
@@ -75,6 +74,24 @@ class Analytics(CloudberryApi):
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.get(url=url, params=params))
 
+    def best_n_computations_for_configuration(self,
+                                              n: int,
+                                              field_name: str,
+                                              configuration_id: str,
+                                              goal: OptimizationGoal,
+                                              kind: OptimizationKind,
+                                              measurement_name: str = None,
+                                              bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/computations/best/forConfiguration'
+        params = Analytics._append_db_params({
+            'n': n,
+            'fieldName': field_name,
+            'configurationIdHex': configuration_id,
+            'optimizationGoal': goal.name,
+            'optimizationKind': kind.name
+        }, measurement_name, bucket_name)
+        return Analytics._wrap_series_request(lambda: requests.get(url=url, params=params))
+
     def avg_and_stddev_for_computations(self,
                                         computation_ids: List[str],
                                         field_name: str,
@@ -115,6 +132,25 @@ class Analytics(CloudberryApi):
         params = Analytics._append_db_params({
             'fieldName': field_name,
             'mode': criteria_mode.name,
+        }, measurement_name, bucket_name)
+        return Analytics._wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            json=thresholds.__dict__
+        ))
+
+    def thresholds_exceeding_computations_for_configuration(self,
+                                                            field_name: str,
+                                                            configuration_id: str,
+                                                            criteria_mode: CriteriaMode,
+                                                            thresholds: Thresholds,
+                                                            measurement_name: str = None,
+                                                            bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/computations/exceedingThresholds/forConfiguration'
+        params = Analytics._append_db_params({
+            'fieldName': field_name,
+            'mode': criteria_mode.name,
+            'configurationIdHex': configuration_id,
         }, measurement_name, bucket_name)
         return Analytics._wrap_series_request(lambda: requests.post(
             url=url,

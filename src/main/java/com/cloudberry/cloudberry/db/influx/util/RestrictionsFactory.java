@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.db.influx.util;
 
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
+import io.vavr.collection.Stream;
 
 import java.util.Collection;
 import java.util.Map;
@@ -60,11 +61,16 @@ public abstract class RestrictionsFactory {
     }
 
     public static Restrictions tagIn(String tagName, Collection<String> tagValues) {
-        var tagRestrictions = tagValues
-                .stream()
-                .map(tagValue -> tagEquals(tagName, tagValue))
-                .toArray(Restrictions[]::new);
+        var tagRestrictions = restrictionsFromSet(Set.copyOf(tagValues), tagValue -> tagEquals(tagName, tagValue));
         return Restrictions.or(tagRestrictions);
+    }
+
+    public static Restrictions everyRestriction(Iterable<Restrictions> restrictions) {
+        return Restrictions.and(Stream.ofAll(restrictions).toJavaArray(Restrictions[]::new));
+    }
+
+    public static Restrictions anyRestriction(Iterable<Restrictions> restrictions) {
+        return Restrictions.or(Stream.ofAll(restrictions).toJavaArray(Restrictions[]::new));
     }
 
     private static <T> Restrictions[] restrictionsFromMap(

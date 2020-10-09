@@ -1,9 +1,8 @@
-package com.cloudberry.cloudberry.rest.api;
+package com.cloudberry.cloudberry.rest.util;
 
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdException;
-import com.cloudberry.cloudberry.rest.util.RestParametersUtil;
 import org.bson.types.ObjectId;
 
 import java.util.List;

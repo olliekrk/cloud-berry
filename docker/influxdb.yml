@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  # todo: https://docs.influxdata.com/influxdb/v2.0/reference/rc0-upgrade-guide/
   influxdb-cb:
     image: quay.io/influxdb/influxdb:2.0.0-beta
     hostname: influxdb-cb

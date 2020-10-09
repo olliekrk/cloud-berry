@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -13,5 +14,11 @@ public interface ThresholdsApi {
                                                Thresholds thresholds,
                                                CriteriaMode mode,
                                                InfluxQueryFields influxQueryFields);
+
+    List<DataSeries> thresholdsExceedingSeriesFrom(String fieldName,
+                                                   Thresholds thresholds,
+                                                   CriteriaMode mode,
+                                                   InfluxQueryFields influxQueryFields,
+                                                   List<ObjectId> computationIds);
 
 }

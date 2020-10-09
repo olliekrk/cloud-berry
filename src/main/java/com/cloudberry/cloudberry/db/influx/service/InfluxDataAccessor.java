@@ -1,12 +1,10 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
-import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.influx.util.FluxQueryUtil;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
-import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.exceptions.InfluxException;
 import com.influxdb.query.FluxRecord;
@@ -45,7 +43,7 @@ public class InfluxDataAccessor {
         ).flatMap(i -> i).collect(Collectors.toSet());
 
         Flux query = FluxQueryUtil
-                .applyRestrictions(
+                .foldRestrictions(
                         Flux.from(bucket).range(Instant.EPOCH),
                         allRestrictions.flatMap(Optional::stream).collect(Collectors.toList())
                 )

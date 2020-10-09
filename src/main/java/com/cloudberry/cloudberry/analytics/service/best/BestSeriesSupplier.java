@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
+import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -13,14 +14,13 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions;
 
 @Service
 @RequiredArgsConstructor
@@ -32,22 +32,34 @@ public class BestSeriesSupplier implements BestSeriesApi {
                                         String fieldName,
                                         Optimization optimization,
                                         InfluxQueryFields influxQueryFields) {
-        var bucketName = influxQueryFields.getBucketName();
+        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField)
+        )));
 
-        var restrictions = influxQueryFields.getMeasurementNameOptional()
-                .map(name -> getFieldAndMeasurementNameRestrictions(fieldName, name))
-                .orElse(ComputationsRestrictionsFactory.getFieldRestrictions(fieldName));
-
-        var bestComputationsIds = getBestComputationIds(n, optimization, bucketName, restrictions);
-
-        return getComputationsSeries(bestComputationsIds, restrictions, bucketName);
+        return getBestComputations(n, optimization, influxQueryFields.getBucketName(), restrictions);
     }
 
-    private List<String> getBestComputationIds(
-            int n,
-            Optimization optimization,
-            String bucketName,
-            Restrictions restrictions) {
+    @Override
+    public List<DataSeries> nBestSeriesFrom(int n,
+                                            String fieldName,
+                                            Optimization optimization,
+                                            InfluxQueryFields influxQueryFields,
+                                            List<ObjectId> computationIds) {
+        if (computationIds.isEmpty()) return List.of();
+        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField),
+                Optional.of(computationIds).map(ComputationsRestrictionsFactory::computationIdIn)
+        )));
+
+        return getBestComputations(n, optimization, influxQueryFields.getBucketName(), restrictions);
+    }
+
+    private List<String> getBestComputationIds(int n,
+                                               Optimization optimization,
+                                               String bucketName,
+                                               Restrictions restrictions) {
         var bestComputations = switch (optimization.getOptimizationKind()) {
             case FINAL_VALUE -> new BestComputationsByLastValue();
             case AREA_UNDER_CURVE -> new BestComputationsByArea();
@@ -56,10 +68,18 @@ public class BestSeriesSupplier implements BestSeriesApi {
         final var optimizationGoal = optimization.getOptimizationGoal();
         var bestComputationsIdsQuery = bestComputations.getBest(n, optimizationGoal, restrictions, bucketName);
 
-        return getComputationsIds(bestComputationsIdsQuery);
+        return queryForComputationIds(bestComputationsIdsQuery);
     }
 
-    private List<String> getComputationsIds(Flux fluxQuery) {
+    private List<DataSeries> getBestComputations(int n,
+                                                 Optimization optimization,
+                                                 String bucketName,
+                                                 Restrictions restrictions) {
+        var ids = getBestComputationIds(n, optimization, bucketName, restrictions);
+        return queryForComputations(ids, restrictions, bucketName);
+    }
+
+    private List<String> queryForComputationIds(Flux fluxQuery) {
         return influxClient
                 .getQueryApi()
                 .query(fluxQuery.toString())
@@ -69,9 +89,9 @@ public class BestSeriesSupplier implements BestSeriesApi {
                 .collect(Collectors.toList());
     }
 
-    private List<DataSeries> getComputationsSeries(List<String> computationsIds,
-                                                   Restrictions restrictions,
-                                                   String bucketName) {
+    private List<DataSeries> queryForComputations(List<String> computationsIds,
+                                                  Restrictions restrictions,
+                                                  String bucketName) {
         var query = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .filter(RestrictionsFactory.tagIn(CommonTags.COMPUTATION_ID, computationsIds))
                 .pivot(

@@ -4,8 +4,10 @@ import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
+import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.properties.TimeInterval;
@@ -15,8 +17,7 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Map;
-
-import static com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory.getComputationsRestrictions;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class MovingAverage implements MovingAverageApi {
@@ -57,8 +58,10 @@ public abstract class MovingAverage implements MovingAverageApi {
     protected Restrictions getRestrictions(InfluxQueryFields influxQueryFields,
                                            List<ObjectId> computationsIds,
                                            String fieldName) {
-        return influxQueryFields.getMeasurementNameOptional()
-                .map(name -> getComputationsRestrictions(computationsIds, fieldName, name))
-                .orElse(ComputationsRestrictionsFactory.getComputationsRestrictions(computationsIds, fieldName));
+        return RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField),
+                Optional.of(computationsIds).map(ComputationsRestrictionsFactory::computationIdIn)
+        )));
     }
 }

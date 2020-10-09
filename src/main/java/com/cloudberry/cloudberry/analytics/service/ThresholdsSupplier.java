@@ -8,8 +8,10 @@ import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
+import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
+import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
@@ -34,11 +36,35 @@ public class ThresholdsSupplier implements ThresholdsApi {
                                                       Thresholds thresholds,
                                                       CriteriaMode mode,
                                                       InfluxQueryFields influxQueryFields) {
-        var bucketName = influxQueryFields.getBucketName();
-        var restrictions = influxQueryFields.getMeasurementNameOptional()
-                .map(name -> ComputationsRestrictionsFactory.getFieldAndMeasurementNameRestrictions(fieldName, name))
-                .orElse(ComputationsRestrictionsFactory.getFieldRestrictions(fieldName));
+        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField)
+        )));
 
+        return thresholdExceedingSeriesWithRestrictions(fieldName, thresholds, mode, influxQueryFields, restrictions);
+    }
+
+    @Override
+    public List<DataSeries> thresholdsExceedingSeriesFrom(String fieldName,
+                                                          Thresholds thresholds,
+                                                          CriteriaMode mode,
+                                                          InfluxQueryFields influxQueryFields,
+                                                          List<ObjectId> computationIds) {
+        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField),
+                Optional.of(computationIds).map(ComputationsRestrictionsFactory::computationIdIn)
+        )));
+
+        return thresholdExceedingSeriesWithRestrictions(fieldName, thresholds, mode, influxQueryFields, restrictions);
+    }
+
+    private List<DataSeries> thresholdExceedingSeriesWithRestrictions(String fieldName,
+                                                                      Thresholds thresholds,
+                                                                      CriteriaMode mode,
+                                                                      InfluxQueryFields influxQueryFields,
+                                                                      Restrictions restrictions) {
+        var bucketName = influxQueryFields.getBucketName();
         var idsQuery = switch (mode) {
             case ANY -> anyValueOverThresholdQuery(thresholds, bucketName, restrictions);
             case FINAL -> finalValueOverThresholdQuery(thresholds, bucketName, restrictions);

@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.service.InfluxOrganizationService;
 import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
@@ -43,7 +42,7 @@ public class BucketsService {
     }
 
     private Optional<Bucket> findBucketByName(String bucketName) {
-        // workaround: BucketsApi.findBucketByName is broken and always returns '_tasks' bucket
+        // workaround: BucketsApi.findBucketByName is somehow broken and always returns '_tasks' bucket
         return bucketsApi()
                 .findBuckets()
                 .stream()

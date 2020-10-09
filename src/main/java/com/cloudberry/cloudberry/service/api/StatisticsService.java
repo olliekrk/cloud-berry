@@ -102,6 +102,21 @@ public class StatisticsService {
                 );
     }
 
+    public List<DataSeries> getNBestComputationsForConfiguration(int n,
+                                                                 String fieldName,
+                                                                 Optimization optimization,
+                                                                 InfluxQueryFields influxQueryFields,
+                                                                 ObjectId configurationId) {
+        return analytics.getBestSeriesApi()
+                .nBestSeriesFrom(
+                        n,
+                        fieldName,
+                        optimization,
+                        influxQueryFields,
+                        metadataService.findAllComputationIdsForConfiguration(configurationId)
+                );
+    }
+
     public List<DataSeries> getAverageAndStddevOfComputations(String fieldName,
                                                               ChronoInterval chronoInterval,
                                                               List<ObjectId> computationsIds,
@@ -117,6 +132,21 @@ public class StatisticsService {
                                                                CriteriaMode mode,
                                                                InfluxQueryFields influxQueryFields) {
         return analytics.getThresholdsApi().thresholdsExceedingSeries(fieldName, thresholds, mode, influxQueryFields);
+    }
+
+    public List<DataSeries> getComputationsExceedingThresholdsForConfiguration(String fieldName,
+                                                                               Thresholds thresholds,
+                                                                               CriteriaMode mode,
+                                                                               InfluxQueryFields influxQueryFields,
+                                                                               ObjectId configurationId) {
+        return analytics.getThresholdsApi()
+                .thresholdsExceedingSeriesFrom(
+                        fieldName,
+                        thresholds,
+                        mode,
+                        influxQueryFields,
+                        metadataService.findAllComputationIdsForConfiguration(configurationId)
+                );
     }
 
     private DataSeries getComputationsAverage(String fieldName,

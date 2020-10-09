@@ -37,4 +37,5 @@ public abstract class ListSyntax {
     public static <T> List<T> without(Collection<T> collection, T element) {
         return collection.stream().filter(e -> !e.equals(element)).collect(Collectors.toList());
     }
+
 }
