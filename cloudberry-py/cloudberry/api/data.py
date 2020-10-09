@@ -7,8 +7,12 @@ from .model import DataPoint, DataSeries
 
 
 class DataFilters:
-    def __init__(self, tags: dict = None, fields: dict = None) -> None:
+    def __init__(self,
+                 tags: dict = None,
+                 tags_presence: List[str] = None,
+                 fields: dict = None) -> None:
         self.tags = tags
+        self.tags_presence = tags_presence
         self.fields = fields
 
 
@@ -62,4 +66,8 @@ class Data(CloudberryApi):
 
     @staticmethod
     def _build_filters_dto(filters: DataFilters) -> dict:
-        return {'tagFilters': filters.tags, 'fieldFilters': filters.fields}
+        return {
+            'tagFilters': filters.tags,
+            'tagPresence': filters.tags_presence,
+            'fieldFilters': filters.fields,
+        }

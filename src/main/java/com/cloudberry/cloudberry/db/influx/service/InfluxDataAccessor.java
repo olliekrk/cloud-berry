@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.db.influx.util.FluxQueryUtil;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.influxdb.client.InfluxDBClient;
+import com.influxdb.exceptions.InfluxException;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
@@ -51,12 +52,21 @@ public class InfluxDataAccessor {
                 .pivot(columnsToKeep, Set.of(InfluxDefaults.Columns.FIELD), InfluxDefaults.Columns.VALUE)
                 .drop(InfluxDefaults.EXCLUDED_COLUMNS);
 
-        return influxClient.getQueryApi()
-                .query(query.toString())
-                .stream()
-                .map(FluxTable::getRecords)
-                .flatMap(List::stream)
-                .peek(record -> record.getValues().keySet().removeAll(InfluxDefaults.EXCLUDED_COLUMNS))
-                .collect(Collectors.toList());
+        var rawQuery = query.toString();
+        try {
+            return influxClient.getQueryApi()
+                    .query(rawQuery)
+                    .stream()
+                    .map(FluxTable::getRecords)
+                    .flatMap(List::stream)
+                    .peek(record -> record.getValues().keySet().removeAll(InfluxDefaults.EXCLUDED_COLUMNS))
+                    .collect(Collectors.toList());
+        } catch (InfluxException e) {
+            log.warn("There is a problem '{}' with the query: {}", e.getMessage(), rawQuery);
+        } catch (Throwable e) {
+            log.warn("Unknown problem occurred '{}' with the query: {}", e.getMessage(), rawQuery);
+        }
+
+        return List.of();
     }
 }
