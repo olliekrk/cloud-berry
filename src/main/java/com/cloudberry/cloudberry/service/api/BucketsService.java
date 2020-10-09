@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
+import com.cloudberry.cloudberry.db.influx.service.InfluxOrganizationService;
 import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.Bucket;
@@ -16,7 +17,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BucketsService {
-    private final InfluxConfig influxConfig;
+    private final InfluxOrganizationService influxOrganizationService;
     private final InfluxDBClient influxClient;
 
     public List<String> getBucketNames() {
@@ -28,7 +29,7 @@ public class BucketsService {
         var buckets = bucketsApi();
         return findBucketByName(bucketName).orElseGet(() -> {
             log.info("Creating new bucket: " + bucketName);
-            return buckets.createBucket(bucketName, influxConfig.getDefaultOrganizationId());
+            return buckets.createBucket(bucketName, influxOrganizationService.getDefaultOrganizationId());
         }).getName();
     }
 

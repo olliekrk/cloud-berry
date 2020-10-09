@@ -19,7 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataWriter {
-    private final InfluxConfig influxConfig;
+    private final InfluxOrganizationService influxOrganizationService;
     private final InfluxPropertiesService influxPropertiesService;
     private final InfluxDBClient influxClient;
     private final BucketsService bucketsService;
@@ -49,7 +49,7 @@ public class InfluxDataWriter {
                 .of(writeApi -> {
                     var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
                     bucketsService.createBucketIfNotExists(bucket);
-                    writeApi.writePoints(bucket, influxConfig.getDefaultOrganizationId(), List.copyOf(points));
+                    writeApi.writePoints(bucket, influxOrganizationService.getDefaultOrganizationId(), List.copyOf(points));
                     return null;
                 }).get();
     }

@@ -2,7 +2,6 @@ package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.util.OffsetsFactory;
 import com.influxdb.client.InfluxDBClient;
@@ -18,8 +17,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataRemover {
-    private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
+    private final InfluxOrganizationService influxOrganizationService;
 
     public void deleteData(InfluxQueryFields influxQueryFields,
                            Map<String, String> tags) {
@@ -31,7 +30,7 @@ public class InfluxDataRemover {
                 stop,
                 buildDeletePredicate(influxQueryFields.getMeasurementNameOptional(), tags),
                 bucket,
-                influxConfig.getDefaultOrganizationId()
+                influxOrganizationService.getDefaultOrganizationId()
         );
     }
 

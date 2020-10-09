@@ -1,13 +1,15 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
+import com.google.common.base.Suppliers;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.domain.Organization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -16,8 +18,16 @@ public class InfluxOrganizationService {
     private final InfluxConfig influxConfig;
     private final InfluxDBClient influxClient;
 
-    private Optional<String> defaultOrganizationId = Optional.empty();
+    private final Supplier<String> defaultOrganizationId =
+            Suppliers.memoizeWithExpiration(this::setupDefaultOrganizationId, 4, TimeUnit.HOURS);
 
+    public String getDefaultOrganizationId() {
+        return defaultOrganizationId.get();
+    }
+
+    /**
+     * Fetch organization ID from Influx instance using organization name from application config.
+     */
     private String setupDefaultOrganizationId() {
         var defaultOrganizationOpt = influxClient
                 .getOrganizationsApi()
@@ -26,24 +36,19 @@ public class InfluxOrganizationService {
                 .filter(organization -> organization.getName().equals(influxConfig.getDefaultOrganizationName()))
                 .findFirst();
 
-        var defaultOrganizationId = defaultOrganizationOpt
+        return defaultOrganizationOpt
                 .map(Organization::getId)
                 .orElseGet(() -> {
-                    var id = influxConfig.getDefaultOrganizationId();
+                    var organizationId = createNewDefaultOrganization().getId();
                     log.warn("No default organization could be fetched from InfluxDB. " +
                             "Verify the application configuration files. " +
-                            "Using default organization ID from configuration (unsafe): " + id);
-                    return id;
+                            "New default organization has been created: {}", organizationId);
+                    return organizationId;
                 });
-
-        this.defaultOrganizationId = Optional.of(defaultOrganizationId);
-        return defaultOrganizationId;
     }
 
-    /**
-     * Lazy method to fetch organization ID from Influx instance using organization name from application config.
-     */
-    public String getDefaultOrganizationId() {
-        return defaultOrganizationId.orElseGet(this::setupDefaultOrganizationId);
+    private Organization createNewDefaultOrganization() {
+        return influxClient.getOrganizationsApi().createOrganization(influxConfig.getDefaultOrganizationName());
     }
+
 }
