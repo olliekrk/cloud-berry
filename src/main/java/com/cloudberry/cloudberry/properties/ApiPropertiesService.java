@@ -20,4 +20,8 @@ public class ApiPropertiesService {
         apiPropertyRepository.save(new ApiProperty(key, value));
     }
 
+    public void reset(String key) {
+        apiPropertyRepository.deleteById(key);
+    }
+
 }

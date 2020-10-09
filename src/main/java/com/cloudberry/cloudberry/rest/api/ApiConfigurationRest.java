@@ -21,4 +21,9 @@ public class ApiConfigurationRest {
         apiPropertiesService.set(key, value);
     }
 
+    @DeleteMapping("property/{key}")
+    public void deleteProperty(@PathVariable String key) {
+        apiPropertiesService.reset(key);
+    }
+
 }
