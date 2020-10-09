@@ -52,6 +52,7 @@ dependencies {
     implementation "org.apache.commons:commons-lang3:$apacheCommonsLangVersion"
     implementation "org.apache.commons:commons-math3:$apacheCommonsMathVersion"
     implementation "org.apache.commons:commons-csv:$apacheCommonsCsvVersion"
+    implementation "com.google.guava:guava:29.0-jre"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion") {

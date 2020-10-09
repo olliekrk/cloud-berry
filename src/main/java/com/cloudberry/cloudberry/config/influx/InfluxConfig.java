@@ -11,6 +11,6 @@ public class InfluxConfig {
     private String defaultBucketName;
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
-    @Value("${spring.influx2.org}")
-    private String defaultOrganization;
+    @Value("${influx.organization-name}")
+    private String defaultOrganizationName;
 }
