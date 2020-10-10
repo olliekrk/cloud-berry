@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
@@ -19,7 +19,7 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentService {
+public class ExperimentCRUService {
     private final ExperimentRepository experimentRepository;
 
     public List<Experiment> findAll() {
@@ -41,12 +41,6 @@ public class ExperimentService {
                 .switchIfEmpty(saveNewExperiment(experiment));
     }
 
-    @NotNull
-    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
-        log.info("Created new experiment " + experiment.getId());
-        return experimentRepository.save(experiment);
-    }
-
     public Experiment update(ObjectId experimentId,
                              @Nullable String name,
                              @Nullable Map<String, Object> newParams,
@@ -56,6 +50,12 @@ public class ExperimentService {
                 .flatMap(experimentRepository::save)
                 .doOnNext(experiment -> log.info("Experiment {} updated", experiment))
                 .block();
+    }
+
+    @NotNull
+    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
+        log.info("Created new experiment " + experiment.getId());
+        return experimentRepository.save(experiment);
     }
 
     @NotNull

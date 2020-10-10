@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ExperimentConfigurationServiceUpdateTest extends ExperimentConfigurationServiceTestBase {
+public class ExperimentConfigurationCRUServiceUpdateTest extends ExperimentConfigurationCRUServiceTestBase {
 
     private static Stream<Arguments> provideParameters() {
         return Stream.of(
@@ -34,7 +34,7 @@ public class ExperimentConfigurationServiceUpdateTest extends ExperimentConfigur
     void updateName() {
         final String newFileName = "new name";
 
-        var updatedExperiment = experimentConfigurationService
+        var updatedExperiment = experimentConfigurationCRUService
                 .update(TEST_CONFIGURATION.getId(), newFileName, null, false);
 
         assertEquals(TEST_CONFIGURATION.withConfigurationFileName(newFileName), updatedExperiment);
@@ -44,7 +44,7 @@ public class ExperimentConfigurationServiceUpdateTest extends ExperimentConfigur
     @ParameterizedTest
     @MethodSource("provideParameters")
     void updateParams(boolean overrideParams, Map<String, Object> newParameters, Map<String, Object> expectedParameters) {
-        var updatedConfiguration = experimentConfigurationService
+        var updatedConfiguration = experimentConfigurationCRUService
                 .update(TEST_CONFIGURATION.getId(), null, newParameters, overrideParams);
 
         assertEquals(expectedParameters, updatedConfiguration.getParameters());

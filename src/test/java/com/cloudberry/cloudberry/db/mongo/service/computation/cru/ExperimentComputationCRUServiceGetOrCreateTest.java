@@ -1,11 +1,11 @@
-package com.cloudberry.cloudberry.db.mongo.service.computation;
+package com.cloudberry.cloudberry.db.mongo.service.computation.cru;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ExperimentComputationServiceGetOrCreateTest extends ExperimentComputationServiceTestBase {
+public class ExperimentComputationCRUServiceGetOrCreateTest extends ExperimentComputationCRUServiceTestBase {
     @Test
     void findExisting() {
         computationRepository.save(TEST_COMPUTATION_1A).block();
@@ -22,7 +22,7 @@ public class ExperimentComputationServiceGetOrCreateTest extends ExperimentCompu
     }
 
     private void getOrCreateAndCompare() {
-        var foundComputation = experimentComputationService.getOrCreateComputation(TEST_COMPUTATION_1A).block();
+        var foundComputation = experimentComputationCRUService.getOrCreateComputation(TEST_COMPUTATION_1A).block();
         var latterComputation = computationRepository.findById(TEST_COMPUTATION_1A.getId()).block();
 
         Assertions.assertEquals(TEST_COMPUTATION_1A, foundComputation);

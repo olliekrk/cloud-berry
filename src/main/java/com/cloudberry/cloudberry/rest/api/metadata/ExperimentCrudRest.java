@@ -1,12 +1,13 @@
 package com.cloudberry.cloudberry.rest.api.metadata;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
-import com.cloudberry.cloudberry.db.mongo.service.ExperimentService;
+import com.cloudberry.cloudberry.db.mongo.service.experiment.ExperimentService;
 import com.cloudberry.cloudberry.rest.api.IdDispatcher;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,5 +55,12 @@ public class ExperimentCrudRest {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
 
         return experimentService.update(experimentId, name, parameters, overrideParams);
+    }
+
+    @DeleteMapping("/deleteById")
+    void deleteComputation(@RequestParam String experimentIdHex) throws InvalidExperimentIdException {
+        val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
+
+        experimentService.deleteById(experimentId);
     }
 }

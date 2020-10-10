@@ -1,16 +1,18 @@
 package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-class ExperimentServiceFindAllTest extends ExperimentServiceTestBase {
+class ExperimentCRUServiceFindAllTest extends ExperimentCRUServiceTestBase {
     @Test
     void findAllEmpty() {
-        var experiments = experimentService.findAll();
+        var experiments = experimentCRUService.findAll();
 
         assertEquals(List.of(), experiments);
     }
@@ -20,9 +22,9 @@ class ExperimentServiceFindAllTest extends ExperimentServiceTestBase {
         final var experiments = List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2);
         experimentRepository.saveAll(experiments).blockLast();
 
-        var foundExperiments = experimentService.findAll();
+        var foundExperiments = experimentCRUService.findAll();
 
-        assertEquals(experiments, foundExperiments);
+        assertThat(foundExperiments, Matchers.containsInAnyOrder(experiments.toArray()));
     }
 
     @Test
@@ -32,8 +34,8 @@ class ExperimentServiceFindAllTest extends ExperimentServiceTestBase {
         experimentRepository.saveAll(experiments).blockLast();
 
         experimentRepository.delete(TEST_EXPERIMENT_2).block();
-        var foundExperiments = experimentService.findAll();
+        var foundExperiments = experimentCRUService.findAll();
 
-        assertEquals(List.of(TEST_EXPERIMENT_1), foundExperiments);
+        assertThat(foundExperiments, Matchers.containsInAnyOrder(TEST_EXPERIMENT_1));
     }
 }

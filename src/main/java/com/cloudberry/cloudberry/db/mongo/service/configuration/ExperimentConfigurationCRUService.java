@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.configuration;
 
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
@@ -21,9 +21,9 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentConfigurationService {
-    private final ConfigurationRepository configurationRepository;
+public class ExperimentConfigurationCRUService {
     private final ExperimentRepository experimentRepository;
+    private final ConfigurationRepository configurationRepository;
 
     public List<ExperimentConfiguration> findAll() {
         return configurationRepository.findAll().collectList().block();
@@ -83,6 +83,5 @@ public class ExperimentConfigurationService {
                             : prevParams);
         };
     }
-
 
 }

@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.computation;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.repository.ComputationRepository;
@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentComputationService {
+public class ExperimentComputationCRUService {
     private final ComputationRepository computationRepository;
 
     public List<ExperimentComputation> findAll() {
@@ -29,8 +29,11 @@ public class ExperimentComputationService {
     public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
         return computationRepository
                 .findById(computation.getId())
-                .doOnNext(next -> log.info("Existing computation " + next.getId() + " was found"))
+                .doOnNext(experimentComputation ->
+                        log.info("Existing computation " + experimentComputation.getId() + " was found"))
                 .switchIfEmpty(computationRepository.save(computation))
-                .doOnNext(next -> log.info("Created new computation " + next.getId()));
+                .doOnNext(
+                        experimentComputation -> log.info("Created new computation " + experimentComputation.getId()));
     }
+
 }
