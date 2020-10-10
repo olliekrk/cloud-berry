@@ -1,11 +1,10 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.configuration;
 
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.repository.ConfigurationRepository;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
-import com.cloudberry.cloudberry.db.mongo.service.deletion.ConfigurationDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -22,11 +21,9 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentConfigurationService {
+public class ExperimentConfigurationCRUService {
     private final ExperimentRepository experimentRepository;
     private final ConfigurationRepository configurationRepository;
-
-    private final ConfigurationDeletionService configurationDeletionService;
 
     public List<ExperimentConfiguration> findAll() {
         return configurationRepository.findAll().collectList().block();
@@ -69,10 +66,6 @@ public class ExperimentConfigurationService {
                 .block();
     }
 
-    public void deleteById(ObjectId configurationId) {
-        configurationDeletionService.deleteConfigurationById(configurationId).blockLast();
-    }
-
     @NotNull
     private Function<ExperimentConfiguration, ExperimentConfiguration> updateConfiguration(
             @Nullable String configurationFileName,
@@ -90,6 +83,5 @@ public class ExperimentConfigurationService {
                             : prevParams);
         };
     }
-
 
 }

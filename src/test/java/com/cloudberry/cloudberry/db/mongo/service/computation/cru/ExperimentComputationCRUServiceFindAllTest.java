@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.computation;
+package com.cloudberry.cloudberry.db.mongo.service.computation.cru;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -8,10 +8,10 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ExperimentComputationServiceFindAllTest extends ExperimentComputationServiceTestBase {
+public class ExperimentComputationCRUServiceFindAllTest extends ExperimentComputationCRUServiceTestBase {
     @Test
     void findAllEmpty() {
-        var computations = experimentComputationService.findAll();
+        var computations = experimentComputationCRUService.findAll();
 
         assertEquals(List.of(), computations);
     }
@@ -20,7 +20,7 @@ public class ExperimentComputationServiceFindAllTest extends ExperimentComputati
     void findAll() {
         saveAllInRepository();
 
-        var foundComputations = experimentComputationService.findAll();
+        var foundComputations = experimentComputationCRUService.findAll();
 
         assertThat(foundComputations, Matchers.containsInAnyOrder(ALL_COMPUTATIONS.toArray()));
     }

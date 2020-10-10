@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.deletion;
+package com.cloudberry.cloudberry.db.mongo.service.computation;
 
 import com.cloudberry.cloudberry.db.mongo.repository.ComputationRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +14,20 @@ public class ComputationDeletionService {
 
     public Flux<Void> deleteComputationById(ObjectId computationId) {
         final Flux<ObjectId> fluxWithComputationIds = Flux.just(computationId);
-        return createFluxWithComputationRemoval(fluxWithComputationIds);
+        return createFluxWithComputationRemovalByComputationIds(fluxWithComputationIds);
     }
 
     @NotNull
-    Flux<Void> createFluxWithComputationRemoval(@NotNull Flux<ObjectId> fluxWithConfigurationIds) {
+    public Flux<Void> createFluxWithComputationRemovalByConfigurationIds(
+            @NotNull Flux<ObjectId> fluxWithConfigurationIds) {
         return fluxWithConfigurationIds
                 .flatMap(computationRepository::deleteByConfigurationId);
     }
+
+    @NotNull
+    Flux<Void> createFluxWithComputationRemovalByComputationIds(@NotNull Flux<ObjectId> fluxWithConfigurationIds) {
+        return fluxWithConfigurationIds
+                .flatMap(computationRepository::deleteById);
+    }
+
 }

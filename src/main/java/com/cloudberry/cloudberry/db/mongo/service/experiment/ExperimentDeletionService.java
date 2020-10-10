@@ -1,6 +1,7 @@
-package com.cloudberry.cloudberry.db.mongo.service.deletion;
+package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
+import com.cloudberry.cloudberry.db.mongo.service.configuration.ExperimentConfigurationDeletionService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
@@ -12,11 +13,11 @@ import reactor.core.publisher.Flux;
 public class ExperimentDeletionService {
     private final ExperimentRepository experimentRepository;
 
-    private final ConfigurationDeletionService configurationDeletionService;
+    private final ExperimentConfigurationDeletionService experimentConfigurationDeletionService;
 
     public Flux<Void> deleteExperimentById(ObjectId experimentId) {
         final Flux<ObjectId> fluxWithExperimentIds = createFluxWithExperimentRemoval(experimentId);
-        return configurationDeletionService.createFluxWithConfigurationRemoval(fluxWithExperimentIds);
+        return experimentConfigurationDeletionService.createFluxWithConfigurationRemoval(fluxWithExperimentIds);
     }
 
     /**

@@ -7,6 +7,9 @@ import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.repository.ComputationRepository;
 import com.cloudberry.cloudberry.db.mongo.repository.ConfigurationRepository;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
+import com.cloudberry.cloudberry.db.mongo.service.computation.ComputationDeletionService;
+import com.cloudberry.cloudberry.db.mongo.service.experiment.ExperimentDeletionService;
+import com.cloudberry.cloudberry.db.mongo.service.configuration.ExperimentConfigurationDeletionService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,7 @@ import java.util.stream.Stream;
 import static java.time.Instant.ofEpochMilli;
 import static java.time.Instant.ofEpochSecond;
 
-@Import({ExperimentDeletionService.class, ConfigurationDeletionService.class, ComputationDeletionService.class})
+@Import({ExperimentDeletionService.class, ExperimentConfigurationDeletionService.class, ComputationDeletionService.class})
 @EmbeddedMongoTest
 abstract class DeletionServiceTestBase {
 

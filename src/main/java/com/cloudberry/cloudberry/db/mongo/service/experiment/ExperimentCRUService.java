@@ -1,9 +1,8 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.experiment;
 
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
-import com.cloudberry.cloudberry.db.mongo.service.deletion.ExperimentDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -20,10 +19,8 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentService {
+public class ExperimentCRUService {
     private final ExperimentRepository experimentRepository;
-
-    private final ExperimentDeletionService experimentDeletionService;
 
     public List<Experiment> findAll() {
         return experimentRepository.findAll().collectList().block();
@@ -44,16 +41,6 @@ public class ExperimentService {
                 .switchIfEmpty(saveNewExperiment(experiment));
     }
 
-    public void deleteById(ObjectId experimentId) {
-        experimentDeletionService.deleteExperimentById(experimentId).blockLast();
-    }
-
-    @NotNull
-    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
-        log.info("Created new experiment " + experiment.getId());
-        return experimentRepository.save(experiment);
-    }
-
     public Experiment update(ObjectId experimentId,
                              @Nullable String name,
                              @Nullable Map<String, Object> newParams,
@@ -63,6 +50,12 @@ public class ExperimentService {
                 .flatMap(experimentRepository::save)
                 .doOnNext(experiment -> log.info("Experiment {} updated", experiment))
                 .block();
+    }
+
+    @NotNull
+    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
+        log.info("Created new experiment " + experiment.getId());
+        return experimentRepository.save(experiment);
     }
 
     @NotNull

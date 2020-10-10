@@ -1,9 +1,8 @@
-package com.cloudberry.cloudberry.db.mongo.service.computation;
+package com.cloudberry.cloudberry.db.mongo.service.computation.cru;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import org.bson.types.ObjectId;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +12,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ExperimentComputationServiceFindAllMatchingTest extends ExperimentComputationServiceTestBase {
+public class ExperimentComputationCRUServiceFindAllMatchingTest extends ExperimentComputationCRUServiceTestBase {
 
     private static Stream<Arguments> provideParameters() {
         return Stream.of(
@@ -28,7 +27,7 @@ public class ExperimentComputationServiceFindAllMatchingTest extends ExperimentC
     void findMatching(ObjectId configurationId, List<ExperimentComputation> expectedComputations) {
         saveAllInRepository();
 
-        var foundComputations = experimentComputationService.findAllComputationsForConfigurationId(configurationId);
+        var foundComputations = experimentComputationCRUService.findAllComputationsForConfigurationId(configurationId);
 
         assertThat(foundComputations, Matchers.containsInAnyOrder(expectedComputations.toArray()));
     }

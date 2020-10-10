@@ -1,7 +1,8 @@
-package com.cloudberry.cloudberry.db.mongo.service.deletion;
+package com.cloudberry.cloudberry.db.mongo.service.configuration;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
 import com.cloudberry.cloudberry.db.mongo.repository.ConfigurationRepository;
+import com.cloudberry.cloudberry.db.mongo.service.computation.ComputationDeletionService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
-public class ConfigurationDeletionService {
+public class ExperimentConfigurationDeletionService {
     private final ConfigurationRepository configurationRepository;
 
     private final ComputationDeletionService computationDeletionService;
@@ -24,15 +25,16 @@ public class ConfigurationDeletionService {
      * @return flux with ids of configuration
      */
     @NotNull
-    Flux<Void> createFluxWithConfigurationRemoval(Flux<ObjectId> fluxWithExperimentIds) {
+    public Flux<Void> createFluxWithConfigurationRemoval(Flux<ObjectId> fluxWithExperimentIds) {
 
         //its deleted in next line so we save it earlier
         final Flux<ObjectId> fluxWithConfigurationsIds =
                 Flux.fromIterable(fluxWithExperimentIds.flatMap(configurationRepository::findAllByExperimentId).map(
                         ExperimentConfiguration::getId).collectList().block());
 
-        fluxWithExperimentIds.flatMap(experimentId -> configurationRepository.deleteByExperimentId(experimentId)).blockLast();
+        fluxWithExperimentIds.flatMap(experimentId -> configurationRepository.deleteByExperimentId(experimentId))
+                .blockLast();
 
-        return computationDeletionService.createFluxWithComputationRemoval(fluxWithConfigurationsIds);
+        return computationDeletionService.createFluxWithComputationRemovalByConfigurationIds(fluxWithConfigurationsIds);
     }
 }

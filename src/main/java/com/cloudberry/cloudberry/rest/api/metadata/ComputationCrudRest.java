@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest.api.metadata;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
-import com.cloudberry.cloudberry.db.mongo.service.ExperimentComputationService;
+import com.cloudberry.cloudberry.db.mongo.service.computation.ExperimentComputationService;
 import com.cloudberry.cloudberry.rest.api.IdDispatcher;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;

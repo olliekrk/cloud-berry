@@ -1,8 +1,7 @@
-package com.cloudberry.cloudberry.db.mongo.service;
+package com.cloudberry.cloudberry.db.mongo.service.computation;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.repository.ComputationRepository;
-import com.cloudberry.cloudberry.db.mongo.service.deletion.ComputationDeletionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -14,9 +13,8 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExperimentComputationService {
+public class ExperimentComputationCRUService {
     private final ComputationRepository computationRepository;
-    private final ComputationDeletionService computationDeletionService;
 
     public List<ExperimentComputation> findAll() {
         return computationRepository.findAll().collectList().block();
@@ -38,7 +36,4 @@ public class ExperimentComputationService {
                         experimentComputation -> log.info("Created new computation " + experimentComputation.getId()));
     }
 
-    public void deleteById(ObjectId computationId) {
-        computationDeletionService.deleteComputationById(computationId).blockLast();
-    }
 }

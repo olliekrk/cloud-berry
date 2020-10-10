@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.computation;
+package com.cloudberry.cloudberry.db.mongo.service.computation.delete;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import org.hamcrest.Matchers;
@@ -10,13 +10,12 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ExperimentComputationServiceDeleteTest extends ExperimentComputationServiceTestBase {
-
+public class ComputationDeletionServiceDeleteTest extends ExperimentComputationDeletionServiceTestBase {
     @Test
     void deleteByIdPresent() {
         saveAllInRepository();
 
-        experimentComputationService.deleteById(TEST_COMPUTATION_1A.getId());
+        computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast();
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = ListSyntax.without(ALL_COMPUTATIONS, TEST_COMPUTATION_1A);
@@ -27,7 +26,8 @@ public class ExperimentComputationServiceDeleteTest extends ExperimentComputatio
     void deleteByIdPresentMultipleTimes() {
         saveAllInRepository();
 
-        IntStream.of(3).forEach(i -> experimentComputationService.deleteById(TEST_COMPUTATION_1A.getId()));
+        IntStream.of(3).forEach(
+                i -> computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast());
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = ListSyntax.without(ALL_COMPUTATIONS, TEST_COMPUTATION_1A);
@@ -39,7 +39,8 @@ public class ExperimentComputationServiceDeleteTest extends ExperimentComputatio
     void deleteByIdAbsent() {
         computationRepository.save(TEST_COMPUTATION_2).block();
 
-        Assertions.assertDoesNotThrow(() -> experimentComputationService.deleteById(TEST_COMPUTATION_1A.getId()));
+        Assertions.assertDoesNotThrow(
+                () -> computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast());
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = List.of(TEST_COMPUTATION_2);
