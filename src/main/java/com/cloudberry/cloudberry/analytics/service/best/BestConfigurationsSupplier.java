@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BestConfigurationsSupplier implements BestConfigurationsApi {
-    private static final int MAX_INTEGRAL_EVALUATIONS = 10_000;
+    private static final int MAX_INTEGRAL_EVALUATIONS = 1_000_000;
     private final ConfigurationSeriesCreator configurationSeriesCreator;
 
     public List<DataSeries> nBestConfigurations(

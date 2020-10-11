@@ -21,7 +21,7 @@ public class ConfigurationStatisticsRest {
     private final ConfigurationStatisticsService configurationStatisticsService;
     private final BucketNameResolver bucketNameResolver;
 
-    @GetMapping("/best")
+    @PostMapping("/best")
     public List<DataSeries> getNBestConfigurations(
             @RequestParam int n,
             @RequestParam String fieldName,
@@ -41,7 +41,7 @@ public class ConfigurationStatisticsRest {
         );
     }
 
-    @GetMapping("/bestForExperiment")
+    @PostMapping("/bestForExperiment")
     public List<DataSeries> getNBestConfigurationsForExperiment(
             @RequestParam int n,
             @RequestParam String fieldName,
