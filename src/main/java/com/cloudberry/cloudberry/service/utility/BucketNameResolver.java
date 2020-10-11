@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.service;
+package com.cloudberry.cloudberry.service.utility;
 
 import com.cloudberry.cloudberry.db.influx.service.InfluxPropertiesService;
 import com.cloudberry.cloudberry.service.api.BucketsService;
