@@ -45,7 +45,7 @@ public class ComputationStatisticsRest {
         );
     }
 
-    @PostMapping("/comparison/forConfiguration")
+    @PostMapping("/comparisonForConfiguration")
     public List<DataSeries> getComputationsByConfigurationId(@RequestParam String fieldName,
                                                              @RequestParam(required = false) String measurementName,
                                                              @RequestParam(required = false) String bucketName,
@@ -76,7 +76,7 @@ public class ComputationStatisticsRest {
         );
     }
 
-    @GetMapping("/best/forConfiguration")
+    @GetMapping("/bestForConfiguration")
     public List<DataSeries> getNBestComputationsForConfiguration(@RequestParam int n,
                                                                  @RequestParam String fieldName,
                                                                  @RequestParam OptimizationGoal optimizationGoal,
@@ -131,7 +131,7 @@ public class ComputationStatisticsRest {
         );
     }
 
-    @PostMapping("/exceedingThresholds/forConfiguration")
+    @PostMapping("/exceedingThresholdsForConfiguration")
     public List<DataSeries> getComputationsExceedingThresholds(@RequestParam String fieldName,
                                                                @RequestParam CriteriaMode mode,
                                                                @RequestParam String configurationIdHex,
