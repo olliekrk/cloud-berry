@@ -1,5 +1,6 @@
-package com.cloudberry.cloudberry.analytics;
+package com.cloudberry.cloudberry.analytics.service.best;
 
+import com.cloudberry.cloudberry.analytics.api.BestConfigurationsApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BestConfigurationsSupplier {
+public class BestConfigurationsSupplier implements BestConfigurationsApi {
     private static final int MAX_INTEGRAL_EVALUATIONS = 10_000;
     private final ConfigurationSeriesCreator configurationSeriesCreator;
 
@@ -32,8 +33,8 @@ public class BestConfigurationsSupplier {
             int n,
             String fieldName,
             Optimization optimization,
-            List<ObjectId> configurationsIds,
-            InfluxQueryFields influxQueryFields
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> configurationsIds
     ) {
         var configurationsSeries = configurationsIds.stream()
                 .collect(Collectors.toMap(

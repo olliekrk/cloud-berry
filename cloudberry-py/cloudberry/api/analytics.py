@@ -51,7 +51,7 @@ class Analytics(CloudberryApi):
                                               field_name: str,
                                               measurement_name: str = None,
                                               bucket_name: str = None) -> List[DataSeries]:
-        url = f'{self.base_url}/configurations/comparison/forExperiment'
+        url = f'{self.base_url}/configurations/comparisonForExperiment'
         params = Analytics._append_db_params({
             'fieldName': field_name,
             'experimentName': experiment_name

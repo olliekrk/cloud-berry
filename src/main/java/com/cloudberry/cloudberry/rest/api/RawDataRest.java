@@ -35,7 +35,7 @@ public class RawDataRest {
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
         rawDataService.saveData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getBucketNameOrDefault(bucketName)),
                 dataPoints);
     }
 
@@ -44,7 +44,7 @@ public class RawDataRest {
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
         return rawDataService.findData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getBucketNameOrDefault(bucketName)),
                 filters);
     }
 
@@ -53,7 +53,7 @@ public class RawDataRest {
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
         rawDataService.deleteData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                new InfluxQueryFields(measurementName, bucketNameResolver.getBucketNameOrDefault(bucketName)),
                 filters);
     }
 

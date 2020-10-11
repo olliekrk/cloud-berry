@@ -9,7 +9,6 @@ import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
-import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -20,12 +19,10 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StatisticsService {
-
+public class ComputationStatisticsService {
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
     private final InfluxUtilService influxUtilService;
-    private final ConfigurationSeriesCreator configurationSeriesCreator;
 
     public List<DataSeries> getComputationsByIds(String fieldName,
                                                  InfluxQueryFields influxQueryFields,
@@ -59,26 +56,6 @@ public class StatisticsService {
             return List.of();
         }
         return getComputationsByIds(fieldName, influxQueryFields, computationIds, computeMean);
-    }
-
-    public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
-                                                        InfluxQueryFields influxQueryFields,
-                                                        List<ObjectId> configurationIds) {
-        return ListSyntax.mapped(
-                configurationIds,
-                configurationId -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
-                        fieldName,
-                        influxQueryFields,
-                        configurationId
-                )
-        );
-    }
-
-    public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,
-                                                                   InfluxQueryFields influxQueryFields,
-                                                                   String experimentName) {
-        var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return getConfigurationsMeansByIds(fieldName, influxQueryFields, configurationIds);
     }
 
     public List<DataSeries> getNBestComputations(int n,

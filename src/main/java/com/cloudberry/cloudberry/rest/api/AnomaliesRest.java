@@ -36,6 +36,6 @@ public class AnomaliesRest {
 
     private InfluxQueryFields getInfluxQueryFields(@Nullable String measurementName,
                                                    @Nullable String bucketName) {
-        return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
+        return new InfluxQueryFields(measurementName, bucketNameResolver.getBucketNameOrDefault(bucketName));
     }
 }
