@@ -1,9 +1,9 @@
-package com.cloudberry.cloudberry.service.series;
+package com.cloudberry.cloudberry.service.configurations;
 
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
-import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.service.api.InfluxUtilService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.util;
+package com.cloudberry.cloudberry.analytics.util.computation;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
