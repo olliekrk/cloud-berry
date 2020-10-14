@@ -4,7 +4,6 @@ import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -14,17 +13,26 @@ public class ExperimentComputationService {
 
     private final ExperimentComputationCRUService experimentComputationCRUService;
     private final ComputationMetaDeletionService computationMetaDeletionService;
+    private final ComputationsByDifferentIdsService computationsByDifferentIdsService;
 
     public List<ExperimentComputation> findAll() {
-        return experimentComputationCRUService.findAll();
+        return experimentComputationCRUService.findAll().collectList().block();
     }
 
-    public List<ExperimentComputation> findAllComputationsForConfigurationId(ObjectId configurationId) {
-        return experimentComputationCRUService.findAllComputationsForConfigurationId(configurationId);
+    public ExperimentComputation findById(ObjectId configurationId) {
+        return computationsByDifferentIdsService.findById(configurationId).block();
     }
 
-    public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
-        return experimentComputationCRUService.getOrCreateComputation(computation);
+    public List<ExperimentComputation> findByConfigurationId(ObjectId configurationId) {
+        return computationsByDifferentIdsService.findByConfigurationId(configurationId).collectList().block();
+    }
+
+    public List<ExperimentComputation> findByExperimentId(ObjectId experimentId) {
+        return computationsByDifferentIdsService.findByExperimentId(experimentId).collectList().block();
+    }
+
+    public ExperimentComputation getOrCreateComputation(ExperimentComputation computation) {
+        return experimentComputationCRUService.findOrCreateComputation(computation).block();
     }
 
     public void deleteById(ObjectId computationId) {

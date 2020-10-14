@@ -35,7 +35,7 @@ public class ExperimentConfigurationCRUServiceUpdateTest extends ExperimentConfi
         final String newFileName = "new name";
 
         var updatedExperiment = experimentConfigurationCRUService
-                .update(TEST_CONFIGURATION.getId(), newFileName, null, false);
+                .update(TEST_CONFIGURATION.getId(), newFileName, null, false).block();
 
         assertEquals(TEST_CONFIGURATION.withConfigurationFileName(newFileName), updatedExperiment);
         assertExperimentInDatabase(updatedExperiment);
@@ -43,9 +43,10 @@ public class ExperimentConfigurationCRUServiceUpdateTest extends ExperimentConfi
 
     @ParameterizedTest
     @MethodSource("provideParameters")
-    void updateParams(boolean overrideParams, Map<String, Object> newParameters, Map<String, Object> expectedParameters) {
+    void updateParams(boolean overrideParams, Map<String, Object> newParameters,
+                      Map<String, Object> expectedParameters) {
         var updatedConfiguration = experimentConfigurationCRUService
-                .update(TEST_CONFIGURATION.getId(), null, newParameters, overrideParams);
+                .update(TEST_CONFIGURATION.getId(), null, newParameters, overrideParams).block();
 
         assertEquals(expectedParameters, updatedConfiguration.getParameters());
         assertExperimentInDatabase(updatedConfiguration);

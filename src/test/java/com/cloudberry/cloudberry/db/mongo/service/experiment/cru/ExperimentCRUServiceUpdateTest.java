@@ -34,7 +34,7 @@ public class ExperimentCRUServiceUpdateTest extends ExperimentCRUServiceTestBase
     void updateName() {
         final String newName = "new name";
 
-        var updatedExperiment = experimentCRUService.update(TEST_EXPERIMENT_1.getId(), newName, null, false);
+        var updatedExperiment = experimentCRUService.update(TEST_EXPERIMENT_1.getId(), newName, null, false).block();
 
         assertEquals(TEST_EXPERIMENT_1.withName(newName), updatedExperiment);
         assertExperimentInDatabase(updatedExperiment);
@@ -45,7 +45,7 @@ public class ExperimentCRUServiceUpdateTest extends ExperimentCRUServiceTestBase
     void updateParams(boolean overrideParams, Map<String, Object> newParameters,
                       Map<String, Object> expectedParameters) {
         var updatedExperiment =
-                experimentCRUService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams);
+                experimentCRUService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams).block();
 
         assertEquals(expectedParameters, updatedExperiment.getParameters());
         assertExperimentInDatabase(updatedExperiment);

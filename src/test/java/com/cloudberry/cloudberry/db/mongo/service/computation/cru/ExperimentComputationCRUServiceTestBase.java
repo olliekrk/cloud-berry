@@ -5,7 +5,7 @@ import com.cloudberry.cloudberry.db.mongo.service.computation.ExperimentComputat
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
-@Import({ExperimentComputationCRUService.class})
+@Import(ExperimentComputationCRUService.class)
 public class ExperimentComputationCRUServiceTestBase extends ExperimentComputationServiceTestBase {
 
     @Autowired

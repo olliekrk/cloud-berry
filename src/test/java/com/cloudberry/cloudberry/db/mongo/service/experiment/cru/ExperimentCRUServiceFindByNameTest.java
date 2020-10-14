@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExperimentCRUServiceFindByNameTest extends ExperimentCRUServiceTestBase {
     @Test
     void findByNameEmpty() {
-        final var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1);
+        final var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1).collectList().block();
 
         Assertions.assertTrue(experiments.isEmpty());
     }
@@ -25,7 +24,7 @@ public class ExperimentCRUServiceFindByNameTest extends ExperimentCRUServiceTest
     void findByNameSingle() {
         experimentRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2)).blockLast();
 
-        final var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1);
+        final var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1).collectList().block();
 
         assertThat(experiments, Matchers.containsInAnyOrder(TEST_EXPERIMENT_1));
     }
@@ -36,7 +35,7 @@ public class ExperimentCRUServiceFindByNameTest extends ExperimentCRUServiceTest
                 new Experiment(ObjectId.get(), EXPERIMENT_NAME_1, Map.of(), Instant.ofEpochMilli(10));
         experimentRepository.saveAll(List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2, additionalExperiment)).blockLast();
 
-        var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1);
+        var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1).collectList().block();
 
         var expected = List.of(TEST_EXPERIMENT_1, additionalExperiment);
         assertThat(experiments, Matchers.containsInAnyOrder(expected.toArray()));

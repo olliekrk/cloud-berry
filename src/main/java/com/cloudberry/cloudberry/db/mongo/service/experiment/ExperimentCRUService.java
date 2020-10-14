@@ -10,9 +10,9 @@ import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -22,15 +22,15 @@ import java.util.function.Function;
 public class ExperimentCRUService {
     private final ExperimentRepository experimentRepository;
 
-    public List<Experiment> findAll() {
-        return experimentRepository.findAll().collectList().block();
+    public Flux<Experiment> findAll() {
+        return experimentRepository.findAll();
     }
 
-    public List<Experiment> findByName(String name) {
-        return experimentRepository.findAllByName(name).collectList().block();
+    public Flux<Experiment> findByName(String name) {
+        return experimentRepository.findAllByName(name);
     }
 
-    public Mono<Experiment> getOrCreateExperiment(Experiment experiment) {
+    public Mono<Experiment> findOrCreateExperiment(Experiment experiment) {
         return experimentRepository
                 .findById(experiment.getId())
                 .switchIfEmpty(experimentRepository
@@ -41,15 +41,14 @@ public class ExperimentCRUService {
                 .switchIfEmpty(saveNewExperiment(experiment));
     }
 
-    public Experiment update(ObjectId experimentId,
-                             @Nullable String name,
-                             @Nullable Map<String, Object> newParams,
-                             boolean overrideParams) {
+    public Mono<Experiment> update(ObjectId experimentId,
+                                   @Nullable String name,
+                                   @Nullable Map<String, Object> newParams,
+                                   boolean overrideParams) {
         return experimentRepository.findById(experimentId)
                 .map(updateExperiment(name, newParams, overrideParams))
                 .flatMap(experimentRepository::save)
-                .doOnNext(experiment -> log.info("Experiment {} updated", experiment))
-                .block();
+                .doOnNext(experiment -> log.info("Experiment {} updated", experiment));
     }
 
     @NotNull

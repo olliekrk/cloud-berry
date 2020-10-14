@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ExperimentComputationCRUServiceFindAllTest extends ExperimentComputationCRUServiceTestBase {
     @Test
     void findAllEmpty() {
-        var computations = experimentComputationCRUService.findAll();
+        var computations = experimentComputationCRUService.findAll().collectList().block();
 
         assertEquals(List.of(), computations);
     }
@@ -20,7 +20,7 @@ public class ExperimentComputationCRUServiceFindAllTest extends ExperimentComput
     void findAll() {
         saveAllInRepository();
 
-        var foundComputations = experimentComputationCRUService.findAll();
+        var foundComputations = experimentComputationCRUService.findAll().collectList().block();
 
         assertThat(foundComputations, Matchers.containsInAnyOrder(ALL_COMPUTATIONS.toArray()));
     }

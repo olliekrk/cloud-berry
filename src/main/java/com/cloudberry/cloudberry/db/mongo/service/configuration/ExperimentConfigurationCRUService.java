@@ -12,9 +12,9 @@ import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -25,28 +25,29 @@ public class ExperimentConfigurationCRUService {
     private final ExperimentRepository experimentRepository;
     private final ConfigurationRepository configurationRepository;
 
-    public List<ExperimentConfiguration> findAll() {
-        return configurationRepository.findAll().collectList().block();
+    public Flux<ExperimentConfiguration> findAll() {
+        return configurationRepository.findAll();
     }
 
-    public List<ExperimentConfiguration> findAllForConfigurationFileName(String configurationFileName) {
-        return configurationRepository.findAllByConfigurationFileName(configurationFileName).collectList().block();
+    public Flux<ExperimentConfiguration> findByConfigurationFileName(String configurationFileName) {
+        return configurationRepository.findAllByConfigurationFileName(configurationFileName);
     }
 
-    public List<ExperimentConfiguration> findAllForExperimentName(String experimentName) {
+    public Flux<ExperimentConfiguration> findByExperimentName(String experimentName) {
         return experimentRepository.findAllByName(experimentName)
                 .map(Experiment::getId)
-                .flatMap(configurationRepository::findAllByExperimentId)
-                .collectList()
-                .block();
+                .flatMap(configurationRepository::findAllByExperimentId);
     }
 
     public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
         return configurationRepository
                 .findById(configuration.getId())
                 .switchIfEmpty(
-                        configurationRepository.findAllByExperimentId(configuration.getExperimentId())
-                                .filter(existing -> existing.getParameters().equals(configuration.getParameters()))
+                        configurationRepository
+                                .findAllByExperimentIdAndParameters(
+                                        configuration.getExperimentId(),
+                                        configuration.getParameters()
+                                )
                                 .limitRequest(1)
                                 .next()
                 )
@@ -55,15 +56,14 @@ public class ExperimentConfigurationCRUService {
                 .doOnNext(next -> log.info("Created new configuration " + next.getId()));
     }
 
-    public ExperimentConfiguration update(ObjectId configurationId,
-                                          @Nullable String configurationFileName,
-                                          @Nullable Map<String, Object> newParams,
-                                          boolean overrideParams) {
+    public Mono<ExperimentConfiguration> update(ObjectId configurationId,
+                                                @Nullable String configurationFileName,
+                                                @Nullable Map<String, Object> newParams,
+                                                boolean overrideParams) {
         return configurationRepository.findById(configurationId)
                 .map(updateConfiguration(configurationFileName, newParams, overrideParams))
                 .flatMap(configurationRepository::save)
-                .doOnNext(experiment -> log.info("Experiment configuration {} updated", experiment))
-                .block();
+                .doOnNext(experiment -> log.info("Experiment configuration {} updated", experiment));
     }
 
     @NotNull

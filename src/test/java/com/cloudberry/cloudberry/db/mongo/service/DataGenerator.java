@@ -33,45 +33,50 @@ public final class DataGenerator {
             List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2, TEST_EXPERIMENT_3_NO_CONFIGURATIONS);
 
     //config experiment configuration
-    public static final ObjectId CONFIGURATION_ID_1 = ObjectId.get();
-    public static final ObjectId CONFIGURATION_ID_2 = ObjectId.get();
-    public static final ObjectId CONFIGURATION_ID_3 = ObjectId.get();
-    public static final ObjectId CONFIGURATION_ID_4_NO_COMPUTATIONS = ObjectId.get();
-    public static final String CONFIGURATION_FILE_NAME_1 = "config_1";
-    public static final String CONFIGURATION_FILE_NAME_2 = "config_2";
-    public static final String CONFIGURATION_FILE_NAME_3 = "config_3";
-    public static final Map<String, Object> CONFIGURATION_PARAMS_1 = Map.of("price", 3000);
-    public static final ExperimentConfiguration TEST_CONFIGURATION_1 =
-            new ExperimentConfiguration(CONFIGURATION_ID_1, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1,
-                    CONFIGURATION_PARAMS_1, ofEpochSecond(10));
-    public static final Map<String, Object> CONFIGURATION_PARAMS_2 = Map.of();
-    public static final ExperimentConfiguration TEST_CONFIGURATION_2 =
-            new ExperimentConfiguration(CONFIGURATION_ID_2, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_2,
-                    CONFIGURATION_PARAMS_2, ofEpochSecond(20));
-    public static final Map<String, Object> CONFIGURATION_PARAMS_3 = Map.of("owner", "Andrew");
-    public static final ExperimentConfiguration TEST_CONFIGURATION_3 =
-            new ExperimentConfiguration(CONFIGURATION_ID_3, EXPERIMENT_ID_2, CONFIGURATION_FILE_NAME_3,
-                    CONFIGURATION_PARAMS_3, ofEpochSecond(30));
-    public static final ExperimentConfiguration TEST_CONFIGURATION_4_NO_COMPUTATIONS =
-            new ExperimentConfiguration(CONFIGURATION_ID_4_NO_COMPUTATIONS, EXPERIMENT_ID_2, CONFIGURATION_FILE_NAME_3,
-                    CONFIGURATION_PARAMS_3, ofEpochSecond(30));
+    public static final ObjectId CONFIGURATION_ID_1_A = ObjectId.get();
+    public static final ObjectId CONFIGURATION_ID_1_B = ObjectId.get();
+    public static final ObjectId CONFIGURATION_ID_2_A = ObjectId.get();
+    public static final ObjectId CONFIGURATION_ID_2_B_NO_COMPUTATIONS = ObjectId.get();
+
+    public static final String CONFIGURATION_FILE_NAME_1_A = "config_1_A";
+    public static final String CONFIGURATION_FILE_NAME_1_B = "config_1_B";
+    public static final String CONFIGURATION_FILE_NAME_2_A = "config_2_A";
+    public static final String CONFIGURATION_FILE_NAME_2_B = "config_2_B";
+
+    public static final ExperimentConfiguration TEST_CONFIGURATION_1_A =
+            new ExperimentConfiguration(CONFIGURATION_ID_1_A, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_A,
+                    Map.of("price", 3000), ofEpochSecond(10));
+    public static final ExperimentConfiguration TEST_CONFIGURATION_1_B =
+            new ExperimentConfiguration(CONFIGURATION_ID_1_B, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_B,
+                    Map.of(), ofEpochSecond(20));
+
+    public static final ExperimentConfiguration TEST_CONFIGURATION_2_A =
+            new ExperimentConfiguration(CONFIGURATION_ID_2_A, EXPERIMENT_ID_2, CONFIGURATION_FILE_NAME_2_A,
+                    Map.of("owner", "Andrew"), ofEpochSecond(30));
+    public static final ExperimentConfiguration TEST_CONFIGURATION_2_B_NO_COMPUTATIONS =
+            new ExperimentConfiguration(CONFIGURATION_ID_2_B_NO_COMPUTATIONS, EXPERIMENT_ID_2,
+                    CONFIGURATION_FILE_NAME_2_B, Map.of(), ofEpochSecond(30));
+
     public static final List<ExperimentConfiguration> ALL_CONFIGURATIONS =
-            List.of(TEST_CONFIGURATION_1, TEST_CONFIGURATION_2, TEST_CONFIGURATION_3,
-                    TEST_CONFIGURATION_4_NO_COMPUTATIONS);
+            List.of(TEST_CONFIGURATION_1_A,
+                    TEST_CONFIGURATION_1_B,
+                    TEST_CONFIGURATION_2_A,
+                    TEST_CONFIGURATION_2_B_NO_COMPUTATIONS);
 
     //config experiment computation
-    public static final ObjectId COMPUTATION_ID_1 = ObjectId.get();
-    public static final ObjectId COMPUTATION_ID_2 = ObjectId.get();
-    public static final ObjectId COMPUTATION_ID_3 = ObjectId.get();
-    public static final ObjectId COMPUTATION_ID_4 = ObjectId.get();
-    public static final ExperimentComputation TEST_COMPUTATION_1 =
-            new ExperimentComputation(COMPUTATION_ID_1, CONFIGURATION_ID_1, Instant.ofEpochSecond(1));
-    public static final ExperimentComputation TEST_COMPUTATION_2 =
-            new ExperimentComputation(COMPUTATION_ID_2, CONFIGURATION_ID_2, Instant.ofEpochSecond(10));
-    public static final ExperimentComputation TEST_COMPUTATION_3 =
-            new ExperimentComputation(COMPUTATION_ID_3, CONFIGURATION_ID_3, Instant.ofEpochSecond(100));
-    public static final ExperimentComputation TEST_COMPUTATION_4 =
-            new ExperimentComputation(COMPUTATION_ID_4, CONFIGURATION_ID_3, Instant.ofEpochSecond(100));
+    public static final ObjectId COMPUTATION_ID_1_A_A = ObjectId.get();
+    public static final ObjectId COMPUTATION_ID_1_B_A = ObjectId.get();
+    public static final ObjectId COMPUTATION_ID_2_A_A = ObjectId.get();
+    public static final ObjectId COMPUTATION_ID_2_A_B = ObjectId.get();
+    public static final ExperimentComputation TEST_COMPUTATION_1_A_A =
+            new ExperimentComputation(COMPUTATION_ID_1_A_A, CONFIGURATION_ID_1_A, Instant.ofEpochSecond(1));
+    public static final ExperimentComputation TEST_COMPUTATION_1_B_A =
+            new ExperimentComputation(COMPUTATION_ID_1_B_A, CONFIGURATION_ID_1_B, Instant.ofEpochSecond(10));
+
+    public static final ExperimentComputation TEST_COMPUTATION_2_A_A =
+            new ExperimentComputation(COMPUTATION_ID_2_A_A, CONFIGURATION_ID_2_A, Instant.ofEpochSecond(100));
+    public static final ExperimentComputation TEST_COMPUTATION_2_A_B =
+            new ExperimentComputation(COMPUTATION_ID_2_A_B, CONFIGURATION_ID_2_A, Instant.ofEpochSecond(100));
     public static final List<ExperimentComputation> ALL_COMPUTATIONS =
-            List.of(TEST_COMPUTATION_1, TEST_COMPUTATION_2, TEST_COMPUTATION_3, TEST_COMPUTATION_4);
+            List.of(TEST_COMPUTATION_1_A_A, TEST_COMPUTATION_1_B_A, TEST_COMPUTATION_2_A_A, TEST_COMPUTATION_2_A_B);
 }

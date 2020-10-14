@@ -15,14 +15,14 @@ import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.ALL_EXPER
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.EXPERIMENT_ID_1;
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.EXPERIMENT_ID_2;
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.EXPERIMENT_ID_3_NO_CONFIGURATIONS;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_1;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_2;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_3;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_4;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_1;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_2;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_3;
-import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_4_NO_COMPUTATIONS;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_1_A_A;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_1_B_A;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_2_A_A;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_COMPUTATION_2_A_B;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_1_A;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_1_B;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_2_A;
+import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_CONFIGURATION_2_B_NO_COMPUTATIONS;
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_EXPERIMENT_1;
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_EXPERIMENT_2;
 import static com.cloudberry.cloudberry.db.mongo.service.DataGenerator.TEST_EXPERIMENT_3_NO_CONFIGURATIONS;
@@ -37,8 +37,8 @@ public class ExperimentMetaDeletionServiceDeleteTest extends ExperimentMetaDelet
         experimentMetaDeletionService.deleteExperimentById(List.of(EXPERIMENT_ID_1)).blockLast();
 
         var expectedExperiments = ListSyntax.without(ALL_EXPERIMENTS, TEST_EXPERIMENT_1);
-        var expectedConfigurations = List.of(TEST_CONFIGURATION_3, TEST_CONFIGURATION_4_NO_COMPUTATIONS);
-        var expectedComputations = List.of(TEST_COMPUTATION_3, TEST_COMPUTATION_4);
+        var expectedConfigurations = List.of(TEST_CONFIGURATION_2_A, TEST_CONFIGURATION_2_B_NO_COMPUTATIONS);
+        var expectedComputations = List.of(TEST_COMPUTATION_2_A_A, TEST_COMPUTATION_2_A_B);
 
         assertProperEntitiesInDb(expectedExperiments, expectedConfigurations, expectedComputations);
     }
@@ -63,8 +63,8 @@ public class ExperimentMetaDeletionServiceDeleteTest extends ExperimentMetaDelet
         experimentMetaDeletionService.deleteExperimentById(List.of(EXPERIMENT_ID_2)).blockLast();
 
         var expectedExperiments = ListSyntax.without(ALL_EXPERIMENTS, TEST_EXPERIMENT_2);
-        var expectedConfigurations = List.of(TEST_CONFIGURATION_1, TEST_CONFIGURATION_2);
-        var expectedComputations = List.of(TEST_COMPUTATION_1, TEST_COMPUTATION_2);
+        var expectedConfigurations = List.of(TEST_CONFIGURATION_1_A, TEST_CONFIGURATION_1_B);
+        var expectedComputations = List.of(TEST_COMPUTATION_1_A_A, TEST_COMPUTATION_1_B_A);
 
         assertProperEntitiesInDb(expectedExperiments, expectedConfigurations, expectedComputations);
     }

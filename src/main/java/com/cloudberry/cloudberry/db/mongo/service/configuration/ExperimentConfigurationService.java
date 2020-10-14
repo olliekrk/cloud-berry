@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -15,30 +14,45 @@ import java.util.Map;
 public class ExperimentConfigurationService {
 
     private final ExperimentConfigurationCRUService experimentConfigurationCRUService;
+    private final ExperimentConfigurationByDifferentIdsService experimentConfigurationByDifferentIdsService;
     private final ExperimentConfigurationMetaDeletionService experimentConfigurationMetaDeletionService;
 
     public List<ExperimentConfiguration> findAll() {
-        return experimentConfigurationCRUService.findAll();
+        return experimentConfigurationCRUService.findAll().collectList().block();
     }
 
-    public List<ExperimentConfiguration> findAllForConfigurationFileName(String configurationFileName) {
-        return experimentConfigurationCRUService.findAllForConfigurationFileName(configurationFileName);
+    public ExperimentConfiguration findById(ObjectId configurationId) {
+        return experimentConfigurationByDifferentIdsService.findById(configurationId).block();
     }
 
-    public List<ExperimentConfiguration> findAllForExperimentName(String experimentName) {
-        return experimentConfigurationCRUService.findAllForExperimentName(experimentName);
+    public List<ExperimentConfiguration> findByConfigurationFileName(String configurationFileName) {
+        return experimentConfigurationCRUService.findByConfigurationFileName(configurationFileName).collectList()
+                .block();
     }
 
-    public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
-        return experimentConfigurationCRUService.getOrCreateConfiguration(configuration);
+    public List<ExperimentConfiguration> findByExperimentName(String experimentName) {
+        return experimentConfigurationCRUService.findByExperimentName(experimentName).collectList().block();
+    }
+
+    public List<ExperimentConfiguration> findByExperimentId(ObjectId experimentId) {
+        return experimentConfigurationByDifferentIdsService.findByExperimentId(experimentId).collectList().block();
+    }
+
+    public ExperimentConfiguration findByComputationId(ObjectId computationId) {
+        return experimentConfigurationByDifferentIdsService.findByComputationId(computationId).block();
+    }
+
+    public ExperimentConfiguration getOrCreateConfiguration(ExperimentConfiguration configuration) {
+        return experimentConfigurationCRUService.getOrCreateConfiguration(configuration).block();
     }
 
     public ExperimentConfiguration update(ObjectId configurationId,
                                           @Nullable String configurationFileName,
                                           @Nullable Map<String, Object> newParams,
                                           boolean overrideParams) {
-        return experimentConfigurationCRUService.update(configurationId, configurationFileName, newParams,
-                overrideParams);
+        return experimentConfigurationCRUService
+                .update(configurationId, configurationFileName, newParams, overrideParams)
+                .block();
     }
 
     public void deleteById(ObjectId configurationId) {

@@ -22,7 +22,7 @@ public class ExperimentComputationCRUServiceGetOrCreateTest extends ExperimentCo
     }
 
     private void getOrCreateAndCompare() {
-        var foundComputation = experimentComputationCRUService.getOrCreateComputation(TEST_COMPUTATION_1A).block();
+        var foundComputation = experimentComputationCRUService.findOrCreateComputation(TEST_COMPUTATION_1A).block();
         var latterComputation = computationRepository.findById(TEST_COMPUTATION_1A.getId()).block();
 
         Assertions.assertEquals(TEST_COMPUTATION_1A, foundComputation);

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ExperimentCRUServiceFindAllTest extends ExperimentCRUServiceTestBase {
     @Test
     void findAllEmpty() {
-        var experiments = experimentCRUService.findAll();
+        var experiments = experimentCRUService.findAll().collectList().block();
 
         assertEquals(List.of(), experiments);
     }
@@ -22,7 +22,7 @@ class ExperimentCRUServiceFindAllTest extends ExperimentCRUServiceTestBase {
         final var experiments = List.of(TEST_EXPERIMENT_1, TEST_EXPERIMENT_2);
         experimentRepository.saveAll(experiments).blockLast();
 
-        var foundExperiments = experimentCRUService.findAll();
+        var foundExperiments = experimentCRUService.findAll().collectList().block();
 
         assertThat(foundExperiments, Matchers.containsInAnyOrder(experiments.toArray()));
     }
@@ -34,7 +34,7 @@ class ExperimentCRUServiceFindAllTest extends ExperimentCRUServiceTestBase {
         experimentRepository.saveAll(experiments).blockLast();
 
         experimentRepository.delete(TEST_EXPERIMENT_2).block();
-        var foundExperiments = experimentCRUService.findAll();
+        var foundExperiments = experimentCRUService.findAll().collectList().block();
 
         assertThat(foundExperiments, Matchers.containsInAnyOrder(TEST_EXPERIMENT_1));
     }

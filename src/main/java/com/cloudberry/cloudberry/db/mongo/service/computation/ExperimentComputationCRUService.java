@@ -6,9 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -16,17 +15,11 @@ import java.util.List;
 public class ExperimentComputationCRUService {
     private final ComputationRepository computationRepository;
 
-    public List<ExperimentComputation> findAll() {
-        return computationRepository.findAll().collectList().block();
+    public Flux<ExperimentComputation> findAll() {
+        return computationRepository.findAll();
     }
 
-    public List<ExperimentComputation> findAllComputationsForConfigurationId(ObjectId configurationId) {
-        return computationRepository.findAllByConfigurationId(configurationId)
-                .collectList()
-                .block();
-    }
-
-    public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {
+    public Mono<ExperimentComputation> findOrCreateComputation(ExperimentComputation computation) {
         return computationRepository
                 .findById(computation.getId())
                 .doOnNext(experimentComputation ->
