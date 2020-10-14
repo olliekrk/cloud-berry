@@ -27,7 +27,7 @@ class Data(CloudberryApi):
                   measurement_name: str = None,
                   bucket_name: str = None) -> bool:
         url = f'{self.base_url}/save'
-        params = Data._build_params(measurement_name, bucket_name)
+        params = Data.build_params(measurement_name, bucket_name)
 
         converted_data = list(map(lambda d: d.__dict__, data))
 
@@ -39,7 +39,7 @@ class Data(CloudberryApi):
                  measurement_name: str = None,
                  bucket_name: str = None) -> DataSeries:
         url = f'{self.base_url}/find'
-        params = Data._build_params(measurement_name, bucket_name)
+        params = Data.build_params(measurement_name, bucket_name)
 
         response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
         return DataSeries.from_json(response.json())
@@ -49,14 +49,14 @@ class Data(CloudberryApi):
                     measurement_name: str = None,
                     bucket_name: str = None) -> bool:
         url = f'{self.base_url}/delete'
-        params = Data._build_params(measurement_name, bucket_name)
+        params = Data.build_params(measurement_name, bucket_name)
 
         response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
         return response.ok
 
     @staticmethod
-    def _build_params(measurement_name: str,
-                      bucket_name: str) -> dict:
+    def build_params(measurement_name: str,
+                     bucket_name: str) -> dict:
         params = {}
         if measurement_name is not None:
             params['measurementName'] = measurement_name
