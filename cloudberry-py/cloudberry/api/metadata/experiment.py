@@ -1,6 +1,6 @@
 import requests
 
-from api.metadata import EXPERIMENT_ID_HEX, COMPUTATION_ID_HEX, CONFIGURATION_ID_HEX
+from .constants import *
 
 OVERRIDE_PARAMS = 'overrideParams'
 NAME = 'name'

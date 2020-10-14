@@ -1,6 +1,6 @@
 import requests
 
-from api.metadata import CONFIGURATION_ID_HEX, COMPUTATION_ID_HEX, EXPERIMENT_ID_HEX
+from .constants import *
 
 
 class ExperimentComputation:

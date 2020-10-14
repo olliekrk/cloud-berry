@@ -1,6 +1,6 @@
 import requests
 
-from api.metadata import EXPERIMENT_ID_HEX, CONFIGURATION_ID_HEX, COMPUTATION_ID_HEX
+from .constants import *
 
 EXPERIMENT_NAME = 'experimentName'
 CONFIGURATION_FILE_NAME = 'configurationFileName'
