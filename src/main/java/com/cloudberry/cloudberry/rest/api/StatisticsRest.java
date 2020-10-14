@@ -1,6 +1,9 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.analytics.model.*;
+import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
+import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
@@ -9,11 +12,15 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationId
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import com.cloudberry.cloudberry.service.api.StatisticsService;
-import com.cloudberry.cloudberry.service.utility.BucketNameResolver;
+import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -22,7 +29,7 @@ import java.util.List;
 @RequestMapping("/statistics")
 @RequiredArgsConstructor
 public class StatisticsRest {
-    private final BucketNameResolver bucketNameResolver;
+    private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
     private final StatisticsService statisticsService;
 
     @PostMapping("/computations/comparison")
@@ -35,7 +42,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByIds(
                 fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 computationIds,
                 true
         );
@@ -51,7 +58,7 @@ public class StatisticsRest {
 
         return statisticsService.getComputationsByConfigurationId(
                 fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 configurationId,
                 true
         );
@@ -64,11 +71,12 @@ public class StatisticsRest {
                                                  @RequestParam OptimizationKind optimizationKind,
                                                  @RequestParam(required = false) String measurementName,
                                                  @RequestParam(required = false) String bucketName) {
+
         return statisticsService.getNBestComputations(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
-                getInfluxQueryFields(measurementName, bucketName)
+                influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 
@@ -81,11 +89,12 @@ public class StatisticsRest {
                                                                  @RequestParam(required = false) String measurementName,
                                                                  @RequestParam(required = false) String bucketName
     ) throws InvalidConfigurationIdException {
+
         return statisticsService.getNBestComputationsForConfiguration(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
         );
     }
@@ -104,7 +113,7 @@ public class StatisticsRest {
                 fieldName,
                 new ChronoInterval(interval, unit),
                 computationIds,
-                getInfluxQueryFields(measurementName, bucketName)
+                influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 
@@ -123,7 +132,7 @@ public class StatisticsRest {
                 fieldName,
                 thresholds,
                 mode,
-                getInfluxQueryFields(measurementName, bucketName)
+                influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 
@@ -143,7 +152,7 @@ public class StatisticsRest {
                 fieldName,
                 thresholds,
                 mode,
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
         );
     }
@@ -158,7 +167,7 @@ public class StatisticsRest {
 
         return statisticsService.getConfigurationsMeansByIds(
                 fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 configurationIds
         );
     }
@@ -172,13 +181,9 @@ public class StatisticsRest {
     ) {
         return statisticsService.getConfigurationsMeansByExperimentName(
                 fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 experimentName
         );
     }
 
-    private InfluxQueryFields getInfluxQueryFields(@Nullable String measurementName,
-                                                   @Nullable String bucketName) {
-        return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
-    }
 }

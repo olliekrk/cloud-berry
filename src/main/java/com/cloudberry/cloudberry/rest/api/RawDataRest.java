@@ -2,7 +2,6 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
@@ -10,13 +9,19 @@ import com.cloudberry.cloudberry.rest.exceptions.RestException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import com.cloudberry.cloudberry.service.api.RawDataService;
-import com.cloudberry.cloudberry.service.utility.BucketNameResolver;
+import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -27,7 +32,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RawDataRest {
-    private final BucketNameResolver bucketNameResolver;
+    private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
     private final RawDataService rawDataService;
 
     @PostMapping("/save")
@@ -35,7 +40,7 @@ public class RawDataRest {
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
         rawDataService.saveData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 dataPoints);
     }
 
@@ -44,7 +49,7 @@ public class RawDataRest {
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
         return rawDataService.findData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 filters);
     }
 
@@ -53,7 +58,7 @@ public class RawDataRest {
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
         rawDataService.deleteData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 filters);
     }
 

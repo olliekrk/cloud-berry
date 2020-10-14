@@ -51,9 +51,9 @@ public class ExperimentCrudRest {
     }
 
     @DeleteMapping("/deleteById")
-    void deleteComputation(@RequestParam String experimentIdHex) throws InvalidExperimentIdException {
+    void deleteExperiment(@RequestParam String experimentIdHex) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
 
-        experimentService.deleteById(experimentId);
+        experimentService.deleteById(List.of(experimentId));
     }
 }

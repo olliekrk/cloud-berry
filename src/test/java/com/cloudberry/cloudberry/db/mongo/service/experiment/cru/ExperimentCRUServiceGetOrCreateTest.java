@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.experiment;
+package com.cloudberry.cloudberry.db.mongo.service.experiment.cru;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import org.bson.types.ObjectId;

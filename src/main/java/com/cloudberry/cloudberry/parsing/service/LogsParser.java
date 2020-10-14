@@ -3,8 +3,8 @@ package com.cloudberry.cloudberry.parsing.service;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import io.vavr.control.Try;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;

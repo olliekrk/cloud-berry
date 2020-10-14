@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.configuration;
+package com.cloudberry.cloudberry.db.mongo.service.configuration.cru;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -10,12 +10,12 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ComputationDeletionServiceDeleteTest extends ExperimentComputationDeletionServiceTestBase {
+public class ComputationMetaDeletionServiceDeleteTest extends ExperimentComputationDeletionServiceTestBase {
     @Test
     void deleteByIdPresent() {
         saveAllInRepository();
 
-        computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast();
+        computationMetaDeletionService.deleteComputationById(List.of(TEST_COMPUTATION_1A.getId())).blockLast();
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = ListSyntax.without(ALL_COMPUTATIONS, TEST_COMPUTATION_1A);
@@ -27,7 +27,8 @@ public class ComputationDeletionServiceDeleteTest extends ExperimentComputationD
         saveAllInRepository();
 
         IntStream.of(3).forEach(
-                i -> computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast());
+                i -> computationMetaDeletionService.deleteComputationById(List.of(TEST_COMPUTATION_1A.getId()))
+                        .blockLast());
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = ListSyntax.without(ALL_COMPUTATIONS, TEST_COMPUTATION_1A);
@@ -40,7 +41,8 @@ public class ComputationDeletionServiceDeleteTest extends ExperimentComputationD
         computationRepository.save(TEST_COMPUTATION_2).block();
 
         Assertions.assertDoesNotThrow(
-                () -> computationDeletionService.deleteComputationById(TEST_COMPUTATION_1A.getId()).blockLast());
+                () -> computationMetaDeletionService.deleteComputationById(List.of(TEST_COMPUTATION_1A.getId()))
+                        .blockLast());
 
         var actual = computationRepository.findAll().collectList().block();
         var expected = List.of(TEST_COMPUTATION_2);

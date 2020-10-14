@@ -4,8 +4,8 @@ import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import lombok.Value;
 import org.apache.commons.csv.CSVFormat;
 import org.bson.types.ObjectId;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**

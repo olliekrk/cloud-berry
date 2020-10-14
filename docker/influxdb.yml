@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   # todo: https://docs.influxdata.com/influxdb/v2.0/reference/rc0-upgrade-guide/

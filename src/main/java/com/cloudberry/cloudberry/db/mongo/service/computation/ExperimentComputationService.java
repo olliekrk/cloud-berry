@@ -13,7 +13,7 @@ import java.util.List;
 public class ExperimentComputationService {
 
     private final ExperimentComputationCRUService experimentComputationCRUService;
-    private final ComputationDeletionService computationDeletionService;
+    private final ComputationMetaDeletionService computationMetaDeletionService;
 
     public List<ExperimentComputation> findAll() {
         return experimentComputationCRUService.findAll();
@@ -28,6 +28,6 @@ public class ExperimentComputationService {
     }
 
     public void deleteById(ObjectId computationId) {
-        computationDeletionService.deleteComputationById(computationId).blockLast();
+        computationMetaDeletionService.deleteComputationById(List.of(computationId)).blockLast();
     }
 }

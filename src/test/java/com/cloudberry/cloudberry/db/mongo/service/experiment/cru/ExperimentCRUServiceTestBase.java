@@ -1,8 +1,9 @@
-package com.cloudberry.cloudberry.db.mongo.service.experiment;
+package com.cloudberry.cloudberry.db.mongo.service.experiment.cru;
 
 import com.cloudberry.cloudberry.EmbeddedMongoTest;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.repository.ExperimentRepository;
+import com.cloudberry.cloudberry.db.mongo.service.experiment.ExperimentCRUService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

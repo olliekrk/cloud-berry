@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.mongo.service.experiment;
+package com.cloudberry.cloudberry.db.mongo.service.experiment.cru;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;

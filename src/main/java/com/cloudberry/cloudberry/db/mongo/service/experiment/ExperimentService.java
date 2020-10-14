@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ExperimentService {
-    private final ExperimentDeletionService experimentDeletionService;
+    private final ExperimentMetaDeletionService experimentMetaDeletionService;
     private final ExperimentCRUService experimentCRUService;
 
     public List<Experiment> findAll() {
@@ -35,8 +35,8 @@ public class ExperimentService {
         return experimentCRUService.update(experimentId, name, newParams, overrideParams);
     }
 
-    public void deleteById(ObjectId experimentId) {
-        experimentDeletionService.deleteExperimentById(experimentId).blockLast();
+    public void deleteById(List<ObjectId> experimentIds) {
+        experimentMetaDeletionService.deleteExperimentById(experimentIds).blockLast();
     }
 
 }

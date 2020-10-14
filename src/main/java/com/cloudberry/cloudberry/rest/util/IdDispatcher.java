@@ -29,6 +29,13 @@ public final class IdDispatcher {
                 .orElseThrow(() -> new InvalidExperimentIdException(List.of(experimentIdHex)));
     }
 
+    public static List<ObjectId> getExperimentIds(List<String> experimentsIdHex) throws InvalidExperimentIdException {
+        var experimentIds = RestParametersUtil.getValidIds(experimentsIdHex);
+        if (experimentIds.isEmpty())
+            throw new InvalidExperimentIdException(experimentsIdHex);
+        return experimentIds;
+    }
+
     public static ObjectId getComputationId(String computationIdHex)
             throws InvalidComputationIdException {
         return RestParametersUtil.getValidId(computationIdHex)

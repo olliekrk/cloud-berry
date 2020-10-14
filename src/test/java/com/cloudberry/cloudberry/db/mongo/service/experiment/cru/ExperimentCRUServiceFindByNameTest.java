@@ -1,8 +1,9 @@
-package com.cloudberry.cloudberry.db.mongo.service.experiment;
+package com.cloudberry.cloudberry.db.mongo.service.experiment.cru;
 
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import org.bson.types.ObjectId;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -15,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ExperimentCRUServiceFindByNameTest extends ExperimentCRUServiceTestBase {
     @Test
     void findByNameEmpty() {
-        var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1);
+        final var experiments = experimentCRUService.findByName(EXPERIMENT_NAME_1);
 
-        assertTrue(experiments.isEmpty());
+        Assertions.assertTrue(experiments.isEmpty());
     }
 
     @Test

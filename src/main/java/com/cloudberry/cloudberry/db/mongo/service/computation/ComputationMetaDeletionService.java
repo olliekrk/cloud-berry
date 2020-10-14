@@ -7,13 +7,15 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class ComputationDeletionService {
+public class ComputationMetaDeletionService {
     private final ComputationRepository computationRepository;
 
-    public Flux<Void> deleteComputationById(ObjectId computationId) {
-        final Flux<ObjectId> fluxWithComputationIds = Flux.just(computationId);
+    public Flux<Void> deleteComputationById(List<ObjectId> computationId) {
+        final Flux<ObjectId> fluxWithComputationIds = Flux.fromIterable(computationId);
         return createFluxWithComputationRemovalByComputationIds(fluxWithComputationIds);
     }
 
@@ -25,7 +27,7 @@ public class ComputationDeletionService {
     }
 
     @NotNull
-    Flux<Void> createFluxWithComputationRemovalByComputationIds(@NotNull Flux<ObjectId> fluxWithConfigurationIds) {
+    private Flux<Void> createFluxWithComputationRemovalByComputationIds(Flux<ObjectId> fluxWithConfigurationIds) {
         return fluxWithConfigurationIds
                 .flatMap(computationRepository::deleteById);
     }

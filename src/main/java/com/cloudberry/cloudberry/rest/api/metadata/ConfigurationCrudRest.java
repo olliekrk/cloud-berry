@@ -62,7 +62,7 @@ public class ConfigurationCrudRest {
     }
 
     @DeleteMapping("/deleteById")
-    void deleteComputation(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
+    void deleteConfiguration(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
         val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
         experimentConfigurationService.deleteById(configurationId);

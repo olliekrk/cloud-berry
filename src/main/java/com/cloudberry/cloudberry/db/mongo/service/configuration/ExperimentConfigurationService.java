@@ -15,7 +15,7 @@ import java.util.Map;
 public class ExperimentConfigurationService {
 
     private final ExperimentConfigurationCRUService experimentConfigurationCRUService;
-    private final ExperimentConfigurationDeletionService experimentConfigurationDeletionService;
+    private final ExperimentConfigurationMetaDeletionService experimentConfigurationMetaDeletionService;
 
     public List<ExperimentConfiguration> findAll() {
         return experimentConfigurationCRUService.findAll();
@@ -42,7 +42,7 @@ public class ExperimentConfigurationService {
     }
 
     public void deleteById(ObjectId configurationId) {
-        experimentConfigurationDeletionService.deleteConfigurationById(configurationId).blockLast();
+        experimentConfigurationMetaDeletionService.deleteConfigurationById(List.of(configurationId)).blockLast();
     }
 
 }
