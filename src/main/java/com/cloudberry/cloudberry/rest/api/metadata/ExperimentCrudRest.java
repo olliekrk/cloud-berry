@@ -49,10 +49,10 @@ public class ExperimentCrudRest {
     }
 
     @GetMapping(value = "/byConfigurationId")
-    Experiment findByConfigurationId(@RequestParam String computationIdHex) throws InvalidConfigurationIdException {
-        val computationId = IdDispatcher.getConfigurationId(computationIdHex);
+    Experiment findByConfigurationId(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
-        return experimentService.findByConfigurationId(computationId);
+        return experimentService.findByConfigurationId(configurationId);
     }
 
     @GetMapping("/byName")
@@ -60,9 +60,9 @@ public class ExperimentCrudRest {
         return experimentService.findByName(name);
     }
 
-    @PostMapping("/getOrCreate")
-    Experiment getOrCreate(@RequestParam String name,
-                           @RequestBody(required = false) Map<String, Object> parameters) {
+    @PostMapping("/findOrCreate")
+    Experiment findOrCreate(@RequestParam String name,
+                            @RequestBody(required = false) Map<String, Object> parameters) {
         val now = Instant.now();
         val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
         val experiment = new Experiment(now, name, experimentParameters);
