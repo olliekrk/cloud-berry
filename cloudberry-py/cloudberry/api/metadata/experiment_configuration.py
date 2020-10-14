@@ -59,3 +59,8 @@ class ExperimentConfiguration:
                   OVERRIDE_PARAMS: override_params}
         response = requests.put(url, params=params, json=parameters)
         return response.json()
+
+    def delete_by_id(self, configuration_id: str):
+        url = f'{self.base_url}/deleteById'
+        params = {COMPUTATION_ID_HEX: configuration_id}
+        requests.delete(url, params=params, json={})

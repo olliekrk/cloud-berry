@@ -48,3 +48,8 @@ class Experiment:
         params = {EXPERIMENT_ID_HEX: experiment_id, NAME: name, OVERRIDE_PARAMS: override_params}
         response = requests.put(url, params=params, json=parameters)
         return response.json()
+
+    def delete_by_id(self, experiment_id: str):
+        url = f'{self.base_url}/deleteById'
+        params = {EXPERIMENT_ID_HEX: experiment_id}
+        requests.delete(url, params=params, json={})

@@ -33,3 +33,8 @@ class ExperimentComputation:
         url = f'{self.base_url}/create'
         response = requests.post(url, params={CONFIGURATION_ID_HEX: configuration_id}, json={})
         return response.json()
+
+    def delete_by_id(self, computation_id: str):
+        url = f'{self.base_url}/deleteById'
+        params = {COMPUTATION_ID_HEX: computation_id}
+        requests.delete(url, params=params, json={})
