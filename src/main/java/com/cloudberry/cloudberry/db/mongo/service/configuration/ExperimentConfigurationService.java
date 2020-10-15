@@ -42,8 +42,8 @@ public class ExperimentConfigurationService {
         return experimentConfigurationByDifferentIdsService.findByComputationId(computationId).block();
     }
 
-    public ExperimentConfiguration getOrCreateConfiguration(ExperimentConfiguration configuration) {
-        return experimentConfigurationCRUService.getOrCreateConfiguration(configuration).block();
+    public ExperimentConfiguration findOrCreateConfiguration(ExperimentConfiguration configuration) {
+        return experimentConfigurationCRUService.findOrCreateConfiguration(configuration).block();
     }
 
     public ExperimentConfiguration update(

@@ -67,18 +67,17 @@ public class ConfigurationCrudRest {
         return experimentConfigurationService.findByExperimentName(experimentName);
     }
 
-    @PostMapping("/getOrCreate")
-    ExperimentConfiguration getOrCreate(
-            @RequestParam String experimentIdHex,
-            @RequestParam(required = false) String configurationFileName,
-            @RequestBody(required = false) Map<String, Object> parameters
+    @PostMapping("/findOrCreate")
+    ExperimentConfiguration findOrCreate(@RequestParam String experimentIdHex,
+                                        @RequestParam(required = false) String configurationFileName,
+                                        @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
         val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
         val now = Instant.now();
         val experimentConfiguration =
                 new ExperimentConfiguration(experimentId, configurationFileName, experimentParameters, now);
-        return experimentConfigurationService.getOrCreateConfiguration(experimentConfiguration);
+        return experimentConfigurationService.findOrCreateConfiguration(experimentConfiguration);
     }
 
     @PutMapping("/update")

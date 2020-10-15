@@ -1,10 +1,12 @@
+from typing import List
+
 import pandas as pd
 import requests
-from typing import List
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
 from .json_util import JSONUtil
-from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds, ThresholdsType
+from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds
+from .constants.constants import CONFIGURATION_ID_HEX
 
 
 class Analytics(CloudberryApi):
@@ -202,7 +204,7 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'n': n,
             'fieldName': field_name,
-            'configurationIdHex': configuration_id,
+            CONFIGURATION_ID_HEX: configuration_id,
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
@@ -287,7 +289,7 @@ class ComputationsAnalytics(CloudberryApi):
             'fieldName': field_name,
             'mode': criteria_mode.name,
             'thresholdsType': thresholds_type.name,
-            'configurationIdHex': configuration_id,
+            CONFIGURATION_ID_HEX: configuration_id,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,

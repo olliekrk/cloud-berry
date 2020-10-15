@@ -39,7 +39,7 @@ public class ExperimentConfigurationCRUService {
                 .flatMap(configurationRepository::findAllByExperimentId);
     }
 
-    public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
+    public Mono<ExperimentConfiguration> findOrCreateConfiguration(ExperimentConfiguration configuration) {
         return configurationRepository
                 .findById(configuration.getId())
                 .switchIfEmpty(

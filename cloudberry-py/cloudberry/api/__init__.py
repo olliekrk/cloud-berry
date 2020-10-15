@@ -5,7 +5,7 @@ from .backend import CloudberryConfig
 from .buckets import Buckets
 from .data import *
 from .deletion import Deletion
-from .metadata import Metadata
+from .metadata_api import Metadata
 from .model import *
 from .plots import DataSeriesPlots
 from .properties import ApiPropertiesIndex
