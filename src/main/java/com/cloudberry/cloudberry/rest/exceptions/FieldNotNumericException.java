@@ -3,7 +3,6 @@ package com.cloudberry.cloudberry.rest.exceptions;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 
 @Value

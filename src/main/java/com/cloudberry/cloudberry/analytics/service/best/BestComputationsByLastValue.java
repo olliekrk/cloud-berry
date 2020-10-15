@@ -12,6 +12,7 @@ import static com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags.COMP
 
 class BestComputationsByLastValue extends BestComputations {
 
+    @Override
     Flux getBest(int n,
                  OptimizationGoal optimizationGoal,
                  Restrictions restrictions,

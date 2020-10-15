@@ -1,10 +1,6 @@
 package com.cloudberry.cloudberry;
 
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.db.influx.model.DataFilters;
-import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.db.influx.service.InfluxOrganizationService;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
@@ -13,10 +9,6 @@ import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
-import com.cloudberry.cloudberry.service.api.RawDataService;
-import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.domain.Bucket;
-import com.influxdb.client.domain.Organization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -24,12 +16,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Slf4j

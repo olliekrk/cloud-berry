@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.Map;
 

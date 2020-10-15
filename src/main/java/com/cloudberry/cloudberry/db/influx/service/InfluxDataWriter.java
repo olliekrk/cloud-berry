@@ -1,6 +1,5 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.influxdb.client.InfluxDBClient;

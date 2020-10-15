@@ -1,6 +1,5 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.db.influx.service.InfluxPropertiesService;
 import com.cloudberry.cloudberry.db.influx.util.converter.LogsEventToPointConverter;
