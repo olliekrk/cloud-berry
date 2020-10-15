@@ -71,7 +71,7 @@ dependencies {
 pmd {
     ignoreFailures = true
     consoleOutput = true
-    ruleSetFiles = files("/pmd-ruleset.xml")
+    ruleSetFiles = files("pmd-ruleset.xml")
 }
 
 jacoco {
