@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface BestConfigurationsApi {
 
+    // todo: this could be more generic & - take List<DataSeries> as input
     List<DataSeries> nBestConfigurations(
             int n,
             String fieldName,

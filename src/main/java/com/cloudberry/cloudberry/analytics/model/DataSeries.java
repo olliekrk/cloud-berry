@@ -18,8 +18,12 @@ public class DataSeries {
 
     List<Map<String, Object>> data;
 
+    public boolean isEmpty() {
+        return this.data.isEmpty();
+    }
+
     public boolean nonEmpty() {
-        return !this.data.isEmpty();
+        return !isEmpty();
     }
 
     public DataSeries renamed(String newSeriesName) {
@@ -58,6 +62,9 @@ public class DataSeries {
                 ));
     }
 
+    /**
+     * Returns sorted tuples with first elements being timestamps from _time field and later being field values.
+     */
     public List<Tuple2<Instant, Double>> getFieldValueByTime(String fieldName, double defaultValue) {
         return getDataSortedByTime()
                 .stream()

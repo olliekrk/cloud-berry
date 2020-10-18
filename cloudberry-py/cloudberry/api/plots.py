@@ -1,9 +1,8 @@
+import matplotlib.pyplot as plt
+from colorhash import ColorHash
 from typing import List
 
-import matplotlib.pyplot as plt
-
 from .model import DataSeries
-from colorhash import ColorHash
 
 DEFAULT_PLOT_SIZE = (15, 5)
 DEFAULT_PLOT_COLOR = 'red'
@@ -53,8 +52,14 @@ class DataSeriesPlots:
             df = ds.as_data_frame
             y_errors = None if yerr_field is None or yerr_field not in df else df[yerr_field]
 
-            axes.errorbar(x=df[x_field],
-                          y=df[y_field],
+            def safe_get_field(field: str):
+                if field in df.columns:
+                    return df[field]
+                else:
+                    return []
+
+            axes.errorbar(x=safe_get_field(x_field),
+                          y=safe_get_field(y_field),
                           yerr=y_errors,
                           label=ds.series_name,
                           ecolor=ERROR_COLOR_RGB,

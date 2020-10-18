@@ -7,15 +7,12 @@ import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.Iterables;
-import io.vavr.Tuple2;
+import com.google.common.collect.Streams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.integration.TrapezoidIntegrator;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +23,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BestConfigurationsSupplier implements BestConfigurationsApi {
-    private static final int MAX_INTEGRAL_EVALUATIONS = 1_000_000;
     private final ConfigurationSeriesCreator configurationSeriesCreator;
 
     public List<DataSeries> nBestConfigurations(
@@ -65,47 +61,28 @@ public class BestConfigurationsSupplier implements BestConfigurationsApi {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Compute the area under the connected points from the series by addition of trapezoids fields
+     */
     private double getSeriesIntegral(String fieldName, DataSeries series) {
         var timeToValue = series.getFieldValueByTime(fieldName, .0);
-        var timeToValueMap = timeToValue.stream().collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
-        UnivariateFunction univariateFunction = milliTime -> {
-            var timestamp = Instant.ofEpochMilli((long) milliTime);
-            if (timeToValueMap.containsKey(timestamp)) {
-                return (Double) timeToValueMap.get(timestamp);
-            } else {
-                var aOpt = timeToValue.stream()
-                        .takeWhile(t -> t._1.isBefore(timestamp) || t._1.equals(timestamp))
-                        .reduce((__, next) -> next);
-                var bOpt = timeToValue.stream()
-                        .filter(t -> t._1.equals(timestamp) || t._1.isAfter(timestamp))
-                        .findFirst();
-
-                if (aOpt.isEmpty() || bOpt.isEmpty()) {
-                    log.warn("Something went wrong when integrating function for series: {}", series.getSeriesName());
-                    return .0;
-                } else {
-                    // linear function
-                    var a = aOpt.get();
-                    var b = bOpt.get();
-                    var coefficient = (b._2 - a._2) / (b._1.toEpochMilli() - a._1.toEpochMilli());
-                    return coefficient * milliTime + b._2;
-                }
-            }
-        };
-
-        return series.getTimeRange().map(range -> new TrapezoidIntegrator().integrate(
-                MAX_INTEGRAL_EVALUATIONS,
-                univariateFunction,
-                range.getStart().toEpochMilli(),
-                range.getEnd().toEpochMilli()
-        )).orElse(.0);
+        if (timeToValue.isEmpty()) {
+            return 0;
+        }
+        var timeToValueTail = io.vavr.collection.List.ofAll(timeToValue).tail();
+        return Streams.zip(timeToValue.stream(), timeToValueTail.toJavaStream(), (pointA, pointB) -> {
+            var a = pointA._2;
+            var b = pointB._2;
+            var height = pointA._1.toEpochMilli() - pointB._1.toEpochMilli();
+            return (a + b) * height / 2.;
+        }).mapToDouble(Double::doubleValue).sum();
     }
 
     private double getSeriesLastValue(String fieldName, DataSeries series) {
-        Map<String, Object> lastPoint = Iterables.getLast(series.getDataSortedByTime(), Map.of());
-        return (double) Optional.ofNullable(lastPoint)
-                .flatMap(point -> Optional.ofNullable(lastPoint.get(fieldName)))
-                .orElse(.0);
+        var lastPoint = Iterables.getLast(series.getDataSortedByTime(), Map.<String, Object>of());
+        return Optional.ofNullable(lastPoint)
+                .flatMap(point -> Optional.ofNullable((Double) lastPoint.get(fieldName)))
+                .orElse(0.);
     }
 
 }

@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class MovingAverage implements MovingAverageApi {
-
+    public static final String AVG_SERIES_NAME = "AVG";
     private final InfluxDBClient influxClient;
 
     static String timedMovingAverageFluxRaw(TimeInterval timeInterval) {

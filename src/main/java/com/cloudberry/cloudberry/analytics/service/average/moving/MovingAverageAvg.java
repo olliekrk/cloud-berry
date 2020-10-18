@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Service
 public class MovingAverageAvg extends MovingAverage {
-    private static final String AVG_SERIES_NAME = "AVG";
 
     public MovingAverageAvg(InfluxDBClient influxClient) {
         super(influxClient);
@@ -35,6 +34,6 @@ public class MovingAverageAvg extends MovingAverage {
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .keep(Set.of(InfluxDefaults.Columns.TIME, InfluxDefaults.Columns.VALUE));
 
-        return queryTimeValueSeries(query, AVG_SERIES_NAME, fieldName);
+        return queryTimeValueSeries(query, MovingAverage.AVG_SERIES_NAME, fieldName);
     }
 }

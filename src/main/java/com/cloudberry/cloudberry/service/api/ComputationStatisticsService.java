@@ -7,6 +7,7 @@ import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverage;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -32,16 +34,20 @@ public class ComputationStatisticsService {
                 .computationsSeries(fieldName, computationIds, influxQueryFields);
 
         if (computeMean) {
-            var intervalNanos = influxUtilService
-                    .averageIntervalNanos(fieldName, computationIds, influxQueryFields);
-
-            var avgSeries = getComputationsAverage(
-                    fieldName,
-                    ChronoInterval.ofNanos(intervalNanos),
-                    computationIds,
-                    influxQueryFields
-            );
-            return ListSyntax.with(computationSeries, avgSeries);
+            Supplier<DataSeries> getAverageSeries = () -> {
+                if (computationSeries.stream().anyMatch(DataSeries::nonEmpty)) {
+                    var intervalNanos = influxUtilService.averageIntervalNanos(fieldName, computationIds, influxQueryFields);
+                    return getComputationsAverage(
+                            fieldName,
+                            ChronoInterval.ofNanos(intervalNanos),
+                            computationIds,
+                            influxQueryFields
+                    );
+                } else {
+                    return DataSeries.empty(MovingAverage.AVG_SERIES_NAME);
+                }
+            };
+            return ListSyntax.with(computationSeries, getAverageSeries.get());
         } else {
             return computationSeries;
         }
