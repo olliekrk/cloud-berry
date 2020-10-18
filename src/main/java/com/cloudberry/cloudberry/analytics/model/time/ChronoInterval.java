@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.model;
+package com.cloudberry.cloudberry.analytics.model.time;
 
 import com.influxdb.query.dsl.functions.properties.TimeInterval;
 import lombok.Value;

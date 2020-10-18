@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
-import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;
@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Service
 public class MovingAverageAvg extends MovingAverage {
-    private static final String AVG_SERIES_NAME = "AVG";
 
     public MovingAverageAvg(InfluxDBClient influxClient) {
         super(influxClient);
@@ -35,6 +34,6 @@ public class MovingAverageAvg extends MovingAverage {
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .keep(Set.of(InfluxDefaults.Columns.TIME, InfluxDefaults.Columns.VALUE));
 
-        return queryTimeValueSeries(query, AVG_SERIES_NAME, fieldName);
+        return queryTimeValueSeries(query, MovingAverage.AVG_SERIES_NAME, fieldName);
     }
 }

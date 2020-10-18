@@ -3,7 +3,7 @@ package com.cloudberry.cloudberry.analytics.service.average.moving;
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory;
+import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public abstract class MovingAverage implements MovingAverageApi {
-
+    public static final String AVG_SERIES_NAME = "AVG";
     private final InfluxDBClient influxClient;
 
     static String timedMovingAverageFluxRaw(TimeInterval timeInterval) {

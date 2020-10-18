@@ -1,31 +1,35 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
+import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
+import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
+import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverage;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
-import com.cloudberry.cloudberry.service.series.ConfigurationSeriesCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StatisticsService {
-
+public class ComputationStatisticsService {
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
     private final InfluxUtilService influxUtilService;
-    private final ConfigurationSeriesCreator configurationSeriesCreator;
 
     public List<DataSeries> getComputationsByIds(String fieldName,
                                                  InfluxQueryFields influxQueryFields,
@@ -35,16 +39,20 @@ public class StatisticsService {
                 .computationsSeries(fieldName, computationIds, influxQueryFields);
 
         if (computeMean) {
-            var intervalNanos = influxUtilService
-                    .averageIntervalNanos(fieldName, computationIds, influxQueryFields);
-
-            var avgSeries = getComputationsAverage(
-                    fieldName,
-                    ChronoInterval.ofNanos(intervalNanos),
-                    computationIds,
-                    influxQueryFields
-            );
-            return ListSyntax.with(computationSeries, avgSeries);
+            Supplier<DataSeries> getAverageSeries = () -> {
+                if (computationSeries.stream().anyMatch(DataSeries::nonEmpty)) {
+                    var intervalNanos = influxUtilService.averageIntervalNanos(fieldName, computationIds, influxQueryFields);
+                    return getComputationsAverage(
+                            fieldName,
+                            ChronoInterval.ofNanos(intervalNanos),
+                            computationIds,
+                            influxQueryFields
+                    );
+                } else {
+                    return DataSeries.empty(MovingAverage.AVG_SERIES_NAME);
+                }
+            };
+            return ListSyntax.with(computationSeries, getAverageSeries.get());
         } else {
             return computationSeries;
         }
@@ -59,26 +67,6 @@ public class StatisticsService {
             return List.of();
         }
         return getComputationsByIds(fieldName, influxQueryFields, computationIds, computeMean);
-    }
-
-    public List<DataSeries> getConfigurationsMeansByIds(String fieldName,
-                                                        InfluxQueryFields influxQueryFields,
-                                                        List<ObjectId> configurationIds) {
-        return ListSyntax.mapped(
-                configurationIds,
-                configurationId -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
-                        fieldName,
-                        influxQueryFields,
-                        configurationId
-                )
-        );
-    }
-
-    public List<DataSeries> getConfigurationsMeansByExperimentName(String fieldName,
-                                                                   InfluxQueryFields influxQueryFields,
-                                                                   String experimentName) {
-        var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return getConfigurationsMeansByIds(fieldName, influxQueryFields, configurationIds);
     }
 
     public List<DataSeries> getNBestComputations(int n,

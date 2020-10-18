@@ -1,9 +1,9 @@
-package com.cloudberry.cloudberry.service.series;
+package com.cloudberry.cloudberry.service.configurations;
 
-import com.cloudberry.cloudberry.analytics.AnalyticsApi;
-import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageAvg;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.service.api.InfluxUtilService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ConfigurationSeriesCreator {
-    private final AnalyticsApi analytics;
+    private final MovingAverageAvg movingAverageApi;
     private final MetadataService metadataService;
     private final InfluxUtilService influxUtilService;
 
@@ -26,7 +26,7 @@ public class ConfigurationSeriesCreator {
             return DataSeries.empty(seriesName);
         } else {
             var intervalNanos = influxUtilService.averageIntervalNanos(fieldName, computationsIds, influxQueryFields);
-            return analytics.getMovingAverageAvg().getTimedMovingSeries(
+            return movingAverageApi.getTimedMovingSeries(
                     fieldName,
                     ChronoInterval.ofNanos(intervalNanos),
                     computationsIds,
