@@ -2,11 +2,6 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
-import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
-import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
@@ -20,7 +15,6 @@ import com.cloudberry.cloudberry.service.api.ComputationStatisticsService;
 import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.temporal.ChronoUnit;
@@ -156,37 +150,4 @@ public class ComputationStatisticsRest {
         );
     }
 
-    @PostMapping("/configurations/comparison")
-    public List<DataSeries> getConfigurationsMeansByIds(@RequestParam String fieldName,
-                                                        @RequestParam(required = false) String measurementName,
-                                                        @RequestParam(required = false) String bucketName,
-                                                        @RequestBody List<String> configurationIdsHex
-    ) throws InvalidConfigurationIdException {
-        val configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
-
-        return statisticsService.getConfigurationsMeansByIds(
-                fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
-                configurationIds
-        );
-    }
-
-    @PostMapping("/configurations/comparison/forExperiment")
-    public List<DataSeries> getConfigurationsMeansByExperimentName(@RequestParam String fieldName,
-                                                                   @RequestParam(required = false)
-                                                                           String measurementName,
-                                                                   @RequestParam(required = false) String bucketName,
-                                                                   @RequestParam String experimentName
-    ) {
-        return statisticsService.getConfigurationsMeansByExperimentName(
-                fieldName,
-                getInfluxQueryFields(measurementName, bucketName),
-                experimentName
-        );
-    }
-
-    private InfluxQueryFields getInfluxQueryFields(@Nullable String measurementName,
-                                                   @Nullable String bucketName) {
-        return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
-    }
 }
