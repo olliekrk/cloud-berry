@@ -12,19 +12,26 @@ import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
+import com.google.common.collect.Streams;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThresholdsSupplier implements ThresholdsApi {
@@ -57,6 +64,53 @@ public class ThresholdsSupplier implements ThresholdsApi {
         )));
 
         return thresholdExceedingSeriesWithRestrictions(fieldName, thresholds, mode, influxQueryFields, restrictions);
+    }
+
+    @Override
+    public List<DataSeries> thresholdsExceedingSeriesFrom(String fieldName,
+                                                          Thresholds thresholds,
+                                                          CriteriaMode mode,
+                                                          Map<ObjectId, DataSeries> dataSeries) {
+        Function<DataSeries, List<Double>> valuesToCheckForAny = series ->
+                series.getDataSortedByTime()
+                        .stream()
+                        .flatMap(data -> Optional.ofNullable(data.get(fieldName)).map(o -> (double) o).stream())
+                        .collect(Collectors.toList());
+
+        Function<DataSeries, List<Double>> valuesToCheckForFinal = series ->
+                Streams.findLast(series.getDataSortedByTime().stream())
+                        .map(data -> (double) data.get(fieldName))
+                        .stream()
+                        .collect(Collectors.toList());
+
+        Function<DataSeries, List<Double>> valuesToCheckForAverage = series -> {
+            var stats = series.getDataSortedByTime()
+                    .stream()
+                    .flatMap(data -> Optional.ofNullable(data.get(fieldName)).map(o -> (double) o).stream())
+                    .collect(Collectors.summarizingDouble(Double::doubleValue));
+            return stats.getCount() == 0 ? List.<Double>of() : List.of(stats.getAverage());
+        };
+
+        var valuesToCheckExtractor = switch (mode) {
+            case ANY -> valuesToCheckForAny;
+            case FINAL -> valuesToCheckForFinal;
+            case AVERAGE -> valuesToCheckForAverage;
+        };
+
+        var exceedingIds = dataSeries.entrySet().stream()
+                .map(entry -> {
+                    try {
+                        return Tuple.of(entry.getKey(), valuesToCheckExtractor.apply(entry.getValue()));
+                    } catch (Exception e) {
+                        log.info("Failure when checking the thresholds for series and field: " + fieldName, e);
+                        return Tuple.of(entry.getKey(), List.<Double>of());
+                    }
+                })
+                .filter(tuple -> tuple._2.stream().anyMatch(value -> isOverOrUnderThreshold(value, thresholds)))
+                .map(Tuple2::_1)
+                .collect(Collectors.toSet());
+
+        return exceedingIds.stream().map(dataSeries::get).collect(Collectors.toList());
     }
 
     private List<DataSeries> thresholdExceedingSeriesWithRestrictions(String fieldName,
@@ -116,6 +170,11 @@ public class ThresholdsSupplier implements ThresholdsApi {
                 Optional.ofNullable(thresholds.getUpper()).map(upper -> Restrictions.value().greater(upper)).orElse(null),
                 Optional.ofNullable(thresholds.getLower()).map(lower -> Restrictions.value().less(lower)).orElse(null)
         ).filter(Objects::nonNull).toArray(Restrictions[]::new));
+    }
+
+    private static boolean isOverOrUnderThreshold(double value, Thresholds thresholds) {
+        return Optional.ofNullable(thresholds.getUpper()).filter(upper -> value > upper).isPresent() ||
+                Optional.ofNullable(thresholds.getLower()).filter(lower -> value < lower).isPresent();
     }
 
 }

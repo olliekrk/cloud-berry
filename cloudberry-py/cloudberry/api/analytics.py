@@ -3,6 +3,7 @@ import requests
 from typing import List
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
+from .json_util import JSONUtil
 from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds
 
 
@@ -111,6 +112,26 @@ class Analytics(CloudberryApi):
                                                             bucket_name: str = None) -> List[DataSeries]:
         self.computations.exceeding_thresholds_for_configuration(field_name, configuration_id, criteria_mode,
                                                                  thresholds, measurement_name, bucket_name)
+
+    def thresholds_exceeding_configurations(self,
+                                            field_name: str,
+                                            criteria_mode: CriteriaMode,
+                                            thresholds: Thresholds,
+                                            configuration_ids: List[str],
+                                            measurement_name: str = None,
+                                            bucket_name: str = None) -> List[DataSeries]:
+        return self.configurations.exceeding_thresholds(field_name, criteria_mode, thresholds, configuration_ids,
+                                                        measurement_name, bucket_name)
+
+    def thresholds_exceeding_configurations_for_experiment(self,
+                                                           field_name: str,
+                                                           criteria_mode: CriteriaMode,
+                                                           thresholds: Thresholds,
+                                                           experiment_name: str,
+                                                           measurement_name: str = None,
+                                                           bucket_name: str = None) -> List[DataSeries]:
+        self.configurations.exceeding_thresholds_for_experiment(field_name, experiment_name, criteria_mode,
+                                                                thresholds, measurement_name, bucket_name)
 
 
 class ComputationsAnalytics(CloudberryApi):
@@ -248,7 +269,7 @@ class ConfigurationsAnalytics(CloudberryApi):
         self.base_url = f'{config.base_url()}/statistics/configurations'
 
     def comparison(self,
-                   configuration_ids: list,
+                   configuration_ids: List[str],
                    field_name: str,
                    measurement_name: str = None,
                    bucket_name: str = None) -> List[DataSeries]:
@@ -304,6 +325,48 @@ class ConfigurationsAnalytics(CloudberryApi):
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params))
+
+    def exceeding_thresholds(self,
+                             field_name: str,
+                             criteria_mode: CriteriaMode,
+                             thresholds: Thresholds,
+                             configuration_ids: List[str],
+                             measurement_name: str = None,
+                             bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/exceedingThresholds'
+        params = AnalyticsUtil.append_influx_params({
+            'fieldName': field_name,
+            'mode': criteria_mode.name,
+        }, measurement_name, bucket_name)
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            files={
+                'thresholds': JSONUtil.multipart_payload(thresholds.__dict__),
+                'configurationIdsHex': JSONUtil.multipart_payload(configuration_ids),
+            }
+        ))
+
+    def exceeding_thresholds_for_experiment(self,
+                                            field_name: str,
+                                            experiment_name: str,
+                                            criteria_mode: CriteriaMode,
+                                            thresholds: Thresholds,
+                                            measurement_name: str = None,
+                                            bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/exceedingThresholdsForExperiment'
+        params = AnalyticsUtil.append_influx_params({
+            'fieldName': field_name,
+            'mode': criteria_mode.name,
+            'experimentName': experiment_name,
+        }, measurement_name, bucket_name)
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            files={
+                'thresholds': JSONUtil.multipart_payload(thresholds.__dict__),
+            }
+        ))
 
 
 class AnalyticsUtil:

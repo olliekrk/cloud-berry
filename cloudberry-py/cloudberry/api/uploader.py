@@ -3,6 +3,7 @@ import requests
 from typing import List
 
 from .backend import CloudberryConfig, CloudberryApi
+from .json_util import JSONUtil
 
 
 class UploadDetails:
@@ -115,4 +116,4 @@ class CsvFileUploader(FileUploader):
 
     @staticmethod
     def __payload_json(payload):
-        return None, json.dumps(payload), 'application/json'
+        return JSONUtil.multipart_payload(payload)
