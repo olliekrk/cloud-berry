@@ -1,8 +1,10 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
+import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
@@ -12,6 +14,9 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +57,37 @@ public class ConfigurationStatisticsService {
         );
     }
 
+    public List<DataSeries> getConfigurationsExceedingThresholds(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> configurationIds
+    ) {
+        return analyticsApi.getThresholdsApi().thresholdsExceedingSeriesFrom(
+                fieldName,
+                thresholds,
+                mode,
+                getConfigurationsSeries(fieldName, influxQueryFields, configurationIds)
+        );
+    }
+
+    public List<DataSeries> getConfigurationsExceedingThresholdsForExperiment(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            InfluxQueryFields influxQueryFields,
+            String experimentName
+    ) {
+        return getConfigurationsExceedingThresholds(
+                fieldName,
+                thresholds,
+                mode,
+                influxQueryFields,
+                metadataService.findAllConfigurationIdsForExperiment(experimentName)
+        );
+    }
+
 
     public List<DataSeries> getConfigurationsMeans(String fieldName,
                                                    InfluxQueryFields influxQueryFields,
@@ -71,6 +107,19 @@ public class ConfigurationStatisticsService {
                                                                 String experimentName) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         return getConfigurationsMeans(fieldName, influxQueryFields, configurationIds);
+    }
+
+    private Map<ObjectId, DataSeries> getConfigurationsSeries(String fieldName,
+                                                              InfluxQueryFields influxQueryFields,
+                                                              List<ObjectId> configurationsIds) {
+        return configurationsIds.stream().collect(Collectors.toMap(
+                Function.identity(),
+                id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
+                        fieldName,
+                        influxQueryFields,
+                        id
+                )
+        ));
     }
 
 }
