@@ -36,9 +36,18 @@ influx: # custom influxdb properties used in InfluxConfig
   organization-name: ${spring.influx2.org}
   buckets:
     default-logs: ${spring.influx2.bucket}
+    default-metrics: cloudberry_metrics
   measurements:
     default-measurement-name: cloudberry-default
 
+management:
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        flavor: telegraf
+        host: localhost
+        port: 8125
 ---
 
 spring:

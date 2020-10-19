@@ -18,6 +18,11 @@ public class ComputationEventProcessor implements EventProcessor<ComputationEven
     @Override
     @Async
     public void process(ComputationEvent event) {
+        process(event, null);
+    }
+
+    @Async
+    public void process(ComputationEvent event, String bucketName) {
         var point = pointBuilder.buildPoint(
                 event.getMeasurementName(),
                 event.getTime(),
@@ -25,7 +30,7 @@ public class ComputationEventProcessor implements EventProcessor<ComputationEven
                 event.getTags()
         );
 
-        influxDataWriter.writePoint(null, point);
+        influxDataWriter.writePoint(bucketName, point);
     }
 
 }
