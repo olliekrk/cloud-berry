@@ -2,10 +2,10 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
+import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
@@ -92,7 +92,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholds")
-    public List<DataSeries> getComputationsExceedingThresholds(
+    public List<DataSeries> getConfigurationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
@@ -115,7 +115,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholdsForExperiment")
-    public List<DataSeries> getComputationsExceedingThresholds(
+    public List<DataSeries> getConfigurationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,

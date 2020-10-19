@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class InfluxUtilService {
-    private final static long DEFAULT_AVERAGE_INTERVAL_NANOS = (long) 1e9;
+    private final static long DEFAULT_AVERAGE_INTERVAL_NANOS = (long) 1e9; // 1 second
     private final InfluxDBClient influxClient;
 
     /**

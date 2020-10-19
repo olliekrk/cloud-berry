@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.rest.exceptions;
 
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
+import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import org.springframework.http.HttpStatus;
 
 public class InvalidThresholdsException extends RestException {

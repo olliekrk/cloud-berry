@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,6 +55,14 @@ public class BestSeriesSupplier implements BestSeriesApi {
         )));
 
         return getBestComputations(n, optimization, influxQueryFields.getBucketName(), restrictions);
+    }
+
+    @Override
+    public List<DataSeries> nBestSeriesFrom(int n,
+                                            String fieldName,
+                                            Optimization optimization,
+                                            Collection<DataSeries> dataSeries) {
+        return BestSeriesInMemoryOps.nBestSeriesFrom(n, fieldName, optimization, dataSeries);
     }
 
     private List<String> getBestComputationIds(int n,

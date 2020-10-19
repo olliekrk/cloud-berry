@@ -4,7 +4,7 @@ from typing import List
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
 from .json_util import JSONUtil
-from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds
+from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds, ThresholdsType
 
 
 class Analytics(CloudberryApi):
@@ -112,6 +112,18 @@ class Analytics(CloudberryApi):
                                                             bucket_name: str = None) -> List[DataSeries]:
         self.computations.exceeding_thresholds_for_configuration(field_name, configuration_id, criteria_mode,
                                                                  thresholds, measurement_name, bucket_name)
+
+    def thresholds_exceeding_computations_relatively(self,
+                                                     field_name: str,
+                                                     configuration_id: str,
+                                                     criteria_mode: CriteriaMode,
+                                                     thresholds: Thresholds,
+                                                     thresholds_type: ThresholdsType,
+                                                     measurement_name: str = None,
+                                                     bucket_name: str = None) -> List[DataSeries]:
+        return self.computations.exceeding_thresholds_relatively(field_name, configuration_id, criteria_mode,
+                                                                 thresholds, thresholds_type,
+                                                                 measurement_name, bucket_name)
 
     def thresholds_exceeding_configurations(self,
                                             field_name: str,
@@ -254,6 +266,27 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name,
             'mode': criteria_mode.name,
+            'configurationIdHex': configuration_id,
+        }, measurement_name, bucket_name)
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(
+            url=url,
+            params=params,
+            json=thresholds.__dict__
+        ))
+
+    def exceeding_thresholds_relatively(self,
+                                        field_name: str,
+                                        configuration_id: str,
+                                        criteria_mode: CriteriaMode,
+                                        thresholds: Thresholds,
+                                        thresholds_type: ThresholdsType,
+                                        measurement_name: str = None,
+                                        bucket_name: str = None) -> List[DataSeries]:
+        url = f'{self.base_url}/exceedingThresholdsRelatively'
+        params = AnalyticsUtil.append_influx_params({
+            'fieldName': field_name,
+            'mode': criteria_mode.name,
+            'thresholdsType': thresholds_type.name,
             'configurationIdHex': configuration_id,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(

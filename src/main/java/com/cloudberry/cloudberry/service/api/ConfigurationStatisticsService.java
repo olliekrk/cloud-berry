@@ -4,8 +4,8 @@ import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
+import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
@@ -32,12 +32,15 @@ public class ConfigurationStatisticsService {
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationIds
     ) {
-        return analyticsApi.getBestConfigurationsApi().nBestConfigurations(
+        var configurationsSeries = configurationIds.stream()
+                .map(id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(fieldName, influxQueryFields, id))
+                .collect(Collectors.toList());
+
+        return analyticsApi.getBestSeriesApi().nBestSeriesFrom(
                 n,
                 fieldName,
                 optimization,
-                influxQueryFields,
-                configurationIds
+                configurationsSeries
         );
     }
 

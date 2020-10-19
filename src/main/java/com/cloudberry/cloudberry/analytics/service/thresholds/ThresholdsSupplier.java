@@ -1,11 +1,12 @@
-package com.cloudberry.cloudberry.analytics.service;
+package com.cloudberry.cloudberry.analytics.service.thresholds;
 
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.api.ThresholdsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
+import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
+import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
@@ -23,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -111,6 +109,16 @@ public class ThresholdsSupplier implements ThresholdsApi {
                 .collect(Collectors.toSet());
 
         return exceedingIds.stream().map(dataSeries::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DataSeries> thresholdsExceedingSeriesRelatively(String fieldName,
+                                                                ThresholdsInfo thresholdsInfo,
+                                                                CriteriaMode mode,
+                                                                Collection<DataSeries> dataSeries,
+                                                                DataSeries relativeSeries) {
+        return ThresholdsInMemoryOps
+                .thresholdsExceedingSeriesRelatively(fieldName, thresholdsInfo, mode, dataSeries, relativeSeries);
     }
 
     private List<DataSeries> thresholdExceedingSeriesWithRestrictions(String fieldName,

@@ -2,10 +2,11 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
+import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
+import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("statistics/computations")
@@ -137,17 +139,40 @@ public class ComputationStatisticsRest {
                                                                @RequestParam(required = false) String bucketName,
                                                                @RequestBody Thresholds thresholds
     ) throws InvalidThresholdsException, InvalidConfigurationIdException {
-        if (!thresholds.isValid()) {
-            throw new InvalidThresholdsException(thresholds);
-        }
-
         return computationStatisticsService.getComputationsExceedingThresholdsForConfiguration(
                 fieldName,
-                thresholds,
+                requireValidThresholds(thresholds),
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
         );
     }
+
+    @PostMapping("/exceedingThresholdsRelatively")
+    public List<DataSeries> getComputationsExceedingThresholdsRelatively(
+            @RequestParam String fieldName,
+            @RequestParam CriteriaMode mode,
+            @RequestParam String configurationIdHex,
+            @RequestParam(required = false) String measurementName,
+            @RequestParam(required = false) String bucketName,
+            @RequestParam ThresholdsType thresholdsType,
+            @RequestBody Thresholds thresholds
+    ) throws InvalidThresholdsException, InvalidConfigurationIdException {
+        return computationStatisticsService.getComputationsExceedingThresholdsRelatively(
+                fieldName,
+                requireValidThresholds(thresholds),
+                thresholdsType,
+                mode,
+                influxQueryFieldsResolver.get(measurementName, bucketName),
+                IdDispatcher.getConfigurationId(configurationIdHex)
+        );
+    }
+
+    private Thresholds requireValidThresholds(Thresholds thresholds) throws InvalidThresholdsException {
+        return Optional.ofNullable(thresholds)
+                .filter(Thresholds::isValid)
+                .orElseThrow(() -> new InvalidThresholdsException(thresholds));
+    }
+
 
 }
