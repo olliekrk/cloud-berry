@@ -5,11 +5,14 @@ import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@Slf4j
 @Value
 public class DataSeries {
     private static final String TIME_FIELD_NAME = InfluxDefaults.Columns.TIME;
@@ -34,7 +37,7 @@ public class DataSeries {
         return new DataSeries(seriesName, Collections.emptyList());
     }
 
-    public List<Map<String, Object>> getDataSorted(String fieldName) {
+    public List<Map<String, Object>> getDataSortedBy(String fieldName) {
         return data.stream()
                 .sorted(Comparator.comparingDouble(dataPoint -> (Double) dataPoint.get(fieldName)))
                 .collect(Collectors.toList());
@@ -74,4 +77,21 @@ public class DataSeries {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public List<Tuple2<Instant, Double>> getFieldValueByTime(String fieldName) {
+        return getDataSortedByTime()
+                .stream()
+                .flatMap(point -> {
+                    try {
+                        var time = (Instant) point.get(TIME_FIELD_NAME);
+                        var valueOpt = Optional.ofNullable((Double) point.get(fieldName));
+                        return valueOpt.stream().map(value -> Tuple.of(time, value));
+                    } catch (Exception e) {
+                        log.debug("Missing or invalid value for field: " + fieldName, e);
+                        return Stream.empty();
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
 }
