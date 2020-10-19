@@ -32,12 +32,15 @@ public class ConfigurationStatisticsService {
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationIds
     ) {
-        return analyticsApi.getBestConfigurationsApi().nBestConfigurations(
+        var configurationsSeries = configurationIds.stream()
+                .map(id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(fieldName, influxQueryFields, id))
+                .collect(Collectors.toList());
+
+        return analyticsApi.getBestSeriesApi().nBestSeriesFrom(
                 n,
                 fieldName,
                 optimization,
-                influxQueryFields,
-                configurationIds
+                configurationsSeries
         );
     }
 
