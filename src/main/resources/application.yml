@@ -36,12 +36,12 @@ influx: # custom influxdb properties used in InfluxConfig
   organization-name: ${spring.influx2.org}
   buckets:
     default-logs: ${spring.influx2.bucket}
-    default-metrics: cloudberry-metrics
+    default-metrics: cloudberry_metrics
   measurements:
     default-measurement-name: cloudberry-default
 
 management.metrics.export.influx:
-  db: cloudberry-metrics
+  db: cloudberry_metrics
   auto-create-db: true
   batch-size: 5000
   password: ${spring.influx2.password}

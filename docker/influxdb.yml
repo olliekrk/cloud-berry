@@ -35,5 +35,5 @@ services:
       USER: root
       TELEGRAF_INFLUX_URL: http://influxdb-cb:9999
       TELEGRAF_INFLUX_ORGANIZATION: "cloudberry"
-      TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry-metrics"
+      TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry_metrics"
       TELEGRAF_INFLUX_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='
