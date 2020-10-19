@@ -1,0 +1,23 @@
+version: '2'
+
+networks:
+  monitoring:
+
+services:
+  telegraf-cb:
+    image: telegraf:1.15.3
+    hostname: telegraf-cb
+    container_name: telegraf-cb
+    restart: always
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - monitoring
+    ports:
+      - 8125:8125/udp
+    environment:
+      USER: root
+      TELEGRAF_INFLUX_URL: http://influxdb-cb:9999
+      TELEGRAF_INFLUX_ORGANIZATION: "cloudberry"
+      TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry_metrics"
+      TELEGRAF_INFLUX_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='

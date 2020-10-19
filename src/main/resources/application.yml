@@ -40,14 +40,14 @@ influx: # custom influxdb properties used in InfluxConfig
   measurements:
     default-measurement-name: cloudberry-default
 
-management.metrics.export.influx:
-  db: cloudberry_metrics
-  auto-create-db: true
-  batch-size: 5000
-  password: ${spring.influx2.password}
-  user-name: ${spring.influx2.username}
-  uri: ${spring.influx2.url}
-  step: 1m # reporting frequency (in minutes)
+management:
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        flavor: telegraf
+        host: localhost
+        port: 8125
 ---
 
 spring:

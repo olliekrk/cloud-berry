@@ -61,6 +61,8 @@ dependencies {
 
     // METRICS
     implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+    implementation "io.micrometer:micrometer-core:1.5.5"
+    implementation "io.micrometer:micrometer-registry-statsd:1.5.5"
 
     // KAFKA
     implementation "org.springframework.kafka:spring-kafka:$springKafkaVersion"

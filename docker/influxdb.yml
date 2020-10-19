@@ -4,7 +4,7 @@ networks:
   monitoring:
 
 services:
-  # todo: https://docs.influxdata.com/influxdb/v2.0/reference/rc0-upgrade-guide/
+  # todo - migrate from beta: https://docs.influxdata.com/influxdb/v2.0/reference/rc0-upgrade-guide/
   influxdb-cb:
     image: quay.io/influxdb/influxdb:2.0.0-beta
     hostname: influxdb-cb
@@ -22,18 +22,3 @@ services:
       INFLUXDB_ADMIN_USER: root
       INFLUXDB_ADMIN_PASSWORD: ziemniak
       INFLUXDB_ADMIN_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='
-  telegraf-cb:
-    image: telegraf:latest
-    hostname: telegraf-cb
-    container_name: telegraf-cb
-    restart: always
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    networks:
-      - monitoring
-    environment:
-      USER: root
-      TELEGRAF_INFLUX_URL: http://influxdb-cb:9999
-      TELEGRAF_INFLUX_ORGANIZATION: "cloudberry"
-      TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry_metrics"
-      TELEGRAF_INFLUX_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='

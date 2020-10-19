@@ -2,7 +2,7 @@ version: '2'
 
 services:
   mongodb-cb:
-    image: mongo:latest
+    image: mongo:4.4.1
     hostname: mongodb-cb
     container_name: mongodb-cb
     environment:
