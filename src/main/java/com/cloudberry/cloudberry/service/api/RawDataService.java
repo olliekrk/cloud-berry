@@ -6,13 +6,13 @@ import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
+import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
-import com.cloudberry.cloudberry.db.influx.service.InfluxDataEvictor;
+import com.cloudberry.cloudberry.db.influx.service.InfluxDataRemover;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsImporter;
-import com.cloudberry.cloudberry.rest.dto.DataFilters;
 import com.cloudberry.cloudberry.rest.exceptions.FileImportException;
 import com.cloudberry.cloudberry.util.FileSystemUtils;
 import com.influxdb.query.FluxRecord;
@@ -33,7 +33,7 @@ import static java.lang.String.format;
 public class RawDataService {
     private final PointBuilder pointBuilder;
     private final InfluxDataWriter influxDataWriter;
-    private final InfluxDataEvictor influxDataEvictor;
+    private final InfluxDataRemover influxDataRemover;
     private final InfluxDataAccessor influxDataAccessor;
     private final LogsImporter logsImporter;
     private final InfluxConfig influxConfig;
@@ -52,22 +52,13 @@ public class RawDataService {
 
     public DataSeries findData(InfluxQueryFields influxQueryFields,
                                DataFilters filters) {
-        var records = influxDataAccessor.findData(
-                influxQueryFields,
-                filters.getFieldFilters(),
-                filters.getTagFilters()
-        );
-
+        var records = influxDataAccessor.findData(influxQueryFields, filters);
         var data = ListSyntax.mapped(records, FluxRecord::getValues);
         return new DataSeries(rawDataSeriesName, data);
     }
 
-    public void deleteData(InfluxQueryFields influxQueryFields,
-                           DataFilters filters) {
-        influxDataEvictor.deleteData(
-                influxQueryFields,
-                filters.getTagFilters()
-        );
+    public void deleteData(InfluxQueryFields influxQueryFields, DataFilters filters) {
+        influxDataRemover.deleteData(influxQueryFields, filters.getTagFilters());
     }
 
     public ObjectId uploadAgeFile(MultipartFile file, String experimentName, AgeUploadDetails uploadDetails) {

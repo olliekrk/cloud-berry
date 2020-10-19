@@ -4,8 +4,11 @@ import com.cloudberry.cloudberry.analytics.api.AnomaliesApi;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.anomalies.AnomalyReport;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
+import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
+import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import io.vavr.Tuple;
@@ -18,9 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.cloudberry.cloudberry.analytics.util.ComputationsRestrictionsFactory.getComputationsRestrictions;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +33,11 @@ public class AnomaliesSupplier implements AnomaliesApi {
     public List<AnomalyReport> getReportsForComputations(String fieldName,
                                                          List<ObjectId> computationsIds,
                                                          InfluxQueryFields influxQueryFields) {
-        val restrictions = influxQueryFields.getMeasurementNameOptional()
-                .map(measurementName -> getComputationsRestrictions(computationsIds, fieldName, measurementName))
-                .orElseGet(() -> getComputationsRestrictions(computationsIds, fieldName));
+        val restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
+                Optional.of(fieldName).map(RestrictionsFactory::hasField),
+                Optional.of(computationsIds).map(ComputationsRestrictionsFactory::computationIdIn)
+        )));
         val baseQuery = FluxUtils.epochQueryByComputationId(influxQueryFields.getBucketName(), restrictions);
 
         val stddev = getReportPart(baseQuery.stddev());

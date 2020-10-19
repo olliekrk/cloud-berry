@@ -1,15 +1,14 @@
 package com.cloudberry.cloudberry.parsing.service.csv;
 
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsParser;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.influxdb.client.write.Point;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
-    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withFirstRecordAsHeader();
 
     @Override
     public ParsedLogs parseFile(File file, CsvUploadDetails details, String defaultMeasurementName) throws IOException {
@@ -36,7 +34,7 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         var computationId = details.getComputationId().toHexString();
 
         return Try.withResources(() -> new BufferedReader(new FileReader(file)))
-                .of(reader -> Try.withResources(() -> CSV_FORMAT.parse(reader))
+                .of(reader -> Try.withResources(() -> details.determineCsvFormat().parse(reader))
                         .of(parser -> {
                             var points = ListSyntax.mapped(parser.getRecords(), record -> {
                                 var recordValues = record.toMap();
@@ -77,4 +75,5 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
                 .map(entry -> Pair.of(entry.getKey(), parseField(entry.getValue())))
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
+
 }

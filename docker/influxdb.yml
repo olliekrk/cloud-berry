@@ -4,6 +4,7 @@ networks:
   monitoring:
 
 services:
+  # todo: https://docs.influxdata.com/influxdb/v2.0/reference/rc0-upgrade-guide/
   influxdb-cb:
     image: quay.io/influxdb/influxdb:2.0.0-beta
     hostname: influxdb-cb
@@ -11,14 +12,16 @@ services:
     ports:
       - 9999:9999
     volumes:
-      - /data/influxdb/cloudberry/data:/var/lib/influxdb # data
-      - /data/influxdb/cloudberry/config:/etc/influxdb # configs
+      - /data/cloudberry/influxdbv2:/root/.influxdbv2 # configs (token, organization, user, password)
     networks:
       - monitoring
-    command: --reporting-disabled
+    command: --reporting-disabled --engine-path /root/.influxdbv2_engine
     environment:
+      INFLUXDB_DEFAULT_ORG: cloudberry
+      INFLUXDB_DEFAULT_BUCKET: cloudberry_logs
       INFLUXDB_ADMIN_USER: root
       INFLUXDB_ADMIN_PASSWORD: ziemniak
+      INFLUXDB_ADMIN_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='
   telegraf-cb:
     image: telegraf:latest
     hostname: telegraf-cb
@@ -33,4 +36,4 @@ services:
       TELEGRAF_INFLUX_URL: http://influxdb-cb:9999
       TELEGRAF_INFLUX_ORGANIZATION: "cloudberry"
       TELEGRAF_INFLUX_METRICS_BUCKET: "cloudberry-metrics"
-      TELEGRAF_INFLUX_TOKEN: m8m8olbdS7PQUNf4MxK7BOvIjG01iGe7FyoP0RXcHNeQXA9xeV2Lo9fr2qXxhrFuyvKNo8D4jqhLyPgZ9Q7Q2Q==
+      TELEGRAF_INFLUX_TOKEN: 'W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ=='

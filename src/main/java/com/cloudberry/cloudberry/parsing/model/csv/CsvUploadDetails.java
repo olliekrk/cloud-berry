@@ -2,9 +2,10 @@ package com.cloudberry.cloudberry.parsing.model.csv;
 
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import lombok.Value;
+import org.apache.commons.csv.CSVFormat;
 import org.bson.types.ObjectId;
+import org.springframework.lang.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -35,4 +36,21 @@ public class CsvUploadDetails implements UploadDetails {
      */
     @Nullable
     String measurementName;
+
+    /**
+     * Csv column headers may be given explicitly instead of reading 1st line of CSV file as headers.
+     */
+    @Nullable
+    List<String> headers;
+
+    public CSVFormat determineCsvFormat() {
+        if (headers == null) {
+            return CSVFormat.DEFAULT
+                    .withFirstRecordAsHeader();
+        } else {
+            return CSVFormat.DEFAULT
+                    .withHeader(headers.toArray(String[]::new))
+                    .withSkipHeaderRecord(false);
+        }
+    }
 }

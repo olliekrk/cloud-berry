@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
+import com.cloudberry.cloudberry.db.influx.service.InfluxPropertiesService;
 import com.cloudberry.cloudberry.db.influx.util.converter.LogsEventToPointConverter;
 import com.cloudberry.cloudberry.kafka.event.Event;
 import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LogsEventProcessor implements EventProcessor<Event> {
-    private final InfluxConfig influxConfig;
+    private final InfluxPropertiesService influxPropertiesService;
     private final InfluxDataWriter influxDataWriter;
     private final LogsEventToPointConverter logsEventToPointConverter;
 
@@ -32,7 +32,7 @@ public class LogsEventProcessor implements EventProcessor<Event> {
         }
 
         if (point != null) {
-            influxDataWriter.writePoint(influxConfig.getDefaultBucketName(), point);
+            influxDataWriter.writePoint(influxPropertiesService.getDefaultBucketName(), point);
         }
     }
 

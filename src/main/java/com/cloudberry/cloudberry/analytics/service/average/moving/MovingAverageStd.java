@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
-import com.cloudberry.cloudberry.analytics.model.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;

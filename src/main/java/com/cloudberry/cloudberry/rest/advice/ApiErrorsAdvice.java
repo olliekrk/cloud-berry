@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.rest.advice;
 
-import com.cloudberry.cloudberry.rest.exceptions.*;
+import com.cloudberry.cloudberry.rest.exceptions.RestException;
+import com.cloudberry.cloudberry.rest.exceptions.RestRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry;
 
 import com.cloudberry.cloudberry.config.kafka.KafkaTopics;
-import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
+import com.cloudberry.cloudberry.db.influx.service.InfluxOrganizationService;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.BestSolutionEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
@@ -10,6 +10,7 @@ import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -20,15 +21,18 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OnStartupRunner implements ApplicationRunner {
 
+    private final InfluxOrganizationService influxOrganizationService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final InfluxDataWriter influxDBConnector;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        logDefaultConfiguration();
+
         // good place for quick dev testing
         sendComputationEvents();
     }
@@ -64,5 +68,9 @@ public class OnStartupRunner implements ApplicationRunner {
         kafkaTemplate.send(KafkaTopics.Logs.SUMMARY_TOPIC, summaryEvent);
         kafkaTemplate.send(KafkaTopics.Logs.BEST_SOLUTION_TOPIC, bestSolutionEvent);
         kafkaTemplate.send(KafkaTopics.Generic.COMPUTATION_TOPIC, computationEvent);
+    }
+
+    private void logDefaultConfiguration() {
+        log.info("Default Influx organization ID: {}", influxOrganizationService.getDefaultOrganizationId());
     }
 }

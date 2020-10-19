@@ -2,17 +2,17 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
-import com.cloudberry.cloudberry.rest.dto.DataFilters;
-import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
-import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
-import com.cloudberry.cloudberry.service.BucketNameResolver;
+import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
+import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import com.cloudberry.cloudberry.service.api.RawDataService;
+import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RawDataRest {
-    private final BucketNameResolver bucketNameResolver;
+    private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
     private final RawDataService rawDataService;
 
     @PostMapping("/save")
@@ -34,7 +34,7 @@ public class RawDataRest {
                          @RequestParam(required = false) String measurementName,
                          @RequestBody List<DataPoint> dataPoints) {
         rawDataService.saveData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 dataPoints);
     }
 
@@ -43,7 +43,7 @@ public class RawDataRest {
                                @RequestParam(required = false) String measurementName,
                                @RequestBody DataFilters filters) {
         return rawDataService.findData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 filters);
     }
 
@@ -52,7 +52,7 @@ public class RawDataRest {
                            @RequestParam(required = false) String measurementName,
                            @RequestBody DataFilters filters) {
         rawDataService.deleteData(
-                new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName)),
+                influxQueryFieldsResolver.get(measurementName, bucketName),
                 filters);
     }
 
@@ -69,21 +69,25 @@ public class RawDataRest {
     @PostMapping(value = "/csvFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ObjectId uploadCsvFile(@PathVariable String experimentName,
                                   @RequestPart MultipartFile file,
-                                  @RequestPart(required = false) List<String> tags,
-                                  @RequestParam String configurationId,
+                                  @RequestPart(name = "tags", required = false) List<String> tagsParam,
+                                  @RequestPart(name = "headers", required = false) List<String> headersParam,
+                                  @RequestParam String configurationIdHex,
                                   @RequestParam(required = false) String computationId,
-                                  @RequestParam(required = false) String measurementName) throws RestException {
-        if (!ObjectId.isValid(configurationId))
-            throw new InvalidConfigurationIdException(List.of(configurationId));
+                                  @RequestParam(required = false) String measurementName,
+                                  @RequestParam(defaultValue = "false") String hasHeaders) throws RestException {
+
+        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
         if (computationId != null && !ObjectId.isValid(computationId))
             throw new InvalidComputationIdException(List.of(computationId));
 
+        var firstRecordAsHeaders = hasHeaders.equals("true");
         var uploadDetails = new CsvUploadDetails(
-                tags == null ? List.of() : tags,
-                new ObjectId(configurationId),
+                tagsParam == null ? List.of() : tagsParam,
+                configurationId,
                 computationId == null ? new ObjectId() : new ObjectId(computationId),
-                measurementName
+                measurementName,
+                firstRecordAsHeaders || headersParam == null ? null : headersParam
         );
         return rawDataService.uploadCsvFile(file, experimentName, uploadDetails);
     }

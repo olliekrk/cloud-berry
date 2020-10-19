@@ -1,6 +1,5 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
-import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.influxdb.client.InfluxDBClient;
@@ -19,7 +18,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class InfluxDataWriter {
-    private final InfluxConfig influxConfig;
+    private final InfluxOrganizationService influxOrganizationService;
+    private final InfluxPropertiesService influxPropertiesService;
     private final InfluxDBClient influxClient;
     private final BucketsService bucketsService;
 
@@ -46,9 +46,9 @@ public class InfluxDataWriter {
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
         Try.withResources(influxClient::getWriteApi)
                 .of(writeApi -> {
-                    var bucket = Optional.ofNullable(bucketName).orElse(influxConfig.getDefaultBucketName());
+                    var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
                     bucketsService.createBucketIfNotExists(bucket);
-                    writeApi.writePoints(bucket, influxConfig.getDefaultOrganization(), List.copyOf(points));
+                    writeApi.writePoints(bucket, influxOrganizationService.getDefaultOrganizationId(), List.copyOf(points));
                     return null;
                 }).get();
     }

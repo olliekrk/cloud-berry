@@ -1,8 +1,9 @@
 import json
-
 import requests
+from typing import List
 
 from .backend import CloudberryConfig, CloudberryApi
+from .json_util import JSONUtil
 
 
 class UploadDetails:
@@ -64,20 +65,55 @@ class CsvUploadDetails(UploadDetails):
 
 class CsvFileUploader(FileUploader):
 
-    def upload_file(self, file_path: str, experiment_name: str, details: CsvUploadDetails):
+    def upload_file_without_headers(self,
+                                    file_path: str,
+                                    experiment_name: str,
+                                    details: CsvUploadDetails,
+                                    headers: List[str]):
+        payload = {
+            'tags': CsvFileUploader.__payload_json(details.tags_names),
+            'headers': CsvFileUploader.__payload_json(headers),
+        }
+        params = {
+            'hasHeaders': 'false',
+        }
+        return self.__upload_file(file_path, experiment_name, details, payload, params)
+
+    def upload_file(self,
+                    file_path: str,
+                    experiment_name: str,
+                    details: CsvUploadDetails):
+        payload = {
+            'tags': CsvFileUploader.__payload_json(details.tags_names),
+        }
+        params = {
+            'hasHeaders': 'true',
+        }
+        return self.__upload_file(file_path, experiment_name, details, payload, params)
+
+    def __upload_file(self,
+                      file_path: str,
+                      experiment_name: str,
+                      details: CsvUploadDetails,
+                      payload: dict,
+                      params: dict):
         with open(file_path, 'rb') as file:
-            url = f'{self.config.base_url()}/raw/csvFile/{experiment_name}'
-            params = {'configurationId': details.configuration_id}
-            if details.computation_id is not None:
-                params['computationId'] = details.computation_id
-            if details.measurement_name is not None:
-                params['measurementName'] = details.measurement_name
-            r = requests.post(
-                url,
-                files={
-                    'file': file,
-                    'tagsNames': (None, json.dumps(details.tags_names), 'application/json'),
-                },
-                params=params
-            )
+            details_params = CsvFileUploader.__csv_details_to_params(details)
+            all_params = {**details_params, **params}
+            payload['file'] = file
+            upload_url = f'{self.config.base_url()}/raw/csvFile/{experiment_name}'
+            r = requests.post(upload_url, files=payload, params=all_params)
             return r.json()
+
+    @staticmethod
+    def __csv_details_to_params(details: CsvUploadDetails):
+        params = {'configurationIdHex': details.configuration_id}
+        if details.computation_id is not None:
+            params['computationId'] = details.computation_id
+        if details.measurement_name is not None:
+            params['measurementName'] = details.measurement_name
+        return params
+
+    @staticmethod
+    def __payload_json(payload):
+        return JSONUtil.multipart_payload(payload)

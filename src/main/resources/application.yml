@@ -23,16 +23,19 @@ spring:
       host: localhost
       port: 27017
       database: cloudberry
-  influx2:
+      auto-index-creation: false
+  influx2: # influxdb-client-java properties
     url: http://localhost:9999/
     username: root
     password: ziemniak
-    bucket: cloudberry-logs
+    token: W5lZySDF5A1XevbKqIK717PHBxZOD-D0pSkwYu--LmmVYudgPMGJ-a-oOVVjDl_tgjASZ1efAtGZkV6FbVIYUQ==
+    org: cloudberry
+    bucket: cloudberry_logs
 
-influx:
-  organization-name: cloudberry
+influx: # custom influxdb properties used in InfluxConfig
+  organization-name: ${spring.influx2.org}
   buckets:
-    default-logs: cloudberry-logs
+    default-logs: ${spring.influx2.bucket}
     default-metrics: cloudberry-metrics
   measurements:
     default-measurement-name: cloudberry-default
@@ -61,19 +64,3 @@ spring:
   profiles: dev
   kafka:
     bootstrap-servers: localhost:9092
-
----
-
-spring:
-  profiles: olgierd
-  influx2:
-    org: 66fb4172c944fe08
-    token: m8m8olbdS7PQUNf4MxK7BOvIjG01iGe7FyoP0RXcHNeQXA9xeV2Lo9fr2qXxhrFuyvKNo8D4jqhLyPgZ9Q7Q2Q==
-
----
-
-spring:
-  profiles: michal
-  influx2:
-    org: 05f6c0b5899c8000
-    token: aGeYf1zFZMcytTyzsRHsWBWvVQgKE88hlCymhncscnEZEcy-dnjKlkm5WFSKgAIFsbJNXYvkOJeZtX62DyA1qA==
