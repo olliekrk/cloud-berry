@@ -1,6 +1,7 @@
+from typing import List
+
 import matplotlib.pyplot as plt
 from colorhash import ColorHash
-from typing import List
 
 from .model import DataSeries
 
@@ -9,6 +10,8 @@ DEFAULT_PLOT_COLOR = 'red'
 ERROR_COLOR_RGB = (1, 0, 0)
 ERROR_LINE_WIDTH = .5
 
+
+# fixme: deprecated in favour of cloudberry.plots
 
 class DataSeriesPlots:
     def __init__(self, series: DataSeries) -> None:
