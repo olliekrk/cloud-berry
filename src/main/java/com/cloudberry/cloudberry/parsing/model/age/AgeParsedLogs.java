@@ -15,9 +15,11 @@ public class AgeParsedLogs extends ParsedLogs {
     String configurationName;
     Map<String, Object> configurationParameters;
 
-    public AgeParsedLogs(List<Point> points,
-                         @Nullable String configurationName,
-                         Map<String, Object> configurationParameters) {
+    public AgeParsedLogs(
+            List<Point> points,
+            @Nullable String configurationName,
+            Map<String, Object> configurationParameters
+    ) {
         super(points);
         this.configurationName = configurationName;
         this.configurationParameters = configurationParameters;

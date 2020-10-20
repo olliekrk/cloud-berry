@@ -11,10 +11,12 @@ import static com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags.COMP
 
 abstract class BestComputations {
 
-    abstract Flux getBest(int n,
-                          OptimizationGoal optimizationGoal,
-                          Restrictions restrictions,
-                          String bucketName);
+    abstract Flux getBest(
+            int n,
+            OptimizationGoal optimizationGoal,
+            Restrictions restrictions,
+            String bucketName
+    );
 
     protected Flux makeFluxGreatAgain(Flux flux, int n, OptimizationGoal optimizationGoal) {
         var isDescendingBetter = OptimizationGoal.isMaximumSearched(optimizationGoal);

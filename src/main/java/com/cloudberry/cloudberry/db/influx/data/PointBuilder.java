@@ -10,10 +10,12 @@ import java.util.Map;
 @Component
 public class PointBuilder {
 
-    public Point buildPoint(String measurementName,
-                            Instant time,
-                            Map<String, Object> fields,
-                            Map<String, String> tags) {
+    public Point buildPoint(
+            String measurementName,
+            Instant time,
+            Map<String, Object> fields,
+            Map<String, String> tags
+    ) {
         return Point.measurement(measurementName)
                 .time(time, InfluxDefaults.WRITE_PRECISION)
                 .addFields(fields)

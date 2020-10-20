@@ -13,7 +13,8 @@ public final class ComputationsRestrictionsFactory {
     public static Restrictions computationIdIn(List<ObjectId> computationsIds) {
         return RestrictionsFactory.tagIn(
                 InfluxDefaults.CommonTags.COMPUTATION_ID,
-                ListSyntax.mapped(computationsIds, ObjectId::toHexString));
+                ListSyntax.mapped(computationsIds, ObjectId::toHexString)
+        );
     }
 
 }

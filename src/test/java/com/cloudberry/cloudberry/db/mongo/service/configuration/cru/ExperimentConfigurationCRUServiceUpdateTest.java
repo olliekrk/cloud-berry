@@ -43,8 +43,10 @@ public class ExperimentConfigurationCRUServiceUpdateTest extends ExperimentConfi
 
     @ParameterizedTest
     @MethodSource("provideParameters")
-    void updateParams(boolean overrideParams, Map<String, Object> newParameters,
-                      Map<String, Object> expectedParameters) {
+    void updateParams(
+            boolean overrideParams, Map<String, Object> newParameters,
+            Map<String, Object> expectedParameters
+    ) {
         var updatedConfiguration = experimentConfigurationCRUService
                 .update(TEST_CONFIGURATION.getId(), null, newParameters, overrideParams).block();
 

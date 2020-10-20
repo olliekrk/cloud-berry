@@ -25,23 +25,28 @@ public class LogsMetadataAppender {
     private final InfluxPropertiesService influxPropertiesService;
     private final MetadataService metadataService;
 
-    public ParsedLogsWithMetadata appendMetadata(ParsedLogs parsedLogs,
-                                                 String experimentName,
-                                                 ObjectId configurationId,
-                                                 ObjectId computationId) {
+    public ParsedLogsWithMetadata appendMetadata(
+            ParsedLogs parsedLogs,
+            String experimentName,
+            ObjectId configurationId,
+            ObjectId computationId
+    ) {
         final var now = Instant.now();
         return metadataService
                 .getOrCreateExperiment(new Experiment(now, experimentName, Map.of()))
                 .map(Tuple::of)
                 .flatMap(meta -> {
-                    var configuration = new ExperimentConfiguration(configurationId, meta._1.getId(), null, Map.of(), now);
+                    var configuration =
+                            new ExperimentConfiguration(configurationId, meta._1.getId(), null, Map.of(), now);
                     return metadataService.getOrCreateConfiguration(configuration).map(meta::append);
                 })
                 .flatMap(meta -> {
                     var computation = new ExperimentComputation(computationId, meta._2.getId(), now);
                     return metadataService.getOrCreateComputation(computation).map(meta::append);
                 })
-                .map(tuple -> new ParsedLogsWithMetadata(influxPropertiesService.getDefaultBucketName(), parsedLogs.getPoints(), tuple._2, tuple._3))
+                .map(tuple -> new ParsedLogsWithMetadata(influxPropertiesService.getDefaultBucketName(),
+                                                         parsedLogs.getPoints(), tuple._2, tuple._3
+                ))
                 .block();
     }
 
@@ -67,7 +72,9 @@ public class LogsMetadataAppender {
                     var computationId = meta._3.getId().toHexString();
                     parsedLogs.getPoints().forEach(point -> point.addTag(CommonTags.COMPUTATION_ID, computationId));
                 })
-                .map(tuple -> new ParsedLogsWithMetadata(influxPropertiesService.getDefaultBucketName(), parsedLogs.getPoints(), tuple._2, tuple._3))
+                .map(tuple -> new ParsedLogsWithMetadata(influxPropertiesService.getDefaultBucketName(),
+                                                         parsedLogs.getPoints(), tuple._2, tuple._3
+                ))
                 .block();
     }
 

@@ -39,7 +39,10 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
                             var points = ListSyntax.mapped(parser.getRecords(), record -> {
                                 var recordValues = record.toMap();
                                 return Point.measurement(measurementName)
-                                        .time(parseTime(recordValues.get(TIME_COLUMN_NAME)), InfluxDefaults.WRITE_PRECISION)
+                                        .time(
+                                                parseTime(recordValues.get(TIME_COLUMN_NAME)),
+                                                InfluxDefaults.WRITE_PRECISION
+                                        )
                                         .addTags(getTags(details, recordValues))
                                         .addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computationId)
                                         .addFields(getFields(details, recordValues));
@@ -57,9 +60,9 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return details.getTagsNames()
                 .stream()
                 .flatMap(tag ->
-                        Optional.ofNullable(values.get(tag))
-                                .map(tagValue -> Pair.of(tag, tagValue))
-                                .stream()
+                                 Optional.ofNullable(values.get(tag))
+                                         .map(tagValue -> Pair.of(tag, tagValue))
+                                         .stream()
                 )
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
@@ -69,8 +72,8 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return values.entrySet()
                 .stream()
                 .filter(entry ->
-                        !Objects.equals(entry.getKey(), TIME_COLUMN_NAME) &&
-                                !details.getTagsNames().contains(entry.getKey())
+                                !Objects.equals(entry.getKey(), TIME_COLUMN_NAME) &&
+                                        !details.getTagsNames().contains(entry.getKey())
                 )
                 .map(entry -> Pair.of(entry.getKey(), parseField(entry.getValue())))
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));

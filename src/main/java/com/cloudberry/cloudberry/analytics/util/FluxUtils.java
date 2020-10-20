@@ -23,16 +23,20 @@ public final class FluxUtils {
         String absValue = "({r with _value: math.abs(x: r._value)})";
     }
 
-    public static Flux epochQuery(String bucketName,
-                                  Restrictions restrictions) {
+    public static Flux epochQuery(
+            String bucketName,
+            Restrictions restrictions
+    ) {
         return Flux
                 .from(bucketName)
                 .range(Instant.EPOCH)
                 .filter(restrictions);
     }
 
-    public static Flux epochQueryByComputationId(String bucketName,
-                                                 Restrictions restrictions) {
+    public static Flux epochQueryByComputationId(
+            String bucketName,
+            Restrictions restrictions
+    ) {
         return epochQuery(bucketName, restrictions)
                 .groupBy(InfluxDefaults.CommonTags.COMPUTATION_ID);
     }

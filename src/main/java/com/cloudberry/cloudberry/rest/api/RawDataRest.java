@@ -15,7 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -30,56 +36,70 @@ public class RawDataRest {
     private final RawDataService rawDataService;
 
     @PostMapping("/save")
-    public void saveData(@RequestParam(required = false) String bucketName,
-                         @RequestParam(required = false) String measurementName,
-                         @RequestBody List<DataPoint> dataPoints) {
+    public void saveData(
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName,
+            @RequestBody List<DataPoint> dataPoints
+    ) {
         rawDataService.saveData(
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                dataPoints);
+                dataPoints
+        );
     }
 
     @PostMapping(value = "/find", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public DataSeries findData(@RequestParam(required = false) String bucketName,
-                               @RequestParam(required = false) String measurementName,
-                               @RequestBody DataFilters filters) {
+    public DataSeries findData(
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName,
+            @RequestBody DataFilters filters
+    ) {
         return rawDataService.findData(
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                filters);
+                filters
+        );
     }
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteData(@RequestParam(required = false) String bucketName,
-                           @RequestParam(required = false) String measurementName,
-                           @RequestBody DataFilters filters) {
+    public void deleteData(
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName,
+            @RequestBody DataFilters filters
+    ) {
         rawDataService.deleteData(
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                filters);
+                filters
+        );
     }
 
     @PostMapping(value = "/ageFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ObjectId uploadAgeFile(@PathVariable String experimentName,
-                                  @RequestPart MultipartFile file,
-                                  @RequestPart(required = false) Map<String, String> headersKeys,
-                                  @RequestPart(required = false) Map<String, String> headersMeasurements,
-                                  @RequestParam(required = false) String configurationName) {
+    public ObjectId uploadAgeFile(
+            @PathVariable String experimentName,
+            @RequestPart MultipartFile file,
+            @RequestPart(required = false) Map<String, String> headersKeys,
+            @RequestPart(required = false) Map<String, String> headersMeasurements,
+            @RequestParam(required = false) String configurationName
+    ) {
         var uploadDetails = new AgeUploadDetails(headersKeys, headersMeasurements, configurationName);
         return rawDataService.uploadAgeFile(file, experimentName, uploadDetails);
     }
 
     @PostMapping(value = "/csvFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ObjectId uploadCsvFile(@PathVariable String experimentName,
-                                  @RequestPart MultipartFile file,
-                                  @RequestPart(name = "tags", required = false) List<String> tagsParam,
-                                  @RequestPart(name = "headers", required = false) List<String> headersParam,
-                                  @RequestParam String configurationIdHex,
-                                  @RequestParam(required = false) String computationId,
-                                  @RequestParam(required = false) String measurementName,
-                                  @RequestParam(defaultValue = "false") String hasHeaders) throws RestException {
+    public ObjectId uploadCsvFile(
+            @PathVariable String experimentName,
+            @RequestPart MultipartFile file,
+            @RequestPart(name = "tags", required = false) List<String> tagsParam,
+            @RequestPart(name = "headers", required = false) List<String> headersParam,
+            @RequestParam String configurationIdHex,
+            @RequestParam(required = false) String computationId,
+            @RequestParam(required = false) String measurementName,
+            @RequestParam(defaultValue = "false") String hasHeaders
+    ) throws RestException {
 
         val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
 
-        if (computationId != null && !ObjectId.isValid(computationId))
+        if (computationId != null && !ObjectId.isValid(computationId)) {
             throw new InvalidComputationIdException(List.of(computationId));
+        }
 
         var firstRecordAsHeaders = hasHeaders.equals("true");
         var uploadDetails = new CsvUploadDetails(

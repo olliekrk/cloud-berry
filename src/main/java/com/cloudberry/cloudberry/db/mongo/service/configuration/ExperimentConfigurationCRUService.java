@@ -56,10 +56,12 @@ public class ExperimentConfigurationCRUService {
                 .doOnNext(next -> log.info("Created new configuration " + next.getId()));
     }
 
-    public Mono<ExperimentConfiguration> update(ObjectId configurationId,
-                                                @Nullable String configurationFileName,
-                                                @Nullable Map<String, Object> newParams,
-                                                boolean overrideParams) {
+    public Mono<ExperimentConfiguration> update(
+            ObjectId configurationId,
+            @Nullable String configurationFileName,
+            @Nullable Map<String, Object> newParams,
+            boolean overrideParams
+    ) {
         return configurationRepository.findById(configurationId)
                 .map(updateConfiguration(configurationFileName, newParams, overrideParams))
                 .flatMap(configurationRepository::save)
@@ -70,7 +72,8 @@ public class ExperimentConfigurationCRUService {
     private Function<ExperimentConfiguration, ExperimentConfiguration> updateConfiguration(
             @Nullable String configurationFileName,
             @Nullable Map<String, Object> newParams,
-            boolean overrideParams) {
+            boolean overrideParams
+    ) {
         return configuration -> {
             val prevParams = configuration.getParameters();
             return configuration
@@ -79,8 +82,8 @@ public class ExperimentConfigurationCRUService {
                                     ? configurationFileName
                                     : configuration.getConfigurationFileName())
                     .withParameters(newParams != null
-                            ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
-                            : prevParams);
+                                            ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
+                                            : prevParams);
         };
     }
 

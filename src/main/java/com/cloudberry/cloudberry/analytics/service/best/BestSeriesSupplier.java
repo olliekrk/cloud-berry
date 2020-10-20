@@ -29,10 +29,12 @@ public class BestSeriesSupplier implements BestSeriesApi {
     private final InfluxDBClient influxClient;
 
     @Override
-    public List<DataSeries> nBestSeries(int n,
-                                        String fieldName,
-                                        Optimization optimization,
-                                        InfluxQueryFields influxQueryFields) {
+    public List<DataSeries> nBestSeries(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            InfluxQueryFields influxQueryFields
+    ) {
         var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField)
@@ -42,12 +44,14 @@ public class BestSeriesSupplier implements BestSeriesApi {
     }
 
     @Override
-    public List<DataSeries> nBestSeriesFrom(int n,
-                                            String fieldName,
-                                            Optimization optimization,
-                                            InfluxQueryFields influxQueryFields,
-                                            List<ObjectId> computationIds) {
-        if (computationIds.isEmpty()) return List.of();
+    public List<DataSeries> nBestSeriesFrom(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> computationIds
+    ) {
+        if (computationIds.isEmpty()) { return List.of(); }
         var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField),
@@ -58,17 +62,21 @@ public class BestSeriesSupplier implements BestSeriesApi {
     }
 
     @Override
-    public List<DataSeries> nBestSeriesFrom(int n,
-                                            String fieldName,
-                                            Optimization optimization,
-                                            Collection<DataSeries> dataSeries) {
+    public List<DataSeries> nBestSeriesFrom(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            Collection<DataSeries> dataSeries
+    ) {
         return BestSeriesInMemoryOps.nBestSeriesFrom(n, fieldName, optimization, dataSeries);
     }
 
-    private List<String> getBestComputationIds(int n,
-                                               Optimization optimization,
-                                               String bucketName,
-                                               Restrictions restrictions) {
+    private List<String> getBestComputationIds(
+            int n,
+            Optimization optimization,
+            String bucketName,
+            Restrictions restrictions
+    ) {
         var bestComputations = switch (optimization.getOptimizationKind()) {
             case FINAL_VALUE -> new BestComputationsByLastValue();
             case AREA_UNDER_CURVE -> new BestComputationsByArea();
@@ -80,10 +88,12 @@ public class BestSeriesSupplier implements BestSeriesApi {
         return queryForComputationIds(bestComputationsIdsQuery);
     }
 
-    private List<DataSeries> getBestComputations(int n,
-                                                 Optimization optimization,
-                                                 String bucketName,
-                                                 Restrictions restrictions) {
+    private List<DataSeries> getBestComputations(
+            int n,
+            Optimization optimization,
+            String bucketName,
+            Restrictions restrictions
+    ) {
         var ids = getBestComputationIds(n, optimization, bucketName, restrictions);
         return queryForComputations(ids, restrictions, bucketName);
     }
@@ -98,9 +108,11 @@ public class BestSeriesSupplier implements BestSeriesApi {
                 .collect(Collectors.toList());
     }
 
-    private List<DataSeries> queryForComputations(List<String> computationsIds,
-                                                  Restrictions restrictions,
-                                                  String bucketName) {
+    private List<DataSeries> queryForComputations(
+            List<String> computationsIds,
+            Restrictions restrictions,
+            String bucketName
+    ) {
         var query = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .filter(RestrictionsFactory.tagIn(CommonTags.COMPUTATION_ID, computationsIds))
                 .pivot(

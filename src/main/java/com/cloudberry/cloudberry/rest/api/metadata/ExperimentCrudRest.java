@@ -61,8 +61,10 @@ public class ExperimentCrudRest {
     }
 
     @PostMapping("/findOrCreate")
-    Experiment findOrCreate(@RequestParam String name,
-                            @RequestBody(required = false) Map<String, Object> parameters) {
+    Experiment findOrCreate(
+            @RequestParam String name,
+            @RequestBody(required = false) Map<String, Object> parameters
+    ) {
         val now = Instant.now();
         val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
         val experiment = new Experiment(now, name, experimentParameters);
@@ -70,10 +72,11 @@ public class ExperimentCrudRest {
     }
 
     @PutMapping("/update")
-    Experiment update(@RequestParam String experimentIdHex,
-                      @RequestParam(required = false) String name,
-                      @RequestParam(defaultValue = "false") boolean overrideParams,
-                      @RequestBody(required = false) Map<String, Object> parameters
+    Experiment update(
+            @RequestParam String experimentIdHex,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "false") boolean overrideParams,
+            @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
 

@@ -45,23 +45,29 @@ public final class DataGenerator {
 
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_A =
             new ExperimentConfiguration(CONFIGURATION_ID_1_A, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_A,
-                    Map.of("price", 3000), ofEpochSecond(10));
+                                        Map.of("price", 3000), ofEpochSecond(10)
+            );
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_B =
             new ExperimentConfiguration(CONFIGURATION_ID_1_B, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_B,
-                    Map.of(), ofEpochSecond(20));
+                                        Map.of(), ofEpochSecond(20)
+            );
 
     public static final ExperimentConfiguration TEST_CONFIGURATION_2_A =
             new ExperimentConfiguration(CONFIGURATION_ID_2_A, EXPERIMENT_ID_2, CONFIGURATION_FILE_NAME_2_A,
-                    Map.of("owner", "Andrew"), ofEpochSecond(30));
+                                        Map.of("owner", "Andrew"), ofEpochSecond(30)
+            );
     public static final ExperimentConfiguration TEST_CONFIGURATION_2_B_NO_COMPUTATIONS =
             new ExperimentConfiguration(CONFIGURATION_ID_2_B_NO_COMPUTATIONS, EXPERIMENT_ID_2,
-                    CONFIGURATION_FILE_NAME_2_B, Map.of(), ofEpochSecond(30));
+                                        CONFIGURATION_FILE_NAME_2_B, Map.of(), ofEpochSecond(30)
+            );
 
     public static final List<ExperimentConfiguration> ALL_CONFIGURATIONS =
-            List.of(TEST_CONFIGURATION_1_A,
+            List.of(
+                    TEST_CONFIGURATION_1_A,
                     TEST_CONFIGURATION_1_B,
                     TEST_CONFIGURATION_2_A,
-                    TEST_CONFIGURATION_2_B_NO_COMPUTATIONS);
+                    TEST_CONFIGURATION_2_B_NO_COMPUTATIONS
+            );
 
     //config experiment computation
     public static final ObjectId COMPUTATION_ID_1_A_A = ObjectId.get();

@@ -27,9 +27,11 @@ public class LogsImporter {
     /**
      * Import file in AgE-specific format as computation data and return id of saved computation.
      */
-    public ObjectId importAgeFile(File file,
-                                  String experimentName,
-                                  AgeUploadDetails uploadDetails) throws IOException {
+    public ObjectId importAgeFile(
+            File file,
+            String experimentName,
+            AgeUploadDetails uploadDetails
+    ) throws IOException {
         final var parsedData =
                 ageLogsParser.parseFile(file, uploadDetails, influxConfig.getDefaultMeasurementName());
         final var parsedDataWithMetadata =
@@ -38,9 +40,11 @@ public class LogsImporter {
         return parsedDataWithMetadata.getExperimentComputation().getId();
     }
 
-    public ObjectId importCsvFile(File file,
-                                  String experimentName,
-                                  CsvUploadDetails uploadDetails) throws IOException {
+    public ObjectId importCsvFile(
+            File file,
+            String experimentName,
+            CsvUploadDetails uploadDetails
+    ) throws IOException {
         final var parsedData =
                 csvLogsParser.parseFile(file, uploadDetails, influxConfig.getDefaultMeasurementName());
         final var parsedDataWithMetadata =

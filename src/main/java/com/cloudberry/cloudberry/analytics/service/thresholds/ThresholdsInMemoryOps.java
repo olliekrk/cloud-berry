@@ -24,11 +24,13 @@ public abstract class ThresholdsInMemoryOps {
      * If the criteria mode is ANY, then the closest values (by timestamps) will be compared.
      * (Assumes that no extra timestamps shift is required)
      */
-    public static List<DataSeries> thresholdsExceedingSeriesRelatively(String fieldName,
-                                                                       ThresholdsInfo thresholdsInfo,
-                                                                       CriteriaMode mode,
-                                                                       Collection<DataSeries> dataSeries,
-                                                                       DataSeries relativeSeries) {
+    public static List<DataSeries> thresholdsExceedingSeriesRelatively(
+            String fieldName,
+            ThresholdsInfo thresholdsInfo,
+            CriteriaMode mode,
+            Collection<DataSeries> dataSeries,
+            DataSeries relativeSeries
+    ) {
         var relativeValues = relativeSeries.getFieldValueByTime(fieldName);
         Function<List<Tuple2<Instant, Double>>, Boolean> checker = switch (mode) {
             case AVERAGE -> v -> isSeriesAverageExceedingThresholds(v, relativeValues, thresholdsInfo);
@@ -54,7 +56,8 @@ public abstract class ThresholdsInMemoryOps {
 
             // get points from relativeSeries, one before and one after
             var relativeBeforeOpt =
-                    Streams.findLast(relativeValues.stream().takeWhile(t -> t._1.isBefore(timestamp) || t._1.equals(timestamp)));
+                    Streams.findLast(
+                            relativeValues.stream().takeWhile(t -> t._1.isBefore(timestamp) || t._1.equals(timestamp)));
             var relativeAfterOpt =
                     relativeValues.stream().dropWhile(t -> t._1.isBefore(timestamp)).limit(1).findFirst();
 
@@ -62,8 +65,10 @@ public abstract class ThresholdsInMemoryOps {
                 // compute relative point as if it belongs to linear function between point before and point after
                 var relativeBefore = relativeBeforeOpt.get();
                 var relativeAfter = relativeAfterOpt.get();
-                var linearCoefficient = (relativeAfter._2 - relativeBefore._2) / (relativeAfter._1.toEpochMilli() - relativeBefore._1.toEpochMilli());
-                var valueToCompare = relativeBefore._2 + linearCoefficient * (timestamp.toEpochMilli() - relativeBefore._1.toEpochMilli());
+                var linearCoefficient = (relativeAfter._2 - relativeBefore._2) /
+                        (relativeAfter._1.toEpochMilli() - relativeBefore._1.toEpochMilli());
+                var valueToCompare = relativeBefore._2 +
+                        linearCoefficient * (timestamp.toEpochMilli() - relativeBefore._1.toEpochMilli());
                 return isExceedingThresholds(value, valueToCompare, thresholdsInfo);
             } else {
                 // case when there is only single relative value to compare to
@@ -71,7 +76,9 @@ public abstract class ThresholdsInMemoryOps {
                         .map(relativePoint -> isExceedingThresholds(value, relativePoint._2, thresholdsInfo))
                         .orElseGet(() -> relativeBeforeOpt
                                 .stream()
-                                .anyMatch(relativePoint -> isExceedingThresholds(value, relativePoint._2, thresholdsInfo)));
+                                .anyMatch(relativePoint -> isExceedingThresholds(value, relativePoint._2,
+                                                                                 thresholdsInfo
+                                )));
             }
         });
     }
@@ -86,7 +93,9 @@ public abstract class ThresholdsInMemoryOps {
 
         return lastValue.isPresent()
                 && lastRelativeValue.isPresent()
-                && isExceedingThresholds(lastValue.map(Tuple2::_2).get(), lastRelativeValue.map(Tuple2::_2).get(), thresholdsInfo);
+                && isExceedingThresholds(lastValue.map(Tuple2::_2).get(), lastRelativeValue.map(Tuple2::_2).get(),
+                                         thresholdsInfo
+        );
     }
 
     public static boolean isSeriesAverageExceedingThresholds(
@@ -107,7 +116,8 @@ public abstract class ThresholdsInMemoryOps {
 
         var absoluteOpts = switch (thresholdsInfo.getType()) {
             case ABSOLUTE -> Tuple.of(lowerOpt, upperOpt);
-            case PERCENTS -> Tuple.of(lowerOpt.map(t -> relativeValue * (1. - t)), upperOpt.map(t -> relativeValue * (1. + t)));
+            case PERCENTS -> Tuple
+                    .of(lowerOpt.map(t -> relativeValue * (1. - t)), upperOpt.map(t -> relativeValue * (1. + t)));
         };
 
         return absoluteOpts._1.stream().anyMatch(lower -> value < lower)

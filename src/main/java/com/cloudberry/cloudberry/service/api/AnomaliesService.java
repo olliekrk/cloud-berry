@@ -14,9 +14,11 @@ import java.util.List;
 public class AnomaliesService {
     private final AnomaliesApi anomaliesApi;
 
-    public List<AnomalyReport> getReports(String fieldName,
-                                           List<ObjectId> computationsIds,
-                                           InfluxQueryFields influxQueryFields) {
+    public List<AnomalyReport> getReports(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    ) {
         return anomaliesApi.getReportsForComputations(fieldName, computationsIds, influxQueryFields);
     }
 }

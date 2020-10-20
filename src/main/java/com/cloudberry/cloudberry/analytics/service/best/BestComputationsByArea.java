@@ -14,10 +14,12 @@ import static com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags.COMP
 class BestComputationsByArea extends BestComputations {
 
     @Override
-    Flux getBest(int n,
-                 OptimizationGoal optimizationGoal,
-                 Restrictions restrictions,
-                 String bucketName) {
+    Flux getBest(
+            int n,
+            OptimizationGoal optimizationGoal,
+            Restrictions restrictions,
+            String bucketName
+    ) {
         var preparedFlux = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .keep(Set.of(TIME, VALUE, COMPUTATION_ID))
                 .integral(); // gets integral from each group

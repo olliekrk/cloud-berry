@@ -10,20 +10,26 @@ import java.util.List;
 
 public interface BestSeriesApi {
 
-    List<DataSeries> nBestSeries(int n,
-                                 String fieldName,
-                                 Optimization optimization,
-                                 InfluxQueryFields influxQueryFields);
+    List<DataSeries> nBestSeries(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            InfluxQueryFields influxQueryFields
+    );
 
-    List<DataSeries> nBestSeriesFrom(int n,
-                                     String fieldName,
-                                     Optimization optimization,
-                                     InfluxQueryFields influxQueryFields,
-                                     List<ObjectId> computationIds);
+    List<DataSeries> nBestSeriesFrom(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> computationIds
+    );
 
-    List<DataSeries> nBestSeriesFrom(int n,
-                                     String fieldName,
-                                     Optimization optimization,
-                                     Collection<DataSeries> seriesMap);
+    List<DataSeries> nBestSeriesFrom(
+            int n,
+            String fieldName,
+            Optimization optimization,
+            Collection<DataSeries> seriesMap
+    );
 
 }

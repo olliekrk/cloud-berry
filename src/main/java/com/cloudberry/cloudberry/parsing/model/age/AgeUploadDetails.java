@@ -40,9 +40,11 @@ public class AgeUploadDetails implements UploadDetails {
     @Nullable
     String configurationName;
 
-    public AgeUploadDetails(@Nullable Map<String, String> headersKeys,
-                            @Nullable Map<String, String> headersMeasurements,
-                            @Nullable String configurationName) {
+    public AgeUploadDetails(
+            @Nullable Map<String, String> headersKeys,
+            @Nullable Map<String, String> headersMeasurements,
+            @Nullable String configurationName
+    ) {
         this.headersKeys = Optional.ofNullable(headersKeys).orElse(Map.of());
         this.headersMeasurements = Optional.ofNullable(headersMeasurements).orElse(Map.of());
         this.configurationName = configurationName;

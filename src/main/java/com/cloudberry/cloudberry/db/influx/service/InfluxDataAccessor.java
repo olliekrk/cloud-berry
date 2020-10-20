@@ -30,11 +30,13 @@ public class InfluxDataAccessor {
     public List<FluxRecord> findData(InfluxQueryFields influxQueryFields, DataFilters dataFilters) {
         var bucket = influxQueryFields.getBucketName();
 
-        var measurementRestriction = influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement);
+        var measurementRestriction =
+                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement);
         var fieldRestrictions = RestrictionsFactory.anyFieldEquals(dataFilters.getFieldFilters());
         var tagRestrictions = RestrictionsFactory.everyTagEquals(dataFilters.getTagFilters());
         var tagPresenceRestrictions = RestrictionsFactory.hasEveryTag(dataFilters.getTagPresence());
-        var allRestrictions = Stream.of(measurementRestriction, tagPresenceRestrictions, tagRestrictions, fieldRestrictions);
+        var allRestrictions =
+                Stream.of(measurementRestriction, tagPresenceRestrictions, tagRestrictions, fieldRestrictions);
 
         var columnsToKeep = Stream.of(
                 dataFilters.getTagFilters().keySet().stream(),

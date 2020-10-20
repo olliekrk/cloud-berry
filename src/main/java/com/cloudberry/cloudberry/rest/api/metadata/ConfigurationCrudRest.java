@@ -68,9 +68,10 @@ public class ConfigurationCrudRest {
     }
 
     @PostMapping("/getOrCreate")
-    ExperimentConfiguration getOrCreate(@RequestParam String experimentIdHex,
-                                        @RequestParam(required = false) String configurationFileName,
-                                        @RequestBody(required = false) Map<String, Object> parameters
+    ExperimentConfiguration getOrCreate(
+            @RequestParam String experimentIdHex,
+            @RequestParam(required = false) String configurationFileName,
+            @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
         val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
@@ -81,10 +82,11 @@ public class ConfigurationCrudRest {
     }
 
     @PutMapping("/update")
-    ExperimentConfiguration update(@RequestParam String configurationIdHex,
-                                   @RequestParam(required = false) String configurationFileName,
-                                   @RequestParam(defaultValue = "false") boolean overrideParams,
-                                   @RequestBody(required = false) Map<String, Object> parameters
+    ExperimentConfiguration update(
+            @RequestParam String configurationIdHex,
+            @RequestParam(required = false) String configurationFileName,
+            @RequestParam(defaultValue = "false") boolean overrideParams,
+            @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidConfigurationIdException {
         val configurationId = IdDispatcher.getConfigurationId((configurationIdHex));
 

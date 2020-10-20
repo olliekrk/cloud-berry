@@ -17,10 +17,12 @@ public class ComputationEvent extends Event {
     private final Map<String, String> tags;
 
     @JsonCreator
-    public ComputationEvent(@JsonProperty("time") Instant time,
-                            @JsonProperty("measurementName") String measurementName,
-                            @JsonProperty("fields") Map<String, Object> fields,
-                            @JsonProperty("tags") Map<String, String> tags) {
+    public ComputationEvent(
+            @JsonProperty("time") Instant time,
+            @JsonProperty("measurementName") String measurementName,
+            @JsonProperty("fields") Map<String, Object> fields,
+            @JsonProperty("tags") Map<String, String> tags
+    ) {
         super(time);
         this.measurementName = measurementName;
         this.fields = fields;

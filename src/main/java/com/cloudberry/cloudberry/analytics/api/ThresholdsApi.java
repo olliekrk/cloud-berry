@@ -17,7 +17,8 @@ public interface ThresholdsApi {
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
-            InfluxQueryFields influxQueryFields);
+            InfluxQueryFields influxQueryFields
+    );
 
     List<DataSeries> thresholdsExceedingSeriesFrom(
             String fieldName,

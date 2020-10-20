@@ -25,10 +25,12 @@ public class MetadataEvent extends Event implements Parametrized<String, Object>
     private final Map<String, Object> experimentParameters;
     private final Map<String, Object> configurationParameters;
 
-    public MetadataEvent(ObjectId computationId,
-                         String experimentName,
-                         Map<String, Object> experimentParameters,
-                         Map<String, Object> configurationParameters) {
+    public MetadataEvent(
+            ObjectId computationId,
+            String experimentName,
+            Map<String, Object> experimentParameters,
+            Map<String, Object> configurationParameters
+    ) {
         this.computationId = computationId;
         this.experimentName = experimentName;
         this.experimentParameters = experimentParameters;
@@ -36,11 +38,13 @@ public class MetadataEvent extends Event implements Parametrized<String, Object>
     }
 
     @JsonCreator
-    private MetadataEvent(@JsonProperty("computationId") ObjectId computationId,
-                          @JsonProperty("time") Instant time,
-                          @JsonProperty("experimentName") String experimentName,
-                          @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
-                          @JsonProperty("configurationParameters") Map<String, Object> configurationParameters) {
+    private MetadataEvent(
+            @JsonProperty("computationId") ObjectId computationId,
+            @JsonProperty("time") Instant time,
+            @JsonProperty("experimentName") String experimentName,
+            @JsonProperty("experimentParameters") Map<String, Object> experimentParameters,
+            @JsonProperty("configurationParameters") Map<String, Object> configurationParameters
+    ) {
         super(time);
         this.computationId = computationId;
         this.experimentName = experimentName;

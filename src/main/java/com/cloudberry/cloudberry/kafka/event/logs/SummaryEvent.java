@@ -27,10 +27,12 @@ public class SummaryEvent extends Event {
     }
 
     @JsonCreator
-    private SummaryEvent(@JsonProperty("computationId") ObjectId computationId,
-                         @JsonProperty("time") Instant time,
-                         @JsonProperty("bestComputation") double bestComputation,
-                         @JsonProperty("computationsCount") long computationsCount) {
+    private SummaryEvent(
+            @JsonProperty("computationId") ObjectId computationId,
+            @JsonProperty("time") Instant time,
+            @JsonProperty("bestComputation") double bestComputation,
+            @JsonProperty("computationsCount") long computationsCount
+    ) {
         super(time);
         this.computationId = computationId;
         this.bestComputation = bestComputation;

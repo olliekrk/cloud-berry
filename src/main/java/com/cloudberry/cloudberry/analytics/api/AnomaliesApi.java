@@ -11,8 +11,10 @@ import java.util.List;
  */
 public interface AnomaliesApi {
 
-    List<AnomalyReport> getReportsForComputations(String fieldName,
-                                                  List<ObjectId> computationsIds,
-                                                  InfluxQueryFields influxQueryFields);
+    List<AnomalyReport> getReportsForComputations(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    );
 
 }

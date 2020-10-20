@@ -21,7 +21,7 @@ public class InfluxPropertiesService {
         );
     }
 
-    public void setDefaultBucketName(String defaultBucketName){
+    public void setDefaultBucketName(String defaultBucketName) {
         apiPropertiesService.set(ApiPropertyKey.OVERRIDDEN_DEFAULT_BUCKET_NAME, defaultBucketName);
     }
 

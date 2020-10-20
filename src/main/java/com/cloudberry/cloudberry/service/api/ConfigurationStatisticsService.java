@@ -33,7 +33,8 @@ public class ConfigurationStatisticsService {
             List<ObjectId> configurationIds
     ) {
         var configurationsSeries = configurationIds.stream()
-                .map(id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(fieldName, influxQueryFields, id))
+                .map(id -> configurationSeriesCreator
+                        .createMovingAverageConfigurationSeries(fieldName, influxQueryFields, id))
                 .collect(Collectors.toList());
 
         return analyticsApi.getBestSeriesApi().nBestSeriesFrom(
@@ -92,9 +93,11 @@ public class ConfigurationStatisticsService {
     }
 
 
-    public List<DataSeries> getConfigurationsMeans(String fieldName,
-                                                   InfluxQueryFields influxQueryFields,
-                                                   List<ObjectId> configurationIds) {
+    public List<DataSeries> getConfigurationsMeans(
+            String fieldName,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> configurationIds
+    ) {
         return ListSyntax.mapped(
                 configurationIds,
                 configurationId -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
@@ -105,16 +108,20 @@ public class ConfigurationStatisticsService {
         );
     }
 
-    public List<DataSeries> getConfigurationsMeansForExperiment(String fieldName,
-                                                                InfluxQueryFields influxQueryFields,
-                                                                String experimentName) {
+    public List<DataSeries> getConfigurationsMeansForExperiment(
+            String fieldName,
+            InfluxQueryFields influxQueryFields,
+            String experimentName
+    ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         return getConfigurationsMeans(fieldName, influxQueryFields, configurationIds);
     }
 
-    private Map<ObjectId, DataSeries> getConfigurationsSeries(String fieldName,
-                                                              InfluxQueryFields influxQueryFields,
-                                                              List<ObjectId> configurationsIds) {
+    private Map<ObjectId, DataSeries> getConfigurationsSeries(
+            String fieldName,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> configurationsIds
+    ) {
         return configurationsIds.stream().collect(Collectors.toMap(
                 Function.identity(),
                 id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(

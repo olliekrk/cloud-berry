@@ -42,8 +42,10 @@ public class ExperimentCRUServiceUpdateTest extends ExperimentCRUServiceTestBase
 
     @ParameterizedTest
     @MethodSource("provideParameters")
-    void updateParams(boolean overrideParams, Map<String, Object> newParameters,
-                      Map<String, Object> expectedParameters) {
+    void updateParams(
+            boolean overrideParams, Map<String, Object> newParameters,
+            Map<String, Object> expectedParameters
+    ) {
         var updatedExperiment =
                 experimentCRUService.update(TEST_EXPERIMENT_1.getId(), null, newParameters, overrideParams).block();
 

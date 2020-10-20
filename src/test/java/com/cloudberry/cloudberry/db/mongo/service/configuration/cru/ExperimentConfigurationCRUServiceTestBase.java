@@ -22,7 +22,8 @@ abstract class ExperimentConfigurationCRUServiceTestBase {
     public static final Map<String, Object> PARAMETERS = Map.of("price", 3000);
     protected static final ExperimentConfiguration TEST_CONFIGURATION =
             new ExperimentConfiguration(ObjectId.get(), EXPERIMENT_ID, CONFIGURATION_FILE_NAME, PARAMETERS,
-                    Instant.ofEpochSecond(10));
+                                        Instant.ofEpochSecond(10)
+            );
 
     @Autowired
     protected ExperimentConfigurationCRUService experimentConfigurationCRUService;

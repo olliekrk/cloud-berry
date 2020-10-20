@@ -39,19 +39,27 @@ public class RawDataService {
     private final InfluxConfig influxConfig;
     public static final String rawDataSeriesName = "raw_data";
 
-    public void saveData(InfluxQueryFields influxQueryFields,
-                         List<DataPoint> dataPoints) {
-        var measurementName = influxQueryFields.getMeasurementNameOptional().orElse(influxConfig.getDefaultMeasurementName());
-        var influxDataPoints = ListSyntax.mapped(dataPoints,
+    public void saveData(
+            InfluxQueryFields influxQueryFields,
+            List<DataPoint> dataPoints
+    ) {
+        var measurementName =
+                influxQueryFields.getMeasurementNameOptional().orElse(influxConfig.getDefaultMeasurementName());
+        var influxDataPoints = ListSyntax.mapped(
+                dataPoints,
                 p -> pointBuilder.buildPoint(measurementName, p.getTime(), p.getFields(), p.getTags())
         );
 
-        log.info(format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(), measurementName));
+        log.info(format("Saving %d data points to the DB with measurement name: %s", influxDataPoints.size(),
+                        measurementName
+        ));
         influxDataWriter.writePoints(influxQueryFields.getBucketName(), influxDataPoints);
     }
 
-    public DataSeries findData(InfluxQueryFields influxQueryFields,
-                               DataFilters filters) {
+    public DataSeries findData(
+            InfluxQueryFields influxQueryFields,
+            DataFilters filters
+    ) {
         var records = influxDataAccessor.findData(influxQueryFields, filters);
         var data = ListSyntax.mapped(records, FluxRecord::getValues);
         return new DataSeries(rawDataSeriesName, data);

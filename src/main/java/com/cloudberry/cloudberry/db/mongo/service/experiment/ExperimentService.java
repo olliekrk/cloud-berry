@@ -40,10 +40,12 @@ public class ExperimentService {
         return experimentCRUService.findOrCreateExperiment(experiment).block();
     }
 
-    public Experiment update(ObjectId experimentId,
-                             @Nullable String name,
-                             @Nullable Map<String, Object> newParams,
-                             boolean overrideParams) {
+    public Experiment update(
+            ObjectId experimentId,
+            @Nullable String name,
+            @Nullable Map<String, Object> newParams,
+            boolean overrideParams
+    ) {
         return experimentCRUService.update(experimentId, name, newParams, overrideParams).block();
     }
 

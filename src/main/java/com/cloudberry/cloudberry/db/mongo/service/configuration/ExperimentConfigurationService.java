@@ -46,10 +46,12 @@ public class ExperimentConfigurationService {
         return experimentConfigurationCRUService.getOrCreateConfiguration(configuration).block();
     }
 
-    public ExperimentConfiguration update(ObjectId configurationId,
-                                          @Nullable String configurationFileName,
-                                          @Nullable Map<String, Object> newParams,
-                                          boolean overrideParams) {
+    public ExperimentConfiguration update(
+            ObjectId configurationId,
+            @Nullable String configurationFileName,
+            @Nullable Map<String, Object> newParams,
+            boolean overrideParams
+    ) {
         return experimentConfigurationCRUService
                 .update(configurationId, configurationFileName, newParams, overrideParams)
                 .block();

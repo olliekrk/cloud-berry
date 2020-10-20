@@ -30,9 +30,11 @@ public class DeletionRest {
     private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
 
     @DeleteMapping("/computation")
-    void deleteComputations(@RequestParam List<String> computationIdsHex,
-                            @RequestParam(required = false) String bucketName,
-                            @RequestParam(required = false) String measurementName)
+    void deleteComputations(
+            @RequestParam List<String> computationIdsHex,
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName
+    )
             throws InvalidComputationIdException {
         val computationIds = IdDispatcher.getComputationIds(computationIdsHex);
 
@@ -41,9 +43,11 @@ public class DeletionRest {
     }
 
     @DeleteMapping("/configuration")
-    void deleteConfigurations(@RequestParam List<String> configurationIdsHex,
-                              @RequestParam(required = false) String bucketName,
-                              @RequestParam(required = false) String measurementName)
+    void deleteConfigurations(
+            @RequestParam List<String> configurationIdsHex,
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName
+    )
             throws InvalidConfigurationIdException {
         val configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
 
@@ -52,9 +56,11 @@ public class DeletionRest {
     }
 
     @DeleteMapping("/experiment")
-    void deleteExperiments(@RequestParam List<String> experimentIdsHex,
-                           @RequestParam(required = false) String bucketName,
-                           @RequestParam(required = false) String measurementName) throws InvalidExperimentIdException {
+    void deleteExperiments(
+            @RequestParam List<String> experimentIdsHex,
+            @RequestParam(required = false) String bucketName,
+            @RequestParam(required = false) String measurementName
+    ) throws InvalidExperimentIdException {
         val experimentIds = IdDispatcher.getExperimentIds(experimentIdsHex);
 
         val influxQueryFields = influxQueryFieldsResolver.get(measurementName, bucketName);

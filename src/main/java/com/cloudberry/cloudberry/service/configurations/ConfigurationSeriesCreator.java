@@ -17,9 +17,11 @@ public class ConfigurationSeriesCreator {
     private final MetadataService metadataService;
     private final InfluxUtilService influxUtilService;
 
-    public DataSeries createMovingAverageConfigurationSeries(String fieldName,
-                                                             InfluxQueryFields influxQueryFields,
-                                                             ObjectId configurationId) {
+    public DataSeries createMovingAverageConfigurationSeries(
+            String fieldName,
+            InfluxQueryFields influxQueryFields,
+            ObjectId configurationId
+    ) {
         var seriesName = getConfigurationSeriesName(configurationId);
         var computationsIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
         if (computationsIds.isEmpty()) {

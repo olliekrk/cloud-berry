@@ -31,12 +31,17 @@ public class InfluxUtilService {
      * Will return default values if there are no data points for given computationsIds
      * and therefore average interval could not be computed.
      */
-    public long averageIntervalNanos(String fieldName,
-                                     List<ObjectId> computationsIds,
-                                     InfluxQueryFields influxQueryFields) {
+    public long averageIntervalNanos(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    ) {
         var bucketName = influxQueryFields.getBucketName();
         var tagRestriction = RestrictionsFactory
-                .tagIn(InfluxDefaults.CommonTags.COMPUTATION_ID, ListSyntax.mapped(computationsIds, ObjectId::toHexString));
+                .tagIn(
+                        InfluxDefaults.CommonTags.COMPUTATION_ID,
+                        ListSyntax.mapped(computationsIds, ObjectId::toHexString)
+                );
         var restrictions = influxQueryFields.getMeasurementNameOptional()
                 .map(name -> Restrictions.and(RestrictionsFactory.measurement(name), tagRestriction))
                 .orElse(tagRestriction);
