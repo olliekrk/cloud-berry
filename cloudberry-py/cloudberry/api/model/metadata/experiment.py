@@ -1,5 +1,4 @@
 from ..str_generator import auto_str
-from typing import List
 
 
 @auto_str

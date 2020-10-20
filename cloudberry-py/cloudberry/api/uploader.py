@@ -1,8 +1,10 @@
 import json
-import requests
 from typing import List
 
+import requests
+
 from .backend import CloudberryConfig, CloudberryApi
+from .constants.constants import *
 from .json_util import JSONUtil
 
 
@@ -107,7 +109,7 @@ class CsvFileUploader(FileUploader):
 
     @staticmethod
     def __csv_details_to_params(details: CsvUploadDetails):
-        params = {'configurationIdHex': details.configuration_id}
+        params = {CONFIGURATION_ID_HEX: details.configuration_id}
         if details.computation_id is not None:
             params['computationId'] = details.computation_id
         if details.measurement_name is not None:
