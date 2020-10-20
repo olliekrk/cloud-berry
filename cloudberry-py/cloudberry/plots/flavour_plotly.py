@@ -1,20 +1,38 @@
+from enum import Enum
 from typing import Dict
 
+import numpy as np
 import plotly.graph_objects as pgo
+from sklearn.linear_model import LinearRegression
 
+from .exceptions import InvalidTrendLine
 from .properties import PlotProperties, PlotSeriesKind
 from .series import PlotSeries
+from .trendlines import TrendLine
 from .utils import PlotUtils
+
+
+class PlotlyTrendLineKind(Enum):
+    LINEAR = 'ols'
+    # REGRESSION = 'lowess'
+
+
+class PlotlyTrendLine(TrendLine):
+    def __init__(self,
+                 related_series_name: str,
+                 kind: PlotlyTrendLineKind):
+        self.related_series_name = related_series_name
+        self.kind = kind
 
 
 class PlotlyFlavourPlot:
     def __init__(self,
                  series: Dict[str, PlotSeries],
-                 trend_series: Dict[str, PlotSeries],
                  avg_series: Dict[str, PlotSeries],
+                 trends: Dict[str, TrendLine],
                  properties: PlotProperties):
         self.series = series
-        self.trends = trend_series
+        self.trends = trends
         self.averages = avg_series
         self.properties = properties
 
@@ -28,6 +46,10 @@ class PlotlyFlavourPlot:
         if self.properties.show_averages:
             for s in self.averages.values():
                 self.__add_trace(s, fig)
+
+        if self.properties.show_trends:
+            for (trend_name, trend) in self.trends.items():
+                self.__add_trend_trace(trend_name, trend, fig)
 
         self.__update_layout(fig)
         self.__update_axes(fig)
@@ -88,3 +110,39 @@ class PlotlyFlavourPlot:
             },
             overwrite=True
         )
+
+    def __add_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
+        if trend.related_series_name not in self.series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+        if not trend.kind == PlotlyTrendLineKind.LINEAR:
+            raise InvalidTrendLine(f"Other kind of trend line than linear is not implemented")
+
+        def reshape(d):
+            return d.reshape(-1, 1)
+
+        def reshape_back(d):
+            return d.reshape(1, -1)[0]
+
+        series = self.series[trend.related_series_name]
+        xs = reshape(np.array(series.data[series.x_field]))
+        ys = reshape(np.array(series.data[series.y_field]))
+
+        # https://plotly.com/python/ml-regression/
+        model = LinearRegression()
+        model.fit(xs, ys)
+
+        xs_predict = reshape(np.linspace(xs.min(), xs.max(), 100))
+        ys_predict = model.predict(xs_predict)
+
+        trace = pgo.Scatter(
+            x=reshape_back(xs_predict),
+            y=reshape_back(ys_predict),
+            name=trend_name,
+            mode='lines',
+            line={
+                'dash': 'dash',
+                'color': 'red',
+            }
+        )
+
+        fig.add_trace(trace)
