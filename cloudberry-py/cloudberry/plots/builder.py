@@ -1,7 +1,8 @@
 from typing import Dict
 
 from .exceptions import DuplicatedSeriesName, InvalidPlotsConfiguration
-from .flavours import PlottingFlavour, PlotlyFlavourPlot
+from .flavour_plotly import PlotlyFlavourPlot
+from .flavours import PlottingFlavour
 from .properties import PlotProperties
 from .series import PlotSeries
 
