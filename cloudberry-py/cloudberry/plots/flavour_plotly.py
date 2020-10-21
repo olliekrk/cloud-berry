@@ -16,14 +16,17 @@ from .utils import PlotUtils
 class PlotlyTrendLineKind(Enum):
     LINEAR = 'linear'
     KNN10 = 'knn'
+    CONST = 'const'
 
 
 class PlotlyTrendLine(TrendLine):
     def __init__(self,
                  related_series_name: str,
-                 kind: PlotlyTrendLineKind):
+                 kind: PlotlyTrendLineKind,
+                 constant: int = None):
         self.related_series_name = related_series_name
         self.kind = kind
+        self.constant = constant
 
 
 class PlotlyFlavourPlot:
@@ -113,35 +116,30 @@ class PlotlyFlavourPlot:
         )
 
     def __add_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
-        def reshape(d):
-            return d.reshape(-1, 1)
+        if trend.kind == PlotlyTrendLineKind.CONST:
+            self.__add_const_trend_trace(trend_name, trend, fig)
+        elif trend.kind == PlotlyTrendLineKind.LINEAR:
+            self.__add_ml_linear_trend_trace(trend_name, trend, fig)
+        elif trend.kind == PlotlyTrendLineKind.KNN10:
+            self.__add_ml_knn_trend_trace(trend_name, trend, fig)
 
-        def reshape_back(d):
-            return d.reshape(1, -1)[0]
-
+    def __add_ml_knn_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
         if trend.related_series_name not in self.series:
             raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
 
         series = self.series[trend.related_series_name]
         xs_base = np.array(series.data[series.x_field])
-        xs = reshape(xs_base)
-        ys = reshape(np.array(series.data[series.y_field]))
-        model = None  # https://plotly.com/python/ml-regression/
-
-        if trend.kind == PlotlyTrendLineKind.LINEAR:
-            model = PlotlyFlavourPlot.linear_regression_model()
-        elif trend.kind == PlotlyTrendLineKind.KNN10:
-            model = PlotlyFlavourPlot.knn10_regression_model(xs_base.size)
-        else:
-            raise InvalidTrendLine(f"Other kind of trend line than linear is not implemented")
+        xs = xs_base.reshape(-1, 1)
+        ys = np.array(series.data[series.y_field]).reshape(-1, 1)
+        model = KNeighborsRegressor(min(10, xs_base.size), weights='distance')
 
         model.fit(xs, ys)
-        xs_predict = reshape(np.linspace(xs.min(), xs.max(), 100))
+        xs_predict = np.linspace(xs.min(), xs.max(), 100).reshape(-1, 1)
         ys_predict = model.predict(xs_predict)
 
         trace = pgo.Scatter(
-            x=reshape_back(xs_predict),
-            y=reshape_back(ys_predict),
+            x=xs_predict.reshape(1, -1)[0],
+            y=ys_predict.reshape(1, -1)[0],
             name=trend_name,
             mode='lines',
             line={
@@ -152,10 +150,52 @@ class PlotlyFlavourPlot:
 
         fig.add_trace(trace)
 
-    @staticmethod
-    def knn10_regression_model(max_n: int):
-        return KNeighborsRegressor(min(10, max_n), weights='distance')
+    def __add_ml_linear_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
+        if trend.related_series_name not in self.series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
 
-    @staticmethod
-    def linear_regression_model():
-        return LinearRegression()
+        series = self.series[trend.related_series_name]
+        xs = np.array(series.data[series.x_field]).reshape(-1, 1)
+        ys = np.array(series.data[series.y_field]).reshape(-1, 1)
+        model = LinearRegression()
+
+        model.fit(xs, ys)
+        xs_predict = np.linspace(xs.min(), xs.max(), 100).reshape(-1, 1)
+        ys_predict = model.predict(xs_predict)
+
+        trace = pgo.Scatter(
+            x=xs_predict.reshape(1, -1)[0],
+            y=ys_predict.reshape(1, -1)[0],
+            name=trend_name,
+            mode='lines',
+            line={
+                'dash': 'dash',
+                'color': 'red',
+            }
+        )
+
+        fig.add_trace(trace)
+
+    def __add_const_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
+        if trend.related_series_name not in self.series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+        if trend.constant is None:
+            raise InvalidTrendLine(f"Constant must be specified to draw const trendline")
+
+        series = self.series[trend.related_series_name]
+        xs_range = series.data[series.x_field]
+        xs = np.linspace(xs_range.min(), xs_range.max(), 10)
+        ys = np.full(10, trend.constant)
+
+        trace = pgo.Scatter(
+            x=xs,
+            y=ys,
+            name=trend_name,
+            mode='lines',
+            line={
+                'dash': 'dash',
+                'color': 'red',
+            }
+        )
+
+        fig.add_trace(trace)
