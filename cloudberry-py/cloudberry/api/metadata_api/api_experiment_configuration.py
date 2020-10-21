@@ -2,6 +2,8 @@ from typing import List
 
 import requests
 
+from ..model.metadata.experiment import Experiment
+from ..model.metadata.experiment_computation import ExperimentComputation
 from ..model.metadata.experiment_configuration import ExperimentConfiguration
 from ...api.constants.constants import *
 
@@ -25,15 +27,15 @@ class ExperimentConfigurationApi:
         response = requests.get(url, params=params, json={})
         return ExperimentConfiguration.from_json(response.json())
 
-    def find_by_computation_id(self, computation_id: str) -> ExperimentConfiguration:
+    def find_by_computation(self, computation: ExperimentComputation) -> ExperimentConfiguration:
         url = f'{self.base_url}/byComputationId'
-        params = {COMPUTATION_ID_HEX: computation_id}
+        params = {COMPUTATION_ID_HEX: computation.computation_id_hex}
         response = requests.get(url, params=params, json={})
         return ExperimentConfiguration.from_json(response.json())
 
-    def find_by_experiment_id(self, experiment_id: str) -> List[ExperimentConfiguration]:
+    def find_by_experiment(self, experiment: Experiment) -> List[ExperimentConfiguration]:
         url = f'{self.base_url}/byExperimentId'
-        params = {EXPERIMENT_ID_HEX: experiment_id}
+        params = {EXPERIMENT_ID_HEX: experiment.experiment_id_hex}
         response = requests.get(url, params=params, json={})
         return ExperimentConfigurationApi._experiment_configuration_list_from_json(response.json())
 
@@ -47,26 +49,28 @@ class ExperimentConfigurationApi:
         response = requests.get(url, params={EXPERIMENT_NAME: name}, json={})
         return ExperimentConfigurationApi._experiment_configuration_list_from_json(response.json())
 
-    def find_or_create(self, experiment_id: str, configuration_file_name: str = None,
+    def find_or_create(self, experiment: Experiment, configuration_file_name: str = None,
                        parameters: dict = None) -> ExperimentConfiguration:
         url = f'{self.base_url}/findOrCreate'
         response = requests.post(url,
-                                 params={EXPERIMENT_ID_HEX: experiment_id,
+                                 params={EXPERIMENT_ID_HEX: experiment.experiment_id_hex,
                                          CONFIGURATION_FILE_NAME: configuration_file_name},
                                  json=parameters)
         return ExperimentConfiguration.from_json(response.json())
 
-    def update(self, configuration_id: str, configuration_file_name: str = None, parameters: dict = None,
+    def update(self, configuration: ExperimentConfiguration, configuration_file_name: str = None,
+               parameters: dict = None,
                override_params: bool = None) -> ExperimentConfiguration:
         url = f'{self.base_url}/update'
-        params = {CONFIGURATION_ID_HEX: configuration_id, CONFIGURATION_FILE_NAME: configuration_file_name,
+        params = {CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex,
+                  CONFIGURATION_FILE_NAME: configuration_file_name,
                   OVERRIDE_PARAMS: override_params}
         response = requests.put(url, params=params, json=parameters)
         return ExperimentConfiguration.from_json(response.json())
 
-    def delete_by_id(self, configuration_id: str) -> bool:
+    def delete(self, configuration: ExperimentConfiguration) -> bool:
         url = f'{self.base_url}/deleteById'
-        params = {COMPUTATION_ID_HEX: configuration_id}
+        params = {COMPUTATION_ID_HEX: configuration.experiment_configuration_id_hex}
         response = requests.delete(url, params=params, json={})
         return response.ok
 

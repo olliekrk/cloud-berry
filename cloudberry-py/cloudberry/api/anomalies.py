@@ -4,6 +4,7 @@ import requests
 
 from .backend import CloudberryApi, CloudberryConfig
 from .model import AnomalyReport
+from .model.metadata.experiment_computation import ExperimentComputation, get_ids_for_computations
 
 
 class Anomalies(CloudberryApi):
@@ -14,19 +15,19 @@ class Anomalies(CloudberryApi):
 
     def get_report(self,
                    field_name: str,
-                   computation_id: str,
+                   computation: ExperimentComputation,
                    measurement_name: str = None,
                    bucket_name: str = None) -> AnomalyReport:
-        return self.get_reports(field_name, [computation_id], measurement_name, bucket_name)[0]
+        return self.get_reports(field_name, [computation], measurement_name, bucket_name)[0]
 
     def get_reports(self,
                     field_name: str,
-                    computation_ids: List[str],
+                    computations: List[ExperimentComputation],
                     measurement_name: str = None,
                     bucket_name: str = None) -> List[AnomalyReport]:
         url = f'{self.base_url}/report/bulk'
         params = Anomalies._query_params(field_name, measurement_name, bucket_name)
-        response = requests.post(url=url, params=params, json=computation_ids)
+        response = requests.post(url=url, params=params, json=get_ids_for_computations(computations))
         return list(map(lambda json: AnomalyReport.from_json(json), response.json()))
 
     @staticmethod

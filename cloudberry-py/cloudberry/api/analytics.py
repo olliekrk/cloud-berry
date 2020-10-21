@@ -7,6 +7,8 @@ from .backend import CloudberryApi, CloudberryConfig, CloudberryException, Cloud
 from .constants.constants import *
 from .json_util import JSONUtil
 from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds, ThresholdsType
+from .model.metadata.experiment_computation import ExperimentComputation, get_ids_for_computations
+from .model.metadata.experiment_configuration import ExperimentConfiguration, get_ids_for_configurations
 
 
 class Analytics(CloudberryApi):
@@ -17,26 +19,26 @@ class Analytics(CloudberryApi):
         self.configurations = ConfigurationsAnalytics(config)
 
     def compare_computations(self,
-                             computation_ids: List[str],
+                             computations: List[ExperimentComputation],
                              field_name: str,
                              measurement_name: str = None,
                              bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.comparison(computation_ids, field_name, measurement_name, bucket_name)
+        return self.computations.comparison(computations, field_name, measurement_name, bucket_name)
 
     def compare_computations_for_configuration(self,
-                                               configuration_id: str,
+                                               configuration: ExperimentConfiguration,
                                                field_name: str,
                                                measurement_name: str = None,
                                                bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.comparison_for_configuration(configuration_id, field_name, measurement_name,
+        return self.computations.comparison_for_configuration(configuration, field_name, measurement_name,
                                                               bucket_name)
 
     def compare_configurations(self,
-                               configuration_ids: list,
+                               configurations: List[ExperimentConfiguration],
                                field_name: str,
                                measurement_name: str = None,
                                bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.comparison(configuration_ids, field_name, measurement_name, bucket_name)
+        return self.configurations.comparison(configurations, field_name, measurement_name, bucket_name)
 
     def compare_configurations_for_experiment(self,
                                               experiment_name: str,
@@ -57,23 +59,23 @@ class Analytics(CloudberryApi):
     def best_n_computations_for_configuration(self,
                                               n: int,
                                               field_name: str,
-                                              configuration_id: str,
+                                              configuration: ExperimentConfiguration,
                                               goal: OptimizationGoal,
                                               kind: OptimizationKind,
                                               measurement_name: str = None,
                                               bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.best_n_for_configuration(n, field_name, configuration_id, goal, kind, measurement_name,
+        return self.computations.best_n_for_configuration(n, field_name, configuration, goal, kind, measurement_name,
                                                           bucket_name)
 
     def best_n_configurations(self,
                               n: int,
                               field_name: str,
-                              configuration_ids: List[str],
+                              configurations: List[ExperimentConfiguration],
                               goal: OptimizationGoal,
                               kind: OptimizationKind,
                               measurement_name: str = None,
                               bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.best_n(n, field_name, configuration_ids, goal, kind, measurement_name, bucket_name)
+        return self.configurations.best_n(n, field_name, configurations, goal, kind, measurement_name, bucket_name)
 
     def best_n_configurations_for_experiment(self,
                                              n: int,
@@ -87,13 +89,13 @@ class Analytics(CloudberryApi):
                                                          bucket_name)
 
     def avg_and_stddev_for_computations(self,
-                                        computation_ids: List[str],
+                                        computations: List[ExperimentComputation],
                                         field_name: str,
                                         interval: int,
                                         time_unit: TimeUnit,
                                         measurement_name: str = None,
                                         bucket_name: str = None) -> DataSeries:
-        return self.computations.avg_and_std_dev(computation_ids, field_name, interval, time_unit, measurement_name,
+        return self.computations.avg_and_std_dev(computations, field_name, interval, time_unit, measurement_name,
                                                  bucket_name)
 
     def thresholds_exceeding_computations(self,
@@ -107,23 +109,23 @@ class Analytics(CloudberryApi):
 
     def thresholds_exceeding_computations_for_configuration(self,
                                                             field_name: str,
-                                                            configuration_id: str,
+                                                            configuration: ExperimentConfiguration,
                                                             criteria_mode: CriteriaMode,
                                                             thresholds: Thresholds,
                                                             measurement_name: str = None,
                                                             bucket_name: str = None) -> List[DataSeries]:
-        self.computations.exceeding_thresholds_for_configuration(field_name, configuration_id, criteria_mode,
-                                                                 thresholds, measurement_name, bucket_name)
+        return self.computations.exceeding_thresholds_for_configuration(field_name, configuration, criteria_mode,
+                                                                        thresholds, measurement_name, bucket_name)
 
     def thresholds_exceeding_computations_relatively(self,
                                                      field_name: str,
-                                                     configuration_id: str,
+                                                     configuration: ExperimentConfiguration,
                                                      criteria_mode: CriteriaMode,
                                                      thresholds: Thresholds,
                                                      thresholds_type: ThresholdsType,
                                                      measurement_name: str = None,
                                                      bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.exceeding_thresholds_relatively(field_name, configuration_id, criteria_mode,
+        return self.computations.exceeding_thresholds_relatively(field_name, configuration, criteria_mode,
                                                                  thresholds, thresholds_type,
                                                                  measurement_name, bucket_name)
 
@@ -131,10 +133,10 @@ class Analytics(CloudberryApi):
                                             field_name: str,
                                             criteria_mode: CriteriaMode,
                                             thresholds: Thresholds,
-                                            configuration_ids: List[str],
+                                            configurations: List[ExperimentConfiguration],
                                             measurement_name: str = None,
                                             bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.exceeding_thresholds(field_name, criteria_mode, thresholds, configuration_ids,
+        return self.configurations.exceeding_thresholds(field_name, criteria_mode, thresholds, configurations,
                                                         measurement_name, bucket_name)
 
     def thresholds_exceeding_configurations_for_experiment(self,
@@ -154,7 +156,7 @@ class ComputationsAnalytics(CloudberryApi):
         self.base_url = f'{config.base_url()}/statistics/computations'
 
     def comparison(self,
-                   computation_ids: List[str],
+                   computations: List[ExperimentComputation],
                    field_name: str,
                    measurement_name: str = None,
                    bucket_name: str = None) -> List[DataSeries]:
@@ -162,17 +164,18 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name
         }, measurement_name, bucket_name)
-        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params, json=computation_ids))
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params,
+                                                                       json=get_ids_for_computations(computations)))
 
     def comparison_for_configuration(self,
-                                     configuration_id: str,
+                                     configuration: ExperimentConfiguration,
                                      field_name: str,
                                      measurement_name: str = None,
                                      bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/comparisonForConfiguration'
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name,
-            CONFIGURATION_ID_HEX: configuration_id
+            CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params))
 
@@ -195,7 +198,7 @@ class ComputationsAnalytics(CloudberryApi):
     def best_n_for_configuration(self,
                                  n: int,
                                  field_name: str,
-                                 configuration_id: str,
+                                 configuration: ExperimentConfiguration,
                                  goal: OptimizationGoal,
                                  kind: OptimizationKind,
                                  measurement_name: str = None,
@@ -204,14 +207,14 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'n': n,
             'fieldName': field_name,
-            CONFIGURATION_ID_HEX: configuration_id,
+            CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex,
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.get(url=url, params=params))
 
     def avg_and_std_dev(self,
-                        computation_ids: List[str],
+                        computations: List[ExperimentComputation],
                         field_name: str,
                         interval: int,
                         time_unit: TimeUnit,
@@ -228,7 +231,7 @@ class ComputationsAnalytics(CloudberryApi):
         series = AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,
             params=params,
-            json=computation_ids
+            json=get_ids_for_computations(computations)
         ))
 
         def get_series(name):
@@ -259,7 +262,7 @@ class ComputationsAnalytics(CloudberryApi):
 
     def exceeding_thresholds_for_configuration(self,
                                                field_name: str,
-                                               configuration_id: str,
+                                               configuration: ExperimentConfiguration,
                                                criteria_mode: CriteriaMode,
                                                thresholds: Thresholds,
                                                measurement_name: str = None,
@@ -268,7 +271,7 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name,
             'mode': criteria_mode.name,
-            CONFIGURATION_ID_HEX: configuration_id,
+            CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,
@@ -278,7 +281,7 @@ class ComputationsAnalytics(CloudberryApi):
 
     def exceeding_thresholds_relatively(self,
                                         field_name: str,
-                                        configuration_id: str,
+                                        configuration: ExperimentConfiguration,
                                         criteria_mode: CriteriaMode,
                                         thresholds: Thresholds,
                                         thresholds_type: ThresholdsType,
@@ -289,7 +292,7 @@ class ComputationsAnalytics(CloudberryApi):
             'fieldName': field_name,
             'mode': criteria_mode.name,
             'thresholdsType': thresholds_type.name,
-            CONFIGURATION_ID_HEX: configuration_id,
+            CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,
@@ -304,7 +307,7 @@ class ConfigurationsAnalytics(CloudberryApi):
         self.base_url = f'{config.base_url()}/statistics/configurations'
 
     def comparison(self,
-                   configuration_ids: List[str],
+                   configurations: List[ExperimentConfiguration],
                    field_name: str,
                    measurement_name: str = None,
                    bucket_name: str = None) -> List[DataSeries]:
@@ -312,7 +315,8 @@ class ConfigurationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name
         }, measurement_name, bucket_name)
-        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params, json=configuration_ids))
+        return AnalyticsUtil.wrap_series_request(
+            lambda: requests.post(url=url, params=params, json=get_ids_for_configurations(configurations)))
 
     def comparison_for_experiment(self,
                                   experiment_name: str,
@@ -329,7 +333,7 @@ class ConfigurationsAnalytics(CloudberryApi):
     def best_n(self,
                n: int,
                field_name: str,
-               configuration_ids: List[str],
+               configurations: List[ExperimentConfiguration],
                goal: OptimizationGoal,
                kind: OptimizationKind,
                measurement_name: str = None,
@@ -341,7 +345,8 @@ class ConfigurationsAnalytics(CloudberryApi):
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
-        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params, json=configuration_ids))
+        return AnalyticsUtil.wrap_series_request(
+            lambda: requests.post(url=url, params=params, json=get_ids_for_configurations(configurations)))
 
     def best_n_for_experiment(self,
                               n: int,
@@ -365,7 +370,7 @@ class ConfigurationsAnalytics(CloudberryApi):
                              field_name: str,
                              criteria_mode: CriteriaMode,
                              thresholds: Thresholds,
-                             configuration_ids: List[str],
+                             configurations: List[ExperimentConfiguration],
                              measurement_name: str = None,
                              bucket_name: str = None) -> List[DataSeries]:
         url = f'{self.base_url}/exceedingThresholds'
@@ -378,7 +383,7 @@ class ConfigurationsAnalytics(CloudberryApi):
             params=params,
             files={
                 'thresholds': JSONUtil.multipart_payload(thresholds.__dict__),
-                'configurationIdsHex': JSONUtil.multipart_payload(configuration_ids),
+                'configurationIdsHex': JSONUtil.multipart_payload(get_ids_for_configurations(configurations)),
             }
         ))
 

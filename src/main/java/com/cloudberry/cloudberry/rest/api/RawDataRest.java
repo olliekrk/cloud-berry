@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.rest.api;
 import com.cloudberry.cloudberry.analytics.model.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.DataSeries;
 import com.cloudberry.cloudberry.db.influx.model.DataFilters;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
@@ -72,7 +73,7 @@ public class RawDataRest {
     }
 
     @PostMapping(value = "/ageFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ObjectId uploadAgeFile(
+    public ExperimentComputation uploadAgeFile(
             @PathVariable String experimentName,
             @RequestPart MultipartFile file,
             @RequestPart(required = false) Map<String, String> headersKeys,
@@ -84,7 +85,7 @@ public class RawDataRest {
     }
 
     @PostMapping(value = "/csvFile/{experimentName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ObjectId uploadCsvFile(
+    public ExperimentComputation uploadCsvFile(
             @PathVariable String experimentName,
             @RequestPart MultipartFile file,
             @RequestPart(name = "tags", required = false) List<String> tagsParam,

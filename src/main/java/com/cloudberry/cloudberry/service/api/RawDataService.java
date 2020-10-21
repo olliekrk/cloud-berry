@@ -10,6 +10,7 @@ import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataAccessor;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataRemover;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsImporter;
@@ -69,7 +70,9 @@ public class RawDataService {
         influxDataRemover.deleteData(influxQueryFields, filters.getTagFilters());
     }
 
-    public ObjectId uploadAgeFile(MultipartFile file, String experimentName, AgeUploadDetails uploadDetails) {
+    public ExperimentComputation uploadAgeFile(
+            MultipartFile file, String experimentName, AgeUploadDetails uploadDetails
+    ) {
         return Try.of(() -> FileSystemUtils.withTemporaryFile(file, tmpFilePath ->
                 Try.of(() -> logsImporter
                         .importAgeFile(tmpFilePath.toFile(), experimentName, uploadDetails))
@@ -77,7 +80,9 @@ public class RawDataService {
                 .getOrElseThrow(FileImportException::new);
     }
 
-    public ObjectId uploadCsvFile(MultipartFile file, String experimentName, CsvUploadDetails uploadDetails) {
+    public ExperimentComputation uploadCsvFile(
+            MultipartFile file, String experimentName, CsvUploadDetails uploadDetails
+    ) {
         return Try.of(() -> FileSystemUtils.withTemporaryFile(file, tmpFilePath ->
                 Try.of(() -> logsImporter
                         .importCsvFile(tmpFilePath.toFile(), experimentName, uploadDetails))

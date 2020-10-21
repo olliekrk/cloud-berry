@@ -1,3 +1,5 @@
+from typing import List
+
 from ..str_generator import auto_str
 
 
@@ -21,3 +23,7 @@ class Experiment:
             json_dict['parameters'],
             json_dict['time'],
         )
+
+
+def get_ids_for_experiments(experiments: List[Experiment]):
+    return list(map(lambda experiment: experiment.experiment_id_hex, experiments))

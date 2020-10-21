@@ -3,6 +3,8 @@ from typing import List
 import requests
 
 from ..model.metadata.experiment import Experiment
+from ..model.metadata.experiment_computation import ExperimentComputation
+from ..model.metadata.experiment_configuration import ExperimentConfiguration
 from ...api.constants.constants import *
 
 OVERRIDE_PARAMS = 'overrideParams'
@@ -24,15 +26,15 @@ class ExperimentApi:
         response = requests.get(url, params=params, json={})
         return Experiment.from_json(response.json())
 
-    def find_by_computation_id(self, computation_id: str) -> Experiment:
+    def find_by_computation(self, computation: ExperimentComputation) -> Experiment:
         url = f'{self.base_url}/byComputationId'
-        params = {COMPUTATION_ID_HEX: computation_id}
+        params = {COMPUTATION_ID_HEX: computation.computation_id_hex}
         response = requests.get(url, params=params, json={})
         return Experiment.from_json(response.json())
 
-    def find_by_configuration_id(self, experiment_id: str) -> Experiment:
+    def find_by_configuration(self, configuration: ExperimentConfiguration) -> Experiment:
         url = f'{self.base_url}/byConfigurationId'
-        params = {CONFIGURATION_ID_HEX: experiment_id}
+        params = {CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex}
         response = requests.get(url, params=params, json={})
         return Experiment.from_json(response.json())
 
@@ -46,16 +48,16 @@ class ExperimentApi:
         response = requests.post(url, params={NAME: name}, json=parameters)
         return Experiment.from_json(response.json())
 
-    def update(self, experiment_id: str, name: str = None, parameters: dict = None,
+    def update(self, experiment: Experiment, name: str = None, parameters: dict = None,
                override_params: bool = None) -> Experiment:
         url = f'{self.base_url}/update'
-        params = {EXPERIMENT_ID_HEX: experiment_id, NAME: name, OVERRIDE_PARAMS: override_params}
+        params = {EXPERIMENT_ID_HEX: experiment.experiment_id_hex, NAME: name, OVERRIDE_PARAMS: override_params}
         response = requests.put(url, params=params, json=parameters)
         return Experiment.from_json(response.json())
 
-    def delete_by_id(self, experiment_id: str) -> bool:
+    def delete(self, experiment: Experiment) -> bool:
         url = f'{self.base_url}/deleteById'
-        params = {EXPERIMENT_ID_HEX: experiment_id}
+        params = {EXPERIMENT_ID_HEX: experiment.experiment_id_hex}
         response = requests.delete(url, params=params, json={})
         return response.ok
 

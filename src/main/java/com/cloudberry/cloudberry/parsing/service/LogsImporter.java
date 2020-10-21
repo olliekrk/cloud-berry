@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.parsing.service;
 
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
+import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.age.AgeLogsParser;
@@ -25,9 +26,9 @@ public class LogsImporter {
     private final CsvLogsParser csvLogsParser;
 
     /**
-     * Import file in AgE-specific format as computation data and return id of saved computation.
+     * Import file in AgE-specific format as computation data and return saved computation.
      */
-    public ObjectId importAgeFile(
+    public ExperimentComputation importAgeFile(
             File file,
             String experimentName,
             AgeUploadDetails uploadDetails
@@ -37,10 +38,10 @@ public class LogsImporter {
         final var parsedDataWithMetadata =
                 logsMetadataAppender.appendMetadata(parsedData, experimentName);
         influxDataWriter.writePoints(parsedDataWithMetadata.getBucketName(), parsedDataWithMetadata.getPoints());
-        return parsedDataWithMetadata.getExperimentComputation().getId();
+        return parsedDataWithMetadata.getExperimentComputation();
     }
 
-    public ObjectId importCsvFile(
+    public ExperimentComputation importCsvFile(
             File file,
             String experimentName,
             CsvUploadDetails uploadDetails
@@ -55,7 +56,7 @@ public class LogsImporter {
                         uploadDetails.getComputationId()
                 );
         influxDataWriter.writePoints(parsedDataWithMetadata.getBucketName(), parsedDataWithMetadata.getPoints());
-        return parsedDataWithMetadata.getExperimentComputation().getId();
+        return parsedDataWithMetadata.getExperimentComputation();
     }
 
 }

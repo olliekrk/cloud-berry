@@ -6,6 +6,8 @@ import requests
 from .backend import CloudberryConfig, CloudberryApi
 from .constants.constants import *
 from .json_util import JSONUtil
+from .model.metadata.experiment_computation import ExperimentComputation
+from .model.metadata.experiment_configuration import ExperimentConfiguration
 
 
 class UploadDetails:
@@ -17,7 +19,7 @@ class FileUploader(CloudberryApi):
     def __init__(self, config: CloudberryConfig) -> None:
         super().__init__(config)
 
-    def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails):
+    def upload_file(self, file_path: str, experiment_name: str, details: UploadDetails) -> ExperimentComputation:
         """Upload experiment data from file under given path and return ID of saved computation"""
         pass
 
@@ -34,7 +36,7 @@ class AgeUploadDetails(UploadDetails):
 
 class AgeFileUploader(FileUploader):
 
-    def upload_file(self, file_path: str, experiment_name: str, details: AgeUploadDetails) -> str:
+    def upload_file(self, file_path: str, experiment_name: str, details: AgeUploadDetails) -> ExperimentComputation:
         with open(file_path, 'rb') as file:
             url = f'{self.config.base_url()}/raw/ageFile/{experiment_name}'
             params = {}
@@ -49,19 +51,19 @@ class AgeFileUploader(FileUploader):
                 },
                 params=params
             )
-            return r.json()
+            return ExperimentComputation.from_json(r.json())
 
 
 class CsvUploadDetails(UploadDetails):
 
     def __init__(self,
                  tags_names,
-                 configuration_id,
-                 computation_id=None,
+                 configuration: ExperimentConfiguration,
+                 computation: ExperimentComputation = None,
                  measurement_name=None) -> None:
         self.tags_names = tags_names
-        self.configuration_id = configuration_id
-        self.computation_id = computation_id
+        self.configuration = configuration
+        self.computation = computation
         self.measurement_name = measurement_name
 
 
@@ -71,7 +73,7 @@ class CsvFileUploader(FileUploader):
                                     file_path: str,
                                     experiment_name: str,
                                     details: CsvUploadDetails,
-                                    headers: List[str]):
+                                    headers: List[str]) -> ExperimentComputation:
         payload = {
             'tags': CsvFileUploader.__payload_json(details.tags_names),
             'headers': CsvFileUploader.__payload_json(headers),
@@ -84,7 +86,7 @@ class CsvFileUploader(FileUploader):
     def upload_file(self,
                     file_path: str,
                     experiment_name: str,
-                    details: CsvUploadDetails):
+                    details: CsvUploadDetails) -> ExperimentComputation:
         payload = {
             'tags': CsvFileUploader.__payload_json(details.tags_names),
         }
@@ -98,20 +100,20 @@ class CsvFileUploader(FileUploader):
                       experiment_name: str,
                       details: CsvUploadDetails,
                       payload: dict,
-                      params: dict):
+                      params: dict) -> ExperimentComputation:
         with open(file_path, 'rb') as file:
             details_params = CsvFileUploader.__csv_details_to_params(details)
             all_params = {**details_params, **params}
             payload['file'] = file
             upload_url = f'{self.config.base_url()}/raw/csvFile/{experiment_name}'
             r = requests.post(upload_url, files=payload, params=all_params)
-            return r.json()
+            return ExperimentComputation.from_json(r.json())
 
     @staticmethod
     def __csv_details_to_params(details: CsvUploadDetails):
-        params = {CONFIGURATION_ID_HEX: details.configuration_id}
-        if details.computation_id is not None:
-            params['computationId'] = details.computation_id
+        params = {CONFIGURATION_ID_HEX: details.configuration.experiment_configuration_id_hex}
+        if details.computation is not None:
+            params['computationId'] = details.computation.computation_id_hex
         if details.measurement_name is not None:
             params['measurementName'] = details.measurement_name
         return params

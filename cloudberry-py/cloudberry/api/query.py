@@ -1,6 +1,7 @@
-from .model import DataSeries
-from .backend import CloudberryConfig, CloudberryApi
 import requests
+
+from .backend import CloudberryConfig, CloudberryApi
+from .model import DataSeries
 
 
 class Query(CloudberryApi):
