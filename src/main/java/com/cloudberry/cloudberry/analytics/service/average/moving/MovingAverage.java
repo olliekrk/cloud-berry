@@ -35,9 +35,11 @@ public abstract class MovingAverage implements MovingAverageApi {
     /**
      * Query the DB & create {{@link DataSeries}} from result having only _time & _value fields.
      */
-    protected DataSeries queryTimeValueSeries(Flux query,
-                                              String seriesName,
-                                              String fieldName) {
+    protected DataSeries queryTimeValueSeries(
+            Flux query,
+            String seriesName,
+            String fieldName
+    ) {
         return influxClient
                 .getQueryApi()
                 .query(query.toString())
@@ -48,16 +50,19 @@ public abstract class MovingAverage implements MovingAverageApi {
                             record -> Map.of(
                                     InfluxDefaults.Columns.TIME, record.getTime(),
                                     fieldName, record.getValue()
-                            ));
+                            )
+                    );
                     return new DataSeries(seriesName, data);
                 })
                 .findAny()
                 .orElse(DataSeries.empty(seriesName));
     }
 
-    protected Restrictions getRestrictions(InfluxQueryFields influxQueryFields,
-                                           List<ObjectId> computationsIds,
-                                           String fieldName) {
+    protected Restrictions getRestrictions(
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> computationsIds,
+            String fieldName
+    ) {
         return RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField),

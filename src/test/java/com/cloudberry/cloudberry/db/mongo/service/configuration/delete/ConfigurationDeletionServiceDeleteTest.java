@@ -46,8 +46,10 @@ public class ConfigurationDeletionServiceDeleteTest extends ConfigurationDeletio
         assertProperEntitiesInDb(expectedConfigurations, expectedComputations);
     }
 
-    private void assertProperEntitiesInDb(List<ExperimentConfiguration> expectedConfigurations,
-                                          List<ExperimentComputation> expectedComputations) {
+    private void assertProperEntitiesInDb(
+            List<ExperimentConfiguration> expectedConfigurations,
+            List<ExperimentComputation> expectedComputations
+    ) {
         var actualConfigurations = configurationRepository.findAll().collectList().block();
         var actualComputations = computationRepository.findAll().collectList().block();
 

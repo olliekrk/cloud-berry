@@ -20,7 +20,8 @@ public class ExperimentMetaDeletionService {
     public Flux<Void> deleteExperimentById(List<ObjectId> experimentIds) {
         final Flux<ObjectId> fluxWithExperimentIds = Flux.fromIterable(experimentIds);
         final Flux<ObjectId> fluxWithExperimentIdsRemoval = createFluxWithExperimentRemoval(fluxWithExperimentIds);
-        return experimentConfigurationMetaDeletionService.createFluxWithConfigurationRemoval(fluxWithExperimentIdsRemoval);
+        return experimentConfigurationMetaDeletionService
+                .createFluxWithConfigurationRemoval(fluxWithExperimentIdsRemoval);
     }
 
     /**

@@ -30,9 +30,11 @@ public class AnomaliesSupplier implements AnomaliesApi {
     private final InfluxDBClient influxClient;
 
     @Override
-    public List<AnomalyReport> getReportsForComputations(String fieldName,
-                                                         List<ObjectId> computationsIds,
-                                                         InfluxQueryFields influxQueryFields) {
+    public List<AnomalyReport> getReportsForComputations(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    ) {
         val restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField),
@@ -64,7 +66,8 @@ public class AnomaliesSupplier implements AnomaliesApi {
                 .query(queryPrefix + query.toString())
                 .stream()
                 .flatMap(table -> FluxUtils.tableToSingleValue(table, record -> {
-                    val computationId = new ObjectId((String) Objects.requireNonNull(record.getValueByKey(InfluxDefaults.CommonTags.COMPUTATION_ID)));
+                    val computationId = new ObjectId((String) Objects
+                            .requireNonNull(record.getValueByKey(InfluxDefaults.CommonTags.COMPUTATION_ID)));
                     val value = (Double) record.getValue();
                     return Tuple.of(computationId, value);
                 }))

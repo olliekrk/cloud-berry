@@ -21,7 +21,8 @@ public class ComputationMetaDeletionService {
 
     @NotNull
     public Flux<Void> createFluxWithComputationRemovalByConfigurationIds(
-            @NotNull Flux<ObjectId> fluxWithConfigurationIds) {
+            @NotNull Flux<ObjectId> fluxWithConfigurationIds
+    ) {
         return fluxWithConfigurationIds
                 .flatMap(computationRepository::deleteByConfigurationId);
     }

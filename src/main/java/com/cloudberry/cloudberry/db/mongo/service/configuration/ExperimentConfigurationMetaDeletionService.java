@@ -49,6 +49,7 @@ public class ExperimentConfigurationMetaDeletionService {
 
     @NotNull
     private Flux<Void> computationRemoval(Flux<ObjectId> fluxWithConfigurationsIds) {
-        return computationMetaDeletionService.createFluxWithComputationRemovalByConfigurationIds(fluxWithConfigurationsIds);
+        return computationMetaDeletionService
+                .createFluxWithComputationRemovalByConfigurationIds(fluxWithConfigurationsIds);
     }
 }

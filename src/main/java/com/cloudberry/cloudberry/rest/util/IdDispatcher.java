@@ -18,8 +18,7 @@ public final class IdDispatcher {
     public static List<ObjectId> getConfigurationIds(List<String> configurationIdsHex)
             throws InvalidConfigurationIdException {
         var configurationIds = RestParametersUtil.getValidIds(configurationIdsHex);
-        if (configurationIds.isEmpty())
-            throw new InvalidConfigurationIdException(configurationIdsHex);
+        if (configurationIds.isEmpty()) { throw new InvalidConfigurationIdException(configurationIdsHex); }
         return configurationIds;
     }
 
@@ -31,8 +30,7 @@ public final class IdDispatcher {
 
     public static List<ObjectId> getExperimentIds(List<String> experimentsIdHex) throws InvalidExperimentIdException {
         var experimentIds = RestParametersUtil.getValidIds(experimentsIdHex);
-        if (experimentIds.isEmpty())
-            throw new InvalidExperimentIdException(experimentsIdHex);
+        if (experimentIds.isEmpty()) { throw new InvalidExperimentIdException(experimentsIdHex); }
         return experimentIds;
     }
 
@@ -45,8 +43,7 @@ public final class IdDispatcher {
     public static List<ObjectId> getComputationIds(List<String> computationIdsHex)
             throws InvalidComputationIdException {
         var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
-        if (computationIds.isEmpty())
-            throw new InvalidComputationIdException(computationIdsHex);
+        if (computationIds.isEmpty()) { throw new InvalidComputationIdException(computationIdsHex); }
         return computationIds;
     }
 }

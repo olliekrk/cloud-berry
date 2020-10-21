@@ -21,9 +21,11 @@ public abstract class MapSyntax {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v, v2) -> v2));
     }
 
-    public static <K, V> Map<K, V> getNewParamsMap(Map<K, V> newParams,
-                                                   Map<K, V> prevParams,
-                                                   boolean overrideParams) {
+    public static <K, V> Map<K, V> getNewParamsMap(
+            Map<K, V> newParams,
+            Map<K, V> prevParams,
+            boolean overrideParams
+    ) {
         return overrideParams ? newParams : merged(prevParams, newParams);
     }
 

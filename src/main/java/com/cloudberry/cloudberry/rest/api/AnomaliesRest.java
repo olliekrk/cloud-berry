@@ -22,10 +22,11 @@ public class AnomaliesRest {
     private final AnomaliesService anomaliesService;
 
     @PostMapping("/report/bulk")
-    public List<AnomalyReport> getReports(@RequestParam String fieldName,
-                                          @RequestParam(required = false) String measurementName,
-                                          @RequestParam(required = false) String bucketName,
-                                          @RequestBody List<String> computationIdsHex
+    public List<AnomalyReport> getReports(
+            @RequestParam String fieldName,
+            @RequestParam(required = false) String measurementName,
+            @RequestParam(required = false) String bucketName,
+            @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
         var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
 

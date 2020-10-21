@@ -35,7 +35,8 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
     }
 
     @Override
-    public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails, String defaultMeasurementName) throws IOException {
+    public AgeParsedLogs parseFile(File file, AgeUploadDetails uploadDetails, String defaultMeasurementName)
+            throws IOException {
         var logHeadersKeys = uploadDetails.getHeadersKeys();
         var logMeasurements = uploadDetails.getHeadersMeasurements();
         var logParametersOrder = new HashMap<String, String[]>();
@@ -100,9 +101,11 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                 );
     }
 
-    private Point getMeasurementPoint(String[] parametersNames,
-                                      String[] parametersValuesRaw,
-                                      String measurementName) {
+    private Point getMeasurementPoint(
+            String[] parametersNames,
+            String[] parametersValuesRaw,
+            String measurementName
+    ) {
         var parametersNamesList = ArraySyntax.linkedList(parametersNames);
         var parametersValues = ArraySyntax.linkedList(parametersValuesRaw);
 

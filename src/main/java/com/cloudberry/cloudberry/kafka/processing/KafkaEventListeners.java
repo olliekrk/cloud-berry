@@ -24,32 +24,42 @@ public class KafkaEventListeners {
     private final EventProcessor<Event> logsEventProcessor;
 
     @KafkaListener(topics = KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC)
-    public void problemDefinitionListener(ConsumerRecord<String, MetadataEvent> consumer,
-                                          @Payload MetadataEvent event) {
+    public void problemDefinitionListener(
+            ConsumerRecord<String, MetadataEvent> consumer,
+            @Payload MetadataEvent event
+    ) {
         metadataEventProcessor.process(event);
     }
 
     @KafkaListener(topics = KafkaTopics.Logs.WORKPLACE_TOPIC)
-    public void workplaceListener(ConsumerRecord<String, WorkplaceEvent> consumer,
-                                  @Payload WorkplaceEvent event) {
+    public void workplaceListener(
+            ConsumerRecord<String, WorkplaceEvent> consumer,
+            @Payload WorkplaceEvent event
+    ) {
         logsEventProcessor.process(event);
     }
 
     @KafkaListener(topics = KafkaTopics.Logs.SUMMARY_TOPIC)
-    public void summaryListener(ConsumerRecord<String, SummaryEvent> consumer,
-                                @Payload SummaryEvent event) {
+    public void summaryListener(
+            ConsumerRecord<String, SummaryEvent> consumer,
+            @Payload SummaryEvent event
+    ) {
         logsEventProcessor.process(event);
     }
 
     @KafkaListener(topics = KafkaTopics.Logs.BEST_SOLUTION_TOPIC)
-    public void bestSolutionListener(ConsumerRecord<String, BestSolutionEvent> consumer,
-                                     @Payload BestSolutionEvent event) {
+    public void bestSolutionListener(
+            ConsumerRecord<String, BestSolutionEvent> consumer,
+            @Payload BestSolutionEvent event
+    ) {
         logsEventProcessor.process(event);
     }
 
     @KafkaListener(topics = KafkaTopics.Generic.COMPUTATION_TOPIC)
-    public void computationListener(ConsumerRecord<String, ComputationEvent> consumer,
-                                    @Payload ComputationEvent event) {
+    public void computationListener(
+            ConsumerRecord<String, ComputationEvent> consumer,
+            @Payload ComputationEvent event
+    ) {
         computationEventProcessor.process(event);
     }
 

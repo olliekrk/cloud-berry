@@ -34,17 +34,19 @@ public class ExperimentCRUService {
         return experimentRepository
                 .findById(experiment.getId())
                 .switchIfEmpty(experimentRepository
-                        .findAllByNameAndParameters(experiment.getName(), experiment.getParameters())
-                        .limitRequest(1)
-                        .next())
+                                       .findAllByNameAndParameters(experiment.getName(), experiment.getParameters())
+                                       .limitRequest(1)
+                                       .next())
                 .doOnNext(next -> log.info("Existing experiment {} was found", next.getId()))
                 .switchIfEmpty(saveNewExperiment(experiment));
     }
 
-    public Mono<Experiment> update(ObjectId experimentId,
-                                   @Nullable String name,
-                                   @Nullable Map<String, Object> newParams,
-                                   boolean overrideParams) {
+    public Mono<Experiment> update(
+            ObjectId experimentId,
+            @Nullable String name,
+            @Nullable Map<String, Object> newParams,
+            boolean overrideParams
+    ) {
         return experimentRepository.findById(experimentId)
                 .map(updateExperiment(name, newParams, overrideParams))
                 .flatMap(experimentRepository::save)
@@ -58,16 +60,18 @@ public class ExperimentCRUService {
     }
 
     @NotNull
-    private Function<Experiment, Experiment> updateExperiment(@Nullable String name,
-                                                              @Nullable Map<String, Object> newParams,
-                                                              boolean overrideParams) {
+    private Function<Experiment, Experiment> updateExperiment(
+            @Nullable String name,
+            @Nullable Map<String, Object> newParams,
+            boolean overrideParams
+    ) {
         return experiment -> {
             val prevParams = experiment.getParameters();
             return experiment
                     .withName(name != null ? name : experiment.getName())
                     .withParameters(newParams != null
-                            ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
-                            : prevParams);
+                                            ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
+                                            : prevParams);
         };
     }
 

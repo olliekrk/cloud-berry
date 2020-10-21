@@ -14,7 +14,8 @@ public class SolutionDetails {
     public SolutionDetails(
             @JsonProperty("workplaceId") long workplaceId,
             @JsonProperty("stepNumber") long stepNumber,
-            @JsonProperty("occurrencesCount") long occurrencesCount) {
+            @JsonProperty("occurrencesCount") long occurrencesCount
+    ) {
         this.workplaceId = workplaceId;
         this.stepNumber = stepNumber;
         this.occurrencesCount = occurrencesCount;

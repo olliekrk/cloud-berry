@@ -1,3 +1,7 @@
+from .str_generator import auto_str
+
+
+@auto_str
 class AnomalyReport:
     def __init__(self,
                  computation_id,

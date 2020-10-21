@@ -17,9 +17,11 @@ public class DataPoint {
     private Map<String, String> tags;
 
     @JsonCreator
-    public DataPoint(@JsonProperty("time") Instant time,
-                     @JsonProperty("fields") Map<String, Object> fields,
-                     @JsonProperty("tags") Map<String, String> tags) {
+    public DataPoint(
+            @JsonProperty("time") Instant time,
+            @JsonProperty("fields") Map<String, Object> fields,
+            @JsonProperty("tags") Map<String, String> tags
+    ) {
         this.time = time;
         this.fields = fields;
         this.tags = tags;

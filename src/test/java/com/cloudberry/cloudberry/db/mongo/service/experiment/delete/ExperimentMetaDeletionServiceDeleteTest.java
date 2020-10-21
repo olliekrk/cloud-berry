@@ -69,9 +69,11 @@ public class ExperimentMetaDeletionServiceDeleteTest extends ExperimentMetaDelet
         assertProperEntitiesInDb(expectedExperiments, expectedConfigurations, expectedComputations);
     }
 
-    private void assertProperEntitiesInDb(List<Experiment> expectedExperiments,
-                                          List<ExperimentConfiguration> expectedConfigurations,
-                                          List<ExperimentComputation> expectedComputations) {
+    private void assertProperEntitiesInDb(
+            List<Experiment> expectedExperiments,
+            List<ExperimentConfiguration> expectedConfigurations,
+            List<ExperimentComputation> expectedComputations
+    ) {
         var actualExperiments = experimentRepository.findAll().collectList().block();
         var actualConfigurations = configurationRepository.findAll().collectList().block();
         var actualComputations = computationRepository.findAll().collectList().block();

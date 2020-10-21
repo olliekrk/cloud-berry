@@ -46,8 +46,10 @@ public class KafkaTest {
 
     @BeforeAll
     void setUp() {
-        Map<String, Object> configs = new HashMap<>(KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker));
-        DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), new StringDeserializer());
+        Map<String, Object> configs =
+                new HashMap<>(KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker));
+        DefaultKafkaConsumerFactory<String, String> consumerFactory =
+                new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), new StringDeserializer());
         ContainerProperties containerProperties = new ContainerProperties(TOPIC);
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
         records = new LinkedBlockingQueue<>();
@@ -65,7 +67,9 @@ public class KafkaTest {
     public void kafkaSetup_withTopic_ensureSendMessageIsReceived() throws Exception {
         // Arrange
         Map<String, Object> configs = new HashMap<>(KafkaTestUtils.producerProps(embeddedKafkaBroker));
-        Producer<String, String> producer = new DefaultKafkaProducerFactory<>(configs, new StringSerializer(), new StringSerializer()).createProducer();
+        Producer<String, String> producer =
+                new DefaultKafkaProducerFactory<>(configs, new StringSerializer(), new StringSerializer())
+                        .createProducer();
 
         // Act
         producer.send(new ProducerRecord<>(TOPIC, "my-aggregate-id", "{\"event\":\"Test Event\"}"));

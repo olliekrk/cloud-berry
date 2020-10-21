@@ -27,9 +27,11 @@ public class SeriesSupplier implements SeriesApi {
     private final InfluxDBClient influxClient;
 
     @Override
-    public List<DataSeries> computationsSeries(String fieldName,
-                                               List<ObjectId> computationsIds,
-                                               InfluxQueryFields influxQueryFields) {
+    public List<DataSeries> computationsSeries(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    ) {
         if (computationsIds.isEmpty()) {
             return Collections.emptyList();
         }

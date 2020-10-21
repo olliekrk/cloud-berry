@@ -1,8 +1,10 @@
-import pandas as pd
-import requests
 from typing import List
 
+import pandas as pd
+import requests
+
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
+from .constants.constants import *
 from .json_util import JSONUtil
 from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds, ThresholdsType
 
@@ -142,8 +144,8 @@ class Analytics(CloudberryApi):
                                                            experiment_name: str,
                                                            measurement_name: str = None,
                                                            bucket_name: str = None) -> List[DataSeries]:
-        self.configurations.exceeding_thresholds_for_experiment(field_name, experiment_name, criteria_mode,
-                                                                thresholds, measurement_name, bucket_name)
+        return self.configurations.exceeding_thresholds_for_experiment(field_name, experiment_name, criteria_mode,
+                                                                       thresholds, measurement_name, bucket_name)
 
 
 class ComputationsAnalytics(CloudberryApi):
@@ -170,7 +172,7 @@ class ComputationsAnalytics(CloudberryApi):
         url = f'{self.base_url}/comparisonForConfiguration'
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name,
-            'configurationIdHex': configuration_id
+            CONFIGURATION_ID_HEX: configuration_id
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params))
 
@@ -202,7 +204,7 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'n': n,
             'fieldName': field_name,
-            'configurationIdHex': configuration_id,
+            CONFIGURATION_ID_HEX: configuration_id,
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
@@ -266,7 +268,7 @@ class ComputationsAnalytics(CloudberryApi):
         params = AnalyticsUtil.append_influx_params({
             'fieldName': field_name,
             'mode': criteria_mode.name,
-            'configurationIdHex': configuration_id,
+            CONFIGURATION_ID_HEX: configuration_id,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,
@@ -287,7 +289,7 @@ class ComputationsAnalytics(CloudberryApi):
             'fieldName': field_name,
             'mode': criteria_mode.name,
             'thresholdsType': thresholds_type.name,
-            'configurationIdHex': configuration_id,
+            CONFIGURATION_ID_HEX: configuration_id,
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.post(
             url=url,

@@ -45,7 +45,7 @@ public class MetadataService {
     }
 
     public Mono<ExperimentConfiguration> getOrCreateConfiguration(ExperimentConfiguration configuration) {
-        return experimentConfigurationCRUService.getOrCreateConfiguration(configuration);
+        return experimentConfigurationCRUService.findOrCreateConfiguration(configuration);
     }
 
     public Mono<ExperimentComputation> getOrCreateComputation(ExperimentComputation computation) {

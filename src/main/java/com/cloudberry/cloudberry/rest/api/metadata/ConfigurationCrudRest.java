@@ -67,8 +67,8 @@ public class ConfigurationCrudRest {
         return experimentConfigurationService.findByExperimentName(experimentName);
     }
 
-    @PostMapping("/getOrCreate")
-    ExperimentConfiguration getOrCreate(@RequestParam String experimentIdHex,
+    @PostMapping("/findOrCreate")
+    ExperimentConfiguration findOrCreate(@RequestParam String experimentIdHex,
                                         @RequestParam(required = false) String configurationFileName,
                                         @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
@@ -77,14 +77,15 @@ public class ConfigurationCrudRest {
         val now = Instant.now();
         val experimentConfiguration =
                 new ExperimentConfiguration(experimentId, configurationFileName, experimentParameters, now);
-        return experimentConfigurationService.getOrCreateConfiguration(experimentConfiguration);
+        return experimentConfigurationService.findOrCreateConfiguration(experimentConfiguration);
     }
 
     @PutMapping("/update")
-    ExperimentConfiguration update(@RequestParam String configurationIdHex,
-                                   @RequestParam(required = false) String configurationFileName,
-                                   @RequestParam(defaultValue = "false") boolean overrideParams,
-                                   @RequestBody(required = false) Map<String, Object> parameters
+    ExperimentConfiguration update(
+            @RequestParam String configurationIdHex,
+            @RequestParam(required = false) String configurationFileName,
+            @RequestParam(defaultValue = "false") boolean overrideParams,
+            @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidConfigurationIdException {
         val configurationId = IdDispatcher.getConfigurationId((configurationIdHex));
 

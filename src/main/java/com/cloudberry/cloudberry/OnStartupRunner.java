@@ -44,13 +44,16 @@ public class OnStartupRunner implements ApplicationRunner {
     private void sendComputationEvents() {
         IntStream.range(0, 10)
                 .boxed()
-                .map(i -> new ComputationEvent(Instant.now(), "bootstrapping-streams-test", Map.of("attempt", 1, "eventNumber", i), Map.of()))
+                .map(i -> new ComputationEvent(Instant.now(), "bootstrapping-streams-test",
+                                               Map.of("attempt", 1, "eventNumber", i), Map.of()
+                ))
                 .forEach(event -> kafkaTemplate.send(KafkaTopics.Generic.COMPUTATION_TOPIC, event));
     }
 
     private void sendSampleProblem(ObjectId computationId) {
         var problemEvent = new MetadataEvent(computationId, "No problem at all", Map.of(), Map.of());
-        IntStream.range(0, 1).forEach(__ -> kafkaTemplate.send(KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC, problemEvent));
+        IntStream.range(0, 1)
+                .forEach(__ -> kafkaTemplate.send(KafkaTopics.Metadata.PROBLEM_DEFINITION_TOPIC, problemEvent));
     }
 
     private void sendSampleLogs(ObjectId computationId) {

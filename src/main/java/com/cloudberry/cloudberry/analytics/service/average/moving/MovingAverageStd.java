@@ -20,10 +20,12 @@ public class MovingAverageStd extends MovingAverage {
     }
 
     @Override
-    public DataSeries getTimedMovingSeries(String fieldName,
-                                           ChronoInterval intervalTime,
-                                           List<ObjectId> computationsIds,
-                                           InfluxQueryFields influxQueryFields) {
+    public DataSeries getTimedMovingSeries(
+            String fieldName,
+            ChronoInterval intervalTime,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    ) {
         var bucketName = influxQueryFields.getBucketName();
         var restrictions = getRestrictions(influxQueryFields, computationsIds, fieldName);
 

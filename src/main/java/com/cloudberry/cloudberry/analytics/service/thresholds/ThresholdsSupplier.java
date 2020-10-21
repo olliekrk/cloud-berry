@@ -24,7 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,10 +41,12 @@ public class ThresholdsSupplier implements ThresholdsApi {
     private final SeriesApi seriesApi;
 
     @Override
-    public List<DataSeries> thresholdsExceedingSeries(String fieldName,
-                                                      Thresholds thresholds,
-                                                      CriteriaMode mode,
-                                                      InfluxQueryFields influxQueryFields) {
+    public List<DataSeries> thresholdsExceedingSeries(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            InfluxQueryFields influxQueryFields
+    ) {
         var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField)
@@ -50,11 +56,13 @@ public class ThresholdsSupplier implements ThresholdsApi {
     }
 
     @Override
-    public List<DataSeries> thresholdsExceedingSeriesFrom(String fieldName,
-                                                          Thresholds thresholds,
-                                                          CriteriaMode mode,
-                                                          InfluxQueryFields influxQueryFields,
-                                                          List<ObjectId> computationIds) {
+    public List<DataSeries> thresholdsExceedingSeriesFrom(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> computationIds
+    ) {
         var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
                 influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
                 Optional.of(fieldName).map(RestrictionsFactory::hasField),
@@ -65,10 +73,12 @@ public class ThresholdsSupplier implements ThresholdsApi {
     }
 
     @Override
-    public List<DataSeries> thresholdsExceedingSeriesFrom(String fieldName,
-                                                          Thresholds thresholds,
-                                                          CriteriaMode mode,
-                                                          Map<ObjectId, DataSeries> dataSeries) {
+    public List<DataSeries> thresholdsExceedingSeriesFrom(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            Map<ObjectId, DataSeries> dataSeries
+    ) {
         Function<DataSeries, List<Double>> valuesToCheckForAny = series ->
                 series.getDataSortedByTime()
                         .stream()
@@ -112,20 +122,24 @@ public class ThresholdsSupplier implements ThresholdsApi {
     }
 
     @Override
-    public List<DataSeries> thresholdsExceedingSeriesRelatively(String fieldName,
-                                                                ThresholdsInfo thresholdsInfo,
-                                                                CriteriaMode mode,
-                                                                Collection<DataSeries> dataSeries,
-                                                                DataSeries relativeSeries) {
+    public List<DataSeries> thresholdsExceedingSeriesRelatively(
+            String fieldName,
+            ThresholdsInfo thresholdsInfo,
+            CriteriaMode mode,
+            Collection<DataSeries> dataSeries,
+            DataSeries relativeSeries
+    ) {
         return ThresholdsInMemoryOps
                 .thresholdsExceedingSeriesRelatively(fieldName, thresholdsInfo, mode, dataSeries, relativeSeries);
     }
 
-    private List<DataSeries> thresholdExceedingSeriesWithRestrictions(String fieldName,
-                                                                      Thresholds thresholds,
-                                                                      CriteriaMode mode,
-                                                                      InfluxQueryFields influxQueryFields,
-                                                                      Restrictions restrictions) {
+    private List<DataSeries> thresholdExceedingSeriesWithRestrictions(
+            String fieldName,
+            Thresholds thresholds,
+            CriteriaMode mode,
+            InfluxQueryFields influxQueryFields,
+            Restrictions restrictions
+    ) {
         var bucketName = influxQueryFields.getBucketName();
         var idsQuery = switch (mode) {
             case ANY -> anyValueOverThresholdQuery(thresholds, bucketName, restrictions);
@@ -145,9 +159,11 @@ public class ThresholdsSupplier implements ThresholdsApi {
         return seriesApi.computationsSeries(fieldName, computationsIds, influxQueryFields);
     }
 
-    private static Flux averageValueOverThresholdQuery(Thresholds thresholds,
-                                                       String bucketName,
-                                                       Restrictions restrictions) {
+    private static Flux averageValueOverThresholdQuery(
+            Thresholds thresholds,
+            String bucketName,
+            Restrictions restrictions
+    ) {
         return FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .mean()
                 .filter(thresholdsToRestrictions(thresholds))
@@ -155,17 +171,21 @@ public class ThresholdsSupplier implements ThresholdsApi {
 
     }
 
-    private static Flux anyValueOverThresholdQuery(Thresholds thresholds,
-                                                   String bucketName,
-                                                   Restrictions restrictions) {
+    private static Flux anyValueOverThresholdQuery(
+            Thresholds thresholds,
+            String bucketName,
+            Restrictions restrictions
+    ) {
         return FluxUtils.epochQuery(bucketName, restrictions)
                 .filter(thresholdsToRestrictions(thresholds))
                 .distinct(CommonTags.COMPUTATION_ID);
     }
 
-    private static Flux finalValueOverThresholdQuery(Thresholds thresholds,
-                                                     String bucketName,
-                                                     Restrictions restrictions) {
+    private static Flux finalValueOverThresholdQuery(
+            Thresholds thresholds,
+            String bucketName,
+            Restrictions restrictions
+    ) {
         return FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .sort(new String[]{Columns.TIME})
                 .last()
@@ -175,7 +195,8 @@ public class ThresholdsSupplier implements ThresholdsApi {
 
     private static Restrictions thresholdsToRestrictions(Thresholds thresholds) {
         return Restrictions.and(Stream.of(
-                Optional.ofNullable(thresholds.getUpper()).map(upper -> Restrictions.value().greater(upper)).orElse(null),
+                Optional.ofNullable(thresholds.getUpper()).map(upper -> Restrictions.value().greater(upper))
+                        .orElse(null),
                 Optional.ofNullable(thresholds.getLower()).map(lower -> Restrictions.value().less(lower)).orElse(null)
         ).filter(Objects::nonNull).toArray(Restrictions[]::new));
     }

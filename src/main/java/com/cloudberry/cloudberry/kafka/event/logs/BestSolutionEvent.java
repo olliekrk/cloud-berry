@@ -30,10 +30,12 @@ public class BestSolutionEvent extends Event {
     }
 
     @JsonCreator
-    private BestSolutionEvent(@JsonProperty("computationId") ObjectId computationId,
-                              @JsonProperty("time") Instant time,
-                              @JsonProperty("solution") Solution solution,
-                              @JsonProperty("details") SolutionDetails details) {
+    private BestSolutionEvent(
+            @JsonProperty("computationId") ObjectId computationId,
+            @JsonProperty("time") Instant time,
+            @JsonProperty("solution") Solution solution,
+            @JsonProperty("details") SolutionDetails details
+    ) {
         super(time);
         this.computationId = computationId;
         this.solution = solution;

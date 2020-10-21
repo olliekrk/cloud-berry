@@ -10,8 +10,10 @@ import java.util.Map;
 public interface ConfigurationRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
     Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
 
-    Flux<ExperimentConfiguration> findAllByExperimentIdAndParameters(ObjectId experimentId,
-                                                                     Map<String, Object> parameters);
+    Flux<ExperimentConfiguration> findAllByExperimentIdAndParameters(
+            ObjectId experimentId,
+            Map<String, Object> parameters
+    );
 
     Flux<ExperimentConfiguration> findAllByConfigurationFileName(String configurationFileName);
 

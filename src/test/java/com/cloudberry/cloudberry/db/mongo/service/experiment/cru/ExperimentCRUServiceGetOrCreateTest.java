@@ -22,7 +22,10 @@ public class ExperimentCRUServiceGetOrCreateTest extends ExperimentCRUServiceTes
     @Test
     void findExistingByNameAndParams() {
         experimentRepository.save(TEST_EXPERIMENT_1).block();
-        var searchedExperiment = new Experiment(ObjectId.get(), TEST_EXPERIMENT_1.getName(), TEST_EXPERIMENT_1.getParameters(), Instant.ofEpochSecond(10));
+        var searchedExperiment =
+                new Experiment(ObjectId.get(), TEST_EXPERIMENT_1.getName(), TEST_EXPERIMENT_1.getParameters(),
+                               Instant.ofEpochSecond(10)
+                );
 
         var foundExperiment = experimentCRUService.findOrCreateExperiment(searchedExperiment).block();
 
@@ -32,7 +35,9 @@ public class ExperimentCRUServiceGetOrCreateTest extends ExperimentCRUServiceTes
     @Test
     void findByDifferentParamsCreatesNew() {
         experimentRepository.save(TEST_EXPERIMENT_1).block();
-        var searchedExperiment = new Experiment(ObjectId.get(), TEST_EXPERIMENT_1.getName(), Map.of("fake param", 1), Instant.ofEpochSecond(10));
+        var searchedExperiment = new Experiment(ObjectId.get(), TEST_EXPERIMENT_1.getName(), Map.of("fake param", 1),
+                                                Instant.ofEpochSecond(10)
+        );
 
         var foundExperiment = experimentCRUService.findOrCreateExperiment(searchedExperiment).block();
         var latterExperiment = experimentRepository.findById(searchedExperiment.getId()).block();

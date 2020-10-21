@@ -22,7 +22,7 @@ public class ExperimentComputationCRUService {
         return computationRepository
                 .findById(computation.getId())
                 .doOnNext(experimentComputation ->
-                        log.info("Existing computation " + experimentComputation.getId() + " was found"))
+                                  log.info("Existing computation " + experimentComputation.getId() + " was found"))
                 .switchIfEmpty(computationRepository.save(computation))
                 .doOnNext(
                         experimentComputation -> log.info("Created new computation " + experimentComputation.getId()));

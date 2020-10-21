@@ -55,7 +55,8 @@ public class TopologyBootstrapper {
         var context = new BootstrappingContext(topology);
         var topologyIterator = new DepthFirstIterator<>(topology.constructGraph(), rootNode.getId());
         topologyIterator.forEachRemaining(nodeId ->
-                topologyNodeService.getNodeById(nodeId).ifPresent(node -> configureNode(context, node))
+                                                  topologyNodeService.getNodeById(nodeId)
+                                                          .ifPresent(node -> configureNode(context, node))
         );
     }
 

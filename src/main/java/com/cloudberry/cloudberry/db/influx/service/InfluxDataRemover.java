@@ -27,8 +27,10 @@ public class InfluxDataRemover {
     private final InfluxDBClient influxClient;
     private final InfluxOrganizationService influxOrganizationService;
 
-    public void deleteData(InfluxQueryFields influxQueryFields,
-                           Map<String, String> tags) {
+    public void deleteData(
+            InfluxQueryFields influxQueryFields,
+            Map<String, String> tags
+    ) {
         var start = OffsetsFactory.epoch();
         var stop = OffsetsFactory.now();
         var bucket = influxQueryFields.getBucketName();
@@ -41,9 +43,11 @@ public class InfluxDataRemover {
         );
     }
 
-    public void deleteDataWithDifferentPossibleTagValues(InfluxQueryFields influxQueryFields,
-                                                         String tagName,
-                                                         List<String> tagValues) {
+    public void deleteDataWithDifferentPossibleTagValues(
+            InfluxQueryFields influxQueryFields,
+            String tagName,
+            List<String> tagValues
+    ) {
         var start = OffsetsFactory.epoch();
         var stop = OffsetsFactory.now();
         var bucket = influxQueryFields.getBucketName();
@@ -68,8 +72,10 @@ public class InfluxDataRemover {
         });
     }
 
-    private static String buildDeletePredicate(Optional<String> measurementName,
-                                               Map<String, String> tags) {
+    private static String buildDeletePredicate(
+            Optional<String> measurementName,
+            Map<String, String> tags
+    ) {
         // build predicates set using tags
         var predicates = CollectionSyntax.mapped(
                 tags.entrySet(),

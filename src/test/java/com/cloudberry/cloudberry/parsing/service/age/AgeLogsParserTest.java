@@ -57,10 +57,11 @@ class AgeLogsParserTest {
 
     private AgeParsedLogs getAgeParsedLogs(String configurationName) {
         return Try.of(() ->
-                ageLogsParser.parseFile(
-                        FilesUtils.getFileFromResources(TEST_FILE),
-                        new AgeUploadDetails(TEST_FILE_KEYS, null, configurationName),
-                        "")
+                              ageLogsParser.parseFile(
+                                      FilesUtils.getFileFromResources(TEST_FILE),
+                                      new AgeUploadDetails(TEST_FILE_KEYS, null, configurationName),
+                                      ""
+                              )
         ).get();
     }
 }

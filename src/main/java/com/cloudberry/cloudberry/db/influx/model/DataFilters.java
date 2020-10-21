@@ -15,9 +15,11 @@ public class DataFilters {
     Set<String> tagPresence;
 
     @JsonCreator
-    public DataFilters(@JsonProperty("fieldFilters") Map<String, Object> fieldFilters,
-                       @JsonProperty("tagFilters") Map<String, String> tagFilters,
-                       @JsonProperty("tagPresence") Set<String> tagPresence) {
+    public DataFilters(
+            @JsonProperty("fieldFilters") Map<String, Object> fieldFilters,
+            @JsonProperty("tagFilters") Map<String, String> tagFilters,
+            @JsonProperty("tagPresence") Set<String> tagPresence
+    ) {
         this.fieldFilters = Optional.ofNullable(fieldFilters).orElse(Map.of());
         this.tagFilters = Optional.ofNullable(tagFilters).orElse(Map.of());
         this.tagPresence = Optional.ofNullable(tagPresence).orElse(Set.of());

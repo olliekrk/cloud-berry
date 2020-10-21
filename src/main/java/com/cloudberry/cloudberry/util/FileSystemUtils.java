@@ -12,8 +12,10 @@ import java.util.function.Function;
 @Slf4j
 public abstract class FileSystemUtils {
 
-    public static <R> R withTemporaryFile(MultipartFile file,
-                                          Function<Path, R> temporaryFilePathAction) throws IOException {
+    public static <R> R withTemporaryFile(
+            MultipartFile file,
+            Function<Path, R> temporaryFilePathAction
+    ) throws IOException {
         Path temporaryFilePath = null;
         try {
             temporaryFilePath = createTemporaryFile(file.getOriginalFilename());

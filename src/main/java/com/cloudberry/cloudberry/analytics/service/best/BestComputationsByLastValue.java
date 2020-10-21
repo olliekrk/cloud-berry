@@ -13,10 +13,12 @@ import static com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags.COMP
 class BestComputationsByLastValue extends BestComputations {
 
     @Override
-    Flux getBest(int n,
-                 OptimizationGoal optimizationGoal,
-                 Restrictions restrictions,
-                 String bucketName) {
+    Flux getBest(
+            int n,
+            OptimizationGoal optimizationGoal,
+            Restrictions restrictions,
+            String bucketName
+    ) {
         var preparedFlux = FluxUtils.epochQueryByComputationId(bucketName, restrictions)
                 .last() // gets last value from each group
                 .keep(Set.of(VALUE, COMPUTATION_ID));

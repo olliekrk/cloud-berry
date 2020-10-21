@@ -41,8 +41,8 @@ public class InfluxOrganizationService {
                 .orElseGet(() -> {
                     var organizationId = createNewDefaultOrganization().getId();
                     log.warn("No default organization could be fetched from InfluxDB. " +
-                            "Verify the application configuration files. " +
-                            "New default organization has been created: {}", organizationId);
+                                     "Verify the application configuration files. " +
+                                     "New default organization has been created: {}", organizationId);
                     return organizationId;
                 });
     }

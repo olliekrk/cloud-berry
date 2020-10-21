@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface MovingAverageApi {
 
-    DataSeries getTimedMovingSeries(String fieldName,
-                                    ChronoInterval chronoInterval,
-                                    List<ObjectId> computationsIds,
-                                    InfluxQueryFields influxQueryFields);
+    DataSeries getTimedMovingSeries(
+            String fieldName,
+            ChronoInterval chronoInterval,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    );
 }

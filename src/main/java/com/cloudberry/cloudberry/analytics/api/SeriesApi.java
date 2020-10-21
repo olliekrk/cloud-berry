@@ -8,8 +8,10 @@ import java.util.List;
 
 public interface SeriesApi {
 
-    List<DataSeries> computationsSeries(String fieldName,
-                                        List<ObjectId> computationsIds,
-                                        InfluxQueryFields influxQueryFields);
+    List<DataSeries> computationsSeries(
+            String fieldName,
+            List<ObjectId> computationsIds,
+            InfluxQueryFields influxQueryFields
+    );
 
 }
