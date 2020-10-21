@@ -9,12 +9,12 @@ from .trendlines import TrendLine
 
 
 class PlotBuilder:
-    __series: Dict[str, PlotSeries] = {}
-    __avg_series: Dict[str, PlotSeries] = {}
-    __trends: Dict[str, TrendLine] = {}
 
     def __init__(self, properties: PlotProperties):
         self.properties = properties
+        self.__series: Dict[str, PlotSeries] = {}
+        self.__avg_series: Dict[str, PlotSeries] = {}
+        self.__trends: Dict[str, TrendLine] = {}
 
     def add_series(self, series: PlotSeries, replace: bool = True):
         PlotBuilder.__add_series(series, self.__series, replace)
