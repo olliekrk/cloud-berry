@@ -4,6 +4,7 @@ from typing import Dict
 import numpy as np
 import plotly.graph_objects as pgo
 from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
 
 from .exceptions import InvalidTrendLine
 from .properties import PlotProperties, PlotSeriesKind
@@ -13,8 +14,8 @@ from .utils import PlotUtils
 
 
 class PlotlyTrendLineKind(Enum):
-    LINEAR = 'ols'
-    # REGRESSION = 'lowess'
+    LINEAR = 'linear'
+    KNN10 = 'knn'
 
 
 class PlotlyTrendLine(TrendLine):
@@ -112,25 +113,29 @@ class PlotlyFlavourPlot:
         )
 
     def __add_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
-        if trend.related_series_name not in self.series:
-            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
-        if not trend.kind == PlotlyTrendLineKind.LINEAR:
-            raise InvalidTrendLine(f"Other kind of trend line than linear is not implemented")
-
         def reshape(d):
             return d.reshape(-1, 1)
 
         def reshape_back(d):
             return d.reshape(1, -1)[0]
 
+        if trend.related_series_name not in self.series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+
         series = self.series[trend.related_series_name]
-        xs = reshape(np.array(series.data[series.x_field]))
+        xs_base = np.array(series.data[series.x_field])
+        xs = reshape(xs_base)
         ys = reshape(np.array(series.data[series.y_field]))
+        model = None  # https://plotly.com/python/ml-regression/
 
-        # https://plotly.com/python/ml-regression/
-        model = LinearRegression()
+        if trend.kind == PlotlyTrendLineKind.LINEAR:
+            model = PlotlyFlavourPlot.linear_regression_model()
+        elif trend.kind == PlotlyTrendLineKind.KNN10:
+            model = PlotlyFlavourPlot.knn10_regression_model(xs_base.size)
+        else:
+            raise InvalidTrendLine(f"Other kind of trend line than linear is not implemented")
+
         model.fit(xs, ys)
-
         xs_predict = reshape(np.linspace(xs.min(), xs.max(), 100))
         ys_predict = model.predict(xs_predict)
 
@@ -146,3 +151,11 @@ class PlotlyFlavourPlot:
         )
 
         fig.add_trace(trace)
+
+    @staticmethod
+    def knn10_regression_model(max_n: int):
+        return KNeighborsRegressor(min(10, max_n), weights='distance')
+
+    @staticmethod
+    def linear_regression_model():
+        return LinearRegression()
