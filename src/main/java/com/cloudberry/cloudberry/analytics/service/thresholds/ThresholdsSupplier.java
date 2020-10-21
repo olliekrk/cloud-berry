@@ -96,7 +96,7 @@ public class ThresholdsSupplier implements ThresholdsApi {
                     .stream()
                     .flatMap(data -> Optional.ofNullable(data.get(fieldName)).map(o -> (double) o).stream())
                     .collect(Collectors.summarizingDouble(Double::doubleValue));
-            return stats.getCount() == 0 ? List.<Double>of() : List.of(stats.getAverage());
+            return stats.getCount() == 0 ? List.of() : List.of(stats.getAverage());
         };
 
         var valuesToCheckExtractor = switch (mode) {
