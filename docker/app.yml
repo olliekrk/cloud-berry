@@ -32,9 +32,9 @@ services:
     extends:
       file: influxdb.yml
       service: influxdb-cb
-#  telegraf-cb:
-#    extends:
-#      file: influxdb.yml
-#      service: telegraf-cb
-#    depends_on:
-#      - influxdb-cb
+  telegraf-cb:
+    extends:
+      file: monitoring.yml
+      service: telegraf-cb
+    depends_on:
+      - influxdb-cb
