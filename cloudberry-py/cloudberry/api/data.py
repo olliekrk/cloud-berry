@@ -4,16 +4,21 @@ import requests
 
 from .backend import CloudberryConfig, CloudberryApi
 from .model import DataPoint, DataSeries
+from .model.metadata.experiment_computation import ExperimentComputation
 
 
 class DataFilters:
     def __init__(self,
                  tags: dict = None,
+                 computation: ExperimentComputation = None,
                  tags_presence: List[str] = None,
-                 fields: dict = None) -> None:
+                 fields: dict = None
+                 ) -> None:
         self.tags = tags
         self.tags_presence = tags_presence
         self.fields = fields
+        if computation is not None:
+            tags['computationId'] = computation.computation_id_hex
 
 
 class Data(CloudberryApi):

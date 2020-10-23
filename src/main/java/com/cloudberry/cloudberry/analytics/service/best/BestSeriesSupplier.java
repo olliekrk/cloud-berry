@@ -95,6 +95,7 @@ public class BestSeriesSupplier implements BestSeriesApi {
             Restrictions restrictions
     ) {
         var ids = getBestComputationIds(n, optimization, bucketName, restrictions);
+        if (ids.isEmpty()) {return List.of();}
         return queryForComputations(ids, restrictions, bucketName);
     }
 
