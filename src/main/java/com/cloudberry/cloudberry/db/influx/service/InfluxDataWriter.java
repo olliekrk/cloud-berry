@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.write.Point;
 import io.vavr.control.Try;
@@ -21,7 +20,6 @@ public class InfluxDataWriter {
     private final InfluxOrganizationService influxOrganizationService;
     private final InfluxPropertiesService influxPropertiesService;
     private final InfluxDBClient influxClient;
-    private final BucketsService bucketsService;
 
     public <M> void writeMeasurement(M measurement) {
         Try.withResources(influxClient::getWriteApi)
@@ -44,15 +42,11 @@ public class InfluxDataWriter {
     }
 
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
-        Try.withResources(influxClient::getWriteApi)
-                .of(writeApi -> {
-                    var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
-                    bucketsService.createBucketIfNotExists(bucket);
-                    writeApi.writePoints(bucket, influxOrganizationService.getDefaultOrganizationId(),
-                                         List.copyOf(points)
-                    );
-                    return null;
-                }).get();
+        Try.withResources(influxClient::getWriteApi).of(writeApi -> {
+            var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
+            writeApi.writePoints(bucket, influxOrganizationService.getDefaultOrganizationId(), List.copyOf(points));
+            return null;
+        }).get();
     }
 
 }

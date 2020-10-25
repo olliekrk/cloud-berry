@@ -1,12 +1,8 @@
-from typing import List
-
 import requests
 
 from .backend import CloudberryApi, CloudberryConfig
 from .data import Data
-from .model.metadata.experiment import Experiment, get_ids_for_experiments
-from .model.metadata.experiment_computation import ExperimentComputation, get_ids_for_computations
-from .model.metadata.experiment_configuration import ExperimentConfiguration, get_ids_for_configurations
+from .model.metadata import *
 
 COMPUTATION_IDS_HEX = 'computationIdsHex'
 CONFIGURATION_IDS_HEX = 'configurationIdsHex'

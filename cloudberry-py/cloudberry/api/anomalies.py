@@ -4,7 +4,7 @@ import requests
 
 from .backend import CloudberryApi, CloudberryConfig
 from .model import AnomalyReport
-from .model.metadata.experiment_computation import ExperimentComputation, get_ids_for_computations
+from .model.metadata import ExperimentComputation, get_ids_for_computations
 
 
 class Anomalies(CloudberryApi):

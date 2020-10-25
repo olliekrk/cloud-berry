@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Dict
+from uuid import uuid4
 
 import numpy as np
 import plotly.graph_objects as pgo
@@ -124,10 +125,11 @@ class PlotlyFlavourPlot:
             self.__add_ml_knn_trend_trace(trend_name, trend, fig)
 
     def __add_ml_knn_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
-        if trend.related_series_name not in self.series:
+        all_series = {**self.series, **self.averages}
+        if trend.related_series_name not in all_series:
             raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
 
-        series = self.series[trend.related_series_name]
+        series = all_series[trend.related_series_name]
         xs_base = np.array(series.data[series.x_field])
         xs = xs_base.reshape(-1, 1)
         ys = np.array(series.data[series.y_field]).reshape(-1, 1)
@@ -151,10 +153,11 @@ class PlotlyFlavourPlot:
         fig.add_trace(trace)
 
     def __add_ml_linear_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
-        if trend.related_series_name not in self.series:
+        all_series = {**self.series, **self.averages}
+        if trend.related_series_name not in all_series:
             raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
 
-        series = self.series[trend.related_series_name]
+        series = all_series[trend.related_series_name]
         xs = np.array(series.data[series.x_field]).reshape(-1, 1)
         ys = np.array(series.data[series.y_field]).reshape(-1, 1)
         model = LinearRegression()
@@ -177,12 +180,13 @@ class PlotlyFlavourPlot:
         fig.add_trace(trace)
 
     def __add_const_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
-        if trend.related_series_name not in self.series:
+        all_series = {**self.series, **self.averages}
+        if trend.related_series_name not in all_series:
             raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
         if trend.constant is None:
             raise InvalidTrendLine(f"Constant must be specified to draw const trendline")
 
-        series = self.series[trend.related_series_name]
+        series = all_series[trend.related_series_name]
         xs_range = series.data[series.x_field]
         xs = np.linspace(xs_range.min(), xs_range.max(), 10)
         ys = np.full(10, trend.constant)
@@ -199,3 +203,26 @@ class PlotlyFlavourPlot:
         )
 
         fig.add_trace(trace)
+
+
+class PlotlyExporter:
+    def __init__(self, plot: pgo.Figure):
+        self.plot = plot
+
+    def write_image(self,
+                    file=None,
+                    width=1920,
+                    height=1080,
+                    scale=None,  # if None use default
+                    image_format="png"):
+        if file is None:
+            file = f"{uuid4()}_plotly"
+
+        self.plot.write_image(
+            file=file,
+            format=image_format,
+            width=width,
+            height=height,
+            scale=scale,
+            engine="kaleido"
+        )

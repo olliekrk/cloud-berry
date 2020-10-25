@@ -1,7 +1,19 @@
+from typing import Optional
+
 from .api_experiment import ExperimentApi
 from .api_experiment_computation import ExperimentComputationApi
 from .api_experiment_configuration import ExperimentConfigurationApi
-from ...api import CloudberryApi, CloudberryConfig
+from .. import CloudberryApi, CloudberryConfig, ExperimentComputation
+
+
+class MetaIds:
+    def __init__(self,
+                 computation_id,
+                 configuration_id,
+                 experiment_id):
+        self.computation_id = computation_id
+        self.configuration_id = configuration_id
+        self.experiment_id = experiment_id
 
 
 class Metadata(CloudberryApi):
@@ -17,3 +29,15 @@ class Metadata(CloudberryApi):
 
     def experiment_computation_api(self) -> ExperimentComputationApi:
         return ExperimentComputationApi(self.base_url)
+
+    def get_meta_ids(self, computation: ExperimentComputation) -> Optional[MetaIds]:
+        try:
+            configuration = self.experiment_configuration_api().find_by_computation(computation)
+            experiment = self.experiment_api().find_by_configuration(configuration)
+            return MetaIds(
+                computation.computation_id_hex,
+                configuration.experiment_configuration_id_hex,
+                experiment.experiment_id_hex
+            )
+        except:
+            return None
