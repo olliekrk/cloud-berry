@@ -1,12 +1,15 @@
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 
+from ...metadata_api import MetaIds
+
 
 class DataSeries:
-    def __init__(self, series_name: str, data: list) -> None:
+    def __init__(self, series_name: str, data: list, meta_ids: Optional[MetaIds] = None) -> None:
         self.series_name = series_name
         self.data = data
+        self.meta_ids = meta_ids
 
     def merge_values_with(self,
                           other_series,
@@ -21,6 +24,10 @@ class DataSeries:
     def as_data_frame(self) -> pd.DataFrame:
         df = pd.DataFrame(self.data)
         df['series_name'] = self.series_name
+        if self.meta_ids is not None:
+            df['experiment_id'] = self.meta_ids.experiment_id
+            df['configuration_id'] = self.meta_ids.configuration_id
+            df['computation_id'] = self.meta_ids.computation_id
         return df
 
     @staticmethod
@@ -33,8 +40,9 @@ class DataSeries:
 
     @staticmethod
     def from_json_list(data_series_jsons: List[dict]):
-        return [DataSeries(series_name=ds['seriesName'], data=ds['data']) for ds in data_series_jsons]
+        return [DataSeries.from_json(ds) for ds in data_series_jsons]
 
     @staticmethod
     def from_json(data_series_json: dict):
-        return DataSeries(series_name=data_series_json['seriesName'], data=data_series_json['data'])
+        return DataSeries(series_name=data_series_json['seriesName'],
+                          data=data_series_json['data'])
