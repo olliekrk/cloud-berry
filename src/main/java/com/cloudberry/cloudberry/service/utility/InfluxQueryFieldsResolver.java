@@ -11,6 +11,6 @@ public class InfluxQueryFieldsResolver {
     private final BucketNameResolver bucketNameResolver;
 
     public InfluxQueryFields get(@Nullable String measurementName, @Nullable String bucketName) {
-        return new InfluxQueryFields(measurementName, bucketNameResolver.getBucketNameOrDefault(bucketName));
+        return new InfluxQueryFields(measurementName, bucketNameResolver.getOrDefault(bucketName));
     }
 }

@@ -1,7 +1,7 @@
 from .api_experiment import ExperimentApi
 from .api_experiment_computation import ExperimentComputationApi
 from .api_experiment_configuration import ExperimentConfigurationApi
-from ...api import CloudberryApi, CloudberryConfig
+from .. import CloudberryApi, CloudberryConfig
 
 
 class Metadata(CloudberryApi):

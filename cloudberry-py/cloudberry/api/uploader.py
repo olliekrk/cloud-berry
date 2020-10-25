@@ -4,10 +4,9 @@ from typing import List
 import requests
 
 from .backend import CloudberryConfig, CloudberryApi
-from .constants.constants import *
+from .constants import *
 from .json_util import JSONUtil
-from .model.metadata.experiment_computation import ExperimentComputation
-from .model.metadata.experiment_configuration import ExperimentConfiguration
+from .model.metadata import ExperimentComputation, ExperimentConfiguration
 
 
 class UploadDetails:

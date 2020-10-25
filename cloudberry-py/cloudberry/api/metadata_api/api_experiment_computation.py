@@ -2,10 +2,8 @@ from typing import List
 
 import requests
 
-from ..model.metadata.experiment import Experiment
-from ..model.metadata.experiment_computation import ExperimentComputation
-from ..model.metadata.experiment_configuration import ExperimentConfiguration
-from ...api.constants.constants import *
+from ..constants import *
+from ..model.metadata import Experiment, ExperimentConfiguration, ExperimentComputation
 
 
 class ExperimentComputationApi:

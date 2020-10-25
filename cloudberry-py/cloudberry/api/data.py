@@ -3,8 +3,8 @@ from typing import List
 import requests
 
 from .backend import CloudberryConfig, CloudberryApi
-from .model import DataPoint, DataSeries
-from .model.metadata.experiment_computation import ExperimentComputation
+from .model.data import DataPoint, DataSeries
+from .model.metadata import ExperimentComputation
 
 
 class DataFilters:
