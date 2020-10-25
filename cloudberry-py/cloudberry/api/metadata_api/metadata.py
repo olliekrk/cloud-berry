@@ -3,7 +3,7 @@ from typing import Optional
 from .api_experiment import ExperimentApi
 from .api_experiment_computation import ExperimentComputationApi
 from .api_experiment_configuration import ExperimentConfigurationApi
-from .. import CloudberryApi, CloudberryConfig
+from .. import CloudberryApi, CloudberryConfig, ExperimentComputation
 
 
 class MetaIds:
@@ -30,9 +30,8 @@ class Metadata(CloudberryApi):
     def experiment_computation_api(self) -> ExperimentComputationApi:
         return ExperimentComputationApi(self.base_url)
 
-    def get_meta_ids(self, computation_id: str) -> Optional[MetaIds]:
+    def get_meta_ids(self, computation: ExperimentComputation) -> Optional[MetaIds]:
         try:
-            computation = self.experiment_computation_api().find_by_id(computation_id)
             configuration = self.experiment_configuration_api().find_by_computation(computation)
             experiment = self.experiment_api().find_by_configuration(configuration)
             return MetaIds(

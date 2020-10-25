@@ -1,15 +1,13 @@
-from typing import List, Optional
+from typing import List
 
 import pandas as pd
 
-from ...metadata_api import MetaIds
-
 
 class DataSeries:
-    def __init__(self, series_name: str, data: list, meta_ids: Optional[MetaIds] = None) -> None:
+    def __init__(self, series_name: str, data: list, meta_ids=None) -> None:
         self.series_name = series_name
         self.data = data
-        self.meta_ids = meta_ids
+        self.meta_ids = meta_ids  # MetaIds
 
     def merge_values_with(self,
                           other_series,
