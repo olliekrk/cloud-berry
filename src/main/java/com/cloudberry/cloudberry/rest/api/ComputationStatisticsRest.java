@@ -39,7 +39,8 @@ public class ComputationStatisticsRest {
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestBody List<String> computationIdsHex
+            @RequestBody List<String> computationIdsHex,
+            @RequestParam(required = false, defaultValue = "true") boolean computeMean
     ) throws InvalidComputationIdException {
         var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
 
@@ -47,7 +48,7 @@ public class ComputationStatisticsRest {
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 computationIds,
-                true
+                computeMean
         );
     }
 

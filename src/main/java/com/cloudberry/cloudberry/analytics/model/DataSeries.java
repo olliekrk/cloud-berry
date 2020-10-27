@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.Value;
+import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Value
+@With
 public class DataSeries {
     private static final String TIME_FIELD_NAME = InfluxDefaults.Columns.TIME;
 
@@ -49,7 +51,7 @@ public class DataSeries {
 
     public List<Map<String, Object>> getDataSortedByTime() {
         return data.stream()
-                .sorted(Comparator.comparing(dataPoint -> (Instant) dataPoint.get(TIME_FIELD_NAME), Instant::compareTo))
+                .sorted(InfluxDefaults.Comparators.byTime)
                 .collect(Collectors.toList());
     }
 
@@ -57,6 +59,15 @@ public class DataSeries {
         return data.stream()
                 .flatMap(point -> Optional.ofNullable((Instant) point.get(TIME_FIELD_NAME)).stream())
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Instant> getStartTime() {
+        return getTimePoints().stream().min(Instant::compareTo);
+    }
+
+
+    public Optional<Instant> getEndTime() {
+        return getTimePoints().stream().min(Instant::compareTo);
     }
 
     public Optional<TimeRange> getTimeRange() {
@@ -96,6 +107,10 @@ public class DataSeries {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public int getDataSize() {
+        return this.data.size();
     }
 
 }
