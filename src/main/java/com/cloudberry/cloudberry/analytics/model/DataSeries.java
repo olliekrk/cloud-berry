@@ -6,7 +6,6 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.Value;
 import lombok.With;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -17,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Slf4j
 @Value
 @With
 public class DataSeries {
@@ -102,7 +100,6 @@ public class DataSeries {
                         var valueOpt = Optional.ofNullable((Double) point.get(fieldName));
                         return valueOpt.stream().map(value -> Tuple.of(time, value));
                     } catch (Exception e) {
-                        log.debug("Missing or invalid value for field: " + fieldName, e);
                         return Stream.empty();
                     }
                 })

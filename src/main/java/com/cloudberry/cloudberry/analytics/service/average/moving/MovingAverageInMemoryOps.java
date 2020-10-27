@@ -38,17 +38,23 @@ public abstract class MovingAverageInMemoryOps {
             series = TimeShiftOps.timeShiftIfPossible(series);
         }
 
+        var firstIntervalStartOpt = TimeShiftOps.minStartTime(series);
+        if (firstIntervalStartOpt.isEmpty()) {
+            log.warn("Moving average could not be performed - no time markers in series");
+            return DataSeries.empty(AVERAGE_SERIES_NAME);
+        }
+
+        var firstIntervalStart = firstIntervalStartOpt.get();
         var allSeriesNames = series.stream().map(DataSeries::getSeriesName).collect(Collectors.toSet());
-        var fieldData = flatFieldDataSortedByTime(series, fieldName);
-        var firstIntervalStart = TimeShiftOps.minStartTime(series);
         var bucketDuration = IntervalOps.suitableMovingBucketDuration(series);
+        var fieldData = flatFieldDataSortedByTime(series, fieldName);
 
         var averageSeriesData = fieldData.stream()
                 .collect(Collectors.groupingBy(point -> {
                     // grouping points by number of interval point belongs to
                     var time = point._1;
                     var durationSinceStart = Duration.between(firstIntervalStart, time);
-                    return durationSinceStart.dividedBy(bucketDuration);
+                    return bucketDuration.isZero() ? 0 : durationSinceStart.dividedBy(bucketDuration);
                 }))
                 .entrySet()
                 .stream()
@@ -68,7 +74,9 @@ public abstract class MovingAverageInMemoryOps {
                         }
                     }
 
-                    var bucketTime = Instant.ofEpochMilli((long) (bucketDuration.toMillis() * (intervalNumber + 0.5)));
+                    var bucketTime = Instant
+                            .ofEpochMilli((long) (bucketDuration.toMillis() * (intervalNumber + 0.5)))
+                            .plusMillis(firstIntervalStart.toEpochMilli());
                     var bucketSummary = pointsInBucket.stream().collect(Collectors.summarizingDouble(Tuple3::_3));
                     var bucketAvg = bucketSummary.getAverage();
                     var bucketStd = Math.sqrt(

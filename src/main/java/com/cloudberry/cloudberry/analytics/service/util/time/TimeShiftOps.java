@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,28 +30,24 @@ public abstract class TimeShiftOps {
         return originalSeries;
     }
 
-    public static Instant minStartTime(List<DataSeries> series) {
+    public static Optional<Instant> minStartTime(List<DataSeries> series) {
         return series.stream()
                 .flatMap(s -> s.getStartTime().stream())
-                .min(Instant::compareTo)
-                .orElseThrow(() -> new IllegalArgumentException("Supplied series are missing time markers."));
-    }
-
-
-    public static Instant maxEndTime(List<DataSeries> series) {
-        return series.stream()
-                .flatMap(s -> s.getEndTime().stream())
-                .max(Instant::compareTo)
-                .orElseThrow(() -> new IllegalArgumentException("Supplied series are missing time markers."));
+                .min(Instant::compareTo);
     }
 
     public static List<DataSeries> timeShift(List<DataSeries> originalSeries) {
         var startingTime = minStartTime(originalSeries);
+        if (startingTime.isEmpty()) {
+            log.warn("Requested time shift could not be performed - no time markers in series");
+            return originalSeries;
+        }
+
         return originalSeries.stream()
                 .flatMap(singleSeries -> singleSeries.getStartTime().stream()
                         .map(start -> {
                             // from every point in the original originalSeries subtract `shift` from _time field
-                            var shift = Duration.between(startingTime, start);
+                            var shift = Duration.between(startingTime.get(), start);
                             var updatedData = singleSeries.getData().stream()
                                     .filter(point -> point.containsKey(TIME_KEY))
                                     .map(point -> {
