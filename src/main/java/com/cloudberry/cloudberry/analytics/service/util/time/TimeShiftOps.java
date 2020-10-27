@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.analytics.service.util.time;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import lombok.extern.slf4j.Slf4j;
 

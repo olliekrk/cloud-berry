@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.model;
+package com.cloudberry.cloudberry.analytics.model.basic;
 
 import com.cloudberry.cloudberry.analytics.model.time.TimeRange;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;

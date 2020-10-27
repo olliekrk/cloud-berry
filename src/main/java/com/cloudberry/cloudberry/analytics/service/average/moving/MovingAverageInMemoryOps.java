@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.service.util.time.IntervalOps;
 import com.cloudberry.cloudberry.analytics.service.util.time.TimeShiftOps;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;

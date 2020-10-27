@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.service.api;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;

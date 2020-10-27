@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.service.deletion;
 
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.db.mongo.service.computation.ComputationMetaDeletionService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;

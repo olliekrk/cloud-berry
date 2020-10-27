@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.api.AnomaliesApi;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.anomalies.AnomalyReport;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;

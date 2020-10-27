@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.service.configurations;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageAvg;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;

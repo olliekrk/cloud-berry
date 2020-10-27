@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.thresholds;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import com.google.common.collect.Streams;
 import io.vavr.Tuple;
