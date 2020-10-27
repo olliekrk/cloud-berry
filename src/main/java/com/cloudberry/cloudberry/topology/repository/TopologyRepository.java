@@ -11,5 +11,7 @@ public interface TopologyRepository extends MongoRepository<Topology, ObjectId> 
 
     List<Topology> findByName(String name);
 
+    List<Topology> findByUserDefinedIsFalse();
+
     void removeAllByIdIn(Collection<ObjectId> id);
 }

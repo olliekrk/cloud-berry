@@ -17,5 +17,6 @@ public class BucketsInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         bucketsService.createBucketIfNotExists(influxConfig.getDefaultBucketName());
         bucketsService.createBucketIfNotExists(influxConfig.getDefaultMetricsBucketName());
+        bucketsService.createBucketIfNotExists(influxConfig.getDefaultStreamsBucketName());
     }
 }

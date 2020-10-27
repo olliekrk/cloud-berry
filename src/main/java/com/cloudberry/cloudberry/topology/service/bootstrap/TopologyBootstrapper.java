@@ -3,7 +3,7 @@ package com.cloudberry.cloudberry.topology.service.bootstrap;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.processing.processor.ComputationEventProcessor;
 import com.cloudberry.cloudberry.topology.exception.InvalidRootNodeException;
-import com.cloudberry.cloudberry.topology.exception.NodeNotFoundException;
+import com.cloudberry.cloudberry.topology.exception.MissingRootNodeException;
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.MissingBootstrappingLogicException;
@@ -21,7 +21,9 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,31 +36,42 @@ public class TopologyBootstrapper {
     private final KafkaStreamsConfiguration kStreamsConfiguration;
 
     public KafkaStreams configureStreams(Topology topology) throws TopologyException {
-        log.info("Topology '" + topology.getName() + "' will now be used.");
-        var rootId = topology.findRootId(); // todo: just a test, (consider having multiple root nodes)
-        var rootNode = topologyNodeService
-                .getNodeById(rootId)
+        log.info("Topology '" + topology.getName() + "' bootstrapping has started.");
+
+        var rootIds = topology.findRootIds();
+        var rootNodes = rootIds.stream()
+                .flatMap(nodeId -> topologyNodeService.getNodeById(nodeId).stream())
                 .map(node -> Optional.of(node)
                         .filter(n -> n instanceof RootNode)
                         .map(n -> (RootNode) n)
                         .orElseThrow(() -> new InvalidRootNodeException(node.getId()))
                 )
-                .orElseThrow(() -> new NodeNotFoundException(rootId));
+                .collect(Collectors.toList());
 
-        traverseAndConfigure(topology, rootNode);
+        if (rootNodes.isEmpty()) {
+            throw new MissingRootNodeException(topology.getId());
+        }
+
+        traverseAndConfigure(topology, rootNodes);
         var streams = new KafkaStreams(kStreamsBuilder.build(), kStreamsConfiguration.asProperties());
         log.info("Topology '" + topology.getName() + "' has been configured.");
         return streams;
     }
 
-    private void traverseAndConfigure(Topology topology, RootNode rootNode) {
+    private void traverseAndConfigure(Topology topology, List<RootNode> rootNodes) {
         var context = new BootstrappingContext(topology);
-        var topologyIterator = new DepthFirstIterator<>(topology.constructGraph(), rootNode.getId());
-        topologyIterator.forEachRemaining(nodeId ->
-                                                  topologyNodeService.getNodeById(nodeId)
-                                                          .ifPresent(node -> configureNode(context, node))
-        );
+        rootNodes.forEach(rootNode -> {
+            var dfsIterator = new DepthFirstIterator<>(topology.constructGraph(), rootNode.getId());
+            dfsIterator.forEachRemaining(nodeId -> topologyNodeService
+                    .getNodeById(nodeId)
+                    .ifPresent(node -> configureNode(context, node))
+            );
+        });
     }
+
+    // TODO #42:
+    //    * verify / modify configureNode & BootstrappingContext logic
+    //    * api to create own topology with useful nodes
 
     // THE ESSENCE
     private void configureNode(BootstrappingContext context, TopologyNode node) throws BootstrappingException {

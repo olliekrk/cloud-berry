@@ -36,6 +36,7 @@ influx: # custom influxdb properties used in InfluxConfig
   organization-name: ${spring.influx2.org}
   buckets:
     default-logs: ${spring.influx2.bucket}
+    default-logs-from-streams: cloudberry_logs_streams
     default-metrics: cloudberry_metrics
   measurements:
     default-measurement-name: cloudberry-default

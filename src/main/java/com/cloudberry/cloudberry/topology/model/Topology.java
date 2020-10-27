@@ -9,11 +9,11 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.util.Pair;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Document
@@ -29,30 +29,35 @@ public class Topology {
     private String name;
 
     /**
+     * Whether this topology is default one generated on each system startup, or one defined or modified by user.
+     */
+    private boolean isUserDefined;
+
+    /**
      * Directed edges representing the topology.
+     * keys == vertices
      */
     private Map<ObjectId, Set<ObjectId>> edges;
 
     /**
-     * @return id of root vertex, assuming there is one and only one in a topology
+     * @return id of root vertices
      */
-    public ObjectId findRootId() {
+    public Set<ObjectId> findRootIds() {
         var graph = constructGraph();
-        // todo, to improve, consider multiple root nodes
         return graph.vertexSet().stream()
-                .filter(vertex -> graph.inDegreeOf(vertex) == 0)
-                .findAny()
-                .orElse(null);
+                .filter(vertex -> graph.inDegreeOf(vertex) == 0) // root vertices have 0 incoming edges
+                .collect(Collectors.toSet());
     }
 
     public Set<ObjectId> findAdjacentVertices(TopologyNode node) {
         return edges.getOrDefault(node.getId(), Set.of());
     }
 
+    /**
+     * Valid graph is one that has at least one root vertex.
+     */
     public boolean isValid() {
-        // todo
-//        var graph = constructGraph();
-        return true;
+        return findRootIds().size() > 0;
     }
 
     public void addEdge(TopologyNode source, TopologyNode target) {
@@ -81,9 +86,7 @@ public class Topology {
     public DefaultDirectedGraph<ObjectId, DefaultEdge> constructGraph() {
         var graph = new DefaultDirectedGraph<ObjectId, DefaultEdge>(DefaultEdge.class);
         edges.keySet().forEach(graph::addVertex);
-        edges.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream().map(target -> Pair.of(entry.getKey(), target)))
-                .forEach(edge -> graph.addEdge(edge.getFirst(), edge.getSecond()));
+        edges.forEach((source, targets) -> targets.forEach(target -> graph.addEdge(source, target)));
         return graph;
     }
 }

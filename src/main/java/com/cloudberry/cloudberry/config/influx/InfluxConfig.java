@@ -11,6 +11,8 @@ public class InfluxConfig {
     private String defaultBucketName;
     @Value("${influx.buckets.default-metrics}")
     private String defaultMetricsBucketName;
+    @Value("${influx.buckets.default-logs-from-streams}")
+    private String defaultStreamsBucketName;
     @Value("${influx.measurements.default-measurement-name}")
     private String defaultMeasurementName;
     @Value("${influx.organization-name}")
