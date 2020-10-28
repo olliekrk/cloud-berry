@@ -1,4 +1,4 @@
-from .analytics import Analytics
+from .analytics import ComputationSeries, ConfigurationSeries
 from .anomalies import Anomalies
 from .api_configuration import ApiConfiguration
 from .backend import CloudberryConfig

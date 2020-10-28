@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ConfigurationStatisticsService {
+public class ConfigurationSeriesService {
     private final AnalyticsApi analyticsApi;
     private final MetadataService metadataService;
     private final ConfigurationSeriesCreator configurationSeriesCreator;

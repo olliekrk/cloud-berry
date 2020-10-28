@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ComputationStatisticsService {
+public class ComputationSeriesService {
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
 

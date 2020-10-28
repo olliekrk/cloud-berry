@@ -7,139 +7,10 @@ from .model import DataSeries, OptimizationGoal, OptimizationKind, CriteriaMode,
 from .model.metadata import *
 
 
-class Analytics(CloudberryApi):
-
+class ComputationSeries(CloudberryApi):
     def __init__(self, config: CloudberryConfig) -> None:
         super().__init__(config)
-        self.computations = ComputationsAnalytics(config)
-        self.configurations = ConfigurationsAnalytics(config)
-
-    def compare_computations(self,
-                             computations: List[ExperimentComputation],
-                             field_name: str,
-                             measurement_name: str = None,
-                             bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.comparison(computations, field_name, measurement_name, bucket_name)
-
-    def compare_computations_for_configuration(self,
-                                               configuration: ExperimentConfiguration,
-                                               field_name: str,
-                                               measurement_name: str = None,
-                                               bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.comparison_for_configuration(configuration, field_name, measurement_name,
-                                                              bucket_name)
-
-    def compare_configurations(self,
-                               configurations: List[ExperimentConfiguration],
-                               field_name: str,
-                               measurement_name: str = None,
-                               bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.comparison(configurations, field_name, measurement_name, bucket_name)
-
-    def compare_configurations_for_experiment(self,
-                                              experiment_name: str,
-                                              field_name: str,
-                                              measurement_name: str = None,
-                                              bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.comparison_for_experiment(experiment_name, field_name, measurement_name, bucket_name)
-
-    def best_n_computations(self,
-                            n: int,
-                            field_name: str,
-                            goal: OptimizationGoal,
-                            kind: OptimizationKind,
-                            measurement_name: str = None,
-                            bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.best_n(n, field_name, goal, kind, measurement_name, bucket_name)
-
-    def best_n_computations_for_configuration(self,
-                                              n: int,
-                                              field_name: str,
-                                              configuration: ExperimentConfiguration,
-                                              goal: OptimizationGoal,
-                                              kind: OptimizationKind,
-                                              measurement_name: str = None,
-                                              bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.best_n_for_configuration(n, field_name, configuration, goal, kind, measurement_name,
-                                                          bucket_name)
-
-    def best_n_configurations(self,
-                              n: int,
-                              field_name: str,
-                              configurations: List[ExperimentConfiguration],
-                              goal: OptimizationGoal,
-                              kind: OptimizationKind,
-                              measurement_name: str = None,
-                              bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.best_n(n, field_name, configurations, goal, kind, measurement_name, bucket_name)
-
-    def best_n_configurations_for_experiment(self,
-                                             n: int,
-                                             field_name: str,
-                                             experiment_name: str,
-                                             goal: OptimizationGoal,
-                                             kind: OptimizationKind,
-                                             measurement_name: str = None,
-                                             bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.best_n_for_experiment(n, field_name, experiment_name, goal, kind, measurement_name,
-                                                         bucket_name)
-
-    def thresholds_exceeding_computations(self,
-                                          field_name: str,
-                                          criteria_mode: CriteriaMode,
-                                          thresholds: Thresholds,
-                                          measurement_name: str = None,
-                                          bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.exceeding_thresholds(field_name, criteria_mode, thresholds, measurement_name,
-                                                      bucket_name)
-
-    def thresholds_exceeding_computations_for_configuration(self,
-                                                            field_name: str,
-                                                            configuration: ExperimentConfiguration,
-                                                            criteria_mode: CriteriaMode,
-                                                            thresholds: Thresholds,
-                                                            measurement_name: str = None,
-                                                            bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.exceeding_thresholds_for_configuration(field_name, configuration, criteria_mode,
-                                                                        thresholds, measurement_name, bucket_name)
-
-    def thresholds_exceeding_computations_relatively(self,
-                                                     field_name: str,
-                                                     configuration: ExperimentConfiguration,
-                                                     criteria_mode: CriteriaMode,
-                                                     thresholds: Thresholds,
-                                                     thresholds_type: ThresholdsType,
-                                                     measurement_name: str = None,
-                                                     bucket_name: str = None) -> List[DataSeries]:
-        return self.computations.exceeding_thresholds_relatively(field_name, configuration, criteria_mode,
-                                                                 thresholds, thresholds_type,
-                                                                 measurement_name, bucket_name)
-
-    def thresholds_exceeding_configurations(self,
-                                            field_name: str,
-                                            criteria_mode: CriteriaMode,
-                                            thresholds: Thresholds,
-                                            configurations: List[ExperimentConfiguration],
-                                            measurement_name: str = None,
-                                            bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.exceeding_thresholds(field_name, criteria_mode, thresholds, configurations,
-                                                        measurement_name, bucket_name)
-
-    def thresholds_exceeding_configurations_for_experiment(self,
-                                                           field_name: str,
-                                                           criteria_mode: CriteriaMode,
-                                                           thresholds: Thresholds,
-                                                           experiment_name: str,
-                                                           measurement_name: str = None,
-                                                           bucket_name: str = None) -> List[DataSeries]:
-        return self.configurations.exceeding_thresholds_for_experiment(field_name, experiment_name, criteria_mode,
-                                                                       thresholds, measurement_name, bucket_name)
-
-
-class ComputationsAnalytics(CloudberryApi):
-    def __init__(self, config: CloudberryConfig) -> None:
-        super().__init__(config)
-        self.base_url = f'{config.base_url()}/statistics/computations'
+        self.base_url = f'{config.base_url()}/series/computations'
 
     def comparison(self,
                    computations: List[ExperimentComputation],
@@ -179,7 +50,7 @@ class ComputationsAnalytics(CloudberryApi):
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
-        return AnalyticsUtil.wrap_series_request(lambda: requests.get(url=url, params=params))
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params))
 
     def best_n_for_configuration(self,
                                  n: int,
@@ -197,7 +68,7 @@ class ComputationsAnalytics(CloudberryApi):
             'optimizationGoal': goal.name,
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
-        return AnalyticsUtil.wrap_series_request(lambda: requests.get(url=url, params=params))
+        return AnalyticsUtil.wrap_series_request(lambda: requests.post(url=url, params=params))
 
     def exceeding_thresholds(self,
                              field_name: str,
@@ -257,10 +128,10 @@ class ComputationsAnalytics(CloudberryApi):
         ))
 
 
-class ConfigurationsAnalytics(CloudberryApi):
+class ConfigurationSeries(CloudberryApi):
     def __init__(self, config: CloudberryConfig) -> None:
         super().__init__(config)
-        self.base_url = f'{config.base_url()}/statistics/configurations'
+        self.base_url = f'{config.base_url()}/series/configurations'
 
     def comparison(self,
                    configurations: List[ExperimentConfiguration],
