@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Value
-public class SeriesResponseDto {
+public class SeriesPack {
+    public static final SeriesPack EMPTY = new SeriesPack(List.of(), Optional.empty());
     List<DataSeries> series;
     Optional<DataSeries> averageSeries;
 }

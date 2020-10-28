@@ -3,14 +3,14 @@ package com.cloudberry.cloudberry.service.api;
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
-import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverage;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageInMemoryOps;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,85 +27,64 @@ import java.util.function.Supplier;
 public class ComputationStatisticsService {
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
-    private final InfluxUtilService influxUtilService;
     private final ConfigurationSeriesCreator configurationSeriesCreator;
 
-    public List<DataSeries> getComputationsByIds(
+    public SeriesPack getComputationsByIds(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> computationIds,
-            boolean computeMean
+            List<ObjectId> computationIds
     ) {
-        var computationSeries = analytics.getSeriesApi()
+        var computationsSeries = analytics.getSeriesApi()
                 .computationsSeries(fieldName, computationIds, influxQueryFields);
 
-        if (computeMean) {
-            Supplier<DataSeries> getAverageSeries = () -> {
-                if (computationSeries.stream().anyMatch(DataSeries::nonEmpty)) {
-                    var intervalNanos =
-                            influxUtilService.averageIntervalNanos(fieldName, computationIds, influxQueryFields);
-                    return getComputationsAverage(
-                            fieldName,
-                            ChronoInterval.ofNanos(intervalNanos),
-                            computationIds,
-                            influxQueryFields
-                    );
-                } else {
-                    return DataSeries.empty(MovingAverage.AVG_SERIES_NAME);
-                }
-            };
-            return ListSyntax.with(computationSeries, getAverageSeries.get());
-        } else {
-            return computationSeries;
-        }
+        var computationsAverage = Optional
+                .of(MovingAverageInMemoryOps.movingAverageSeries(computationsSeries, fieldName));
+
+        return new SeriesPack(computationsSeries, computationsAverage);
     }
 
-    public List<DataSeries> getComputationsByConfigurationId(
+    public SeriesPack getComputationsByConfigurationId(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId,
-            boolean computeMean
+            ObjectId configurationId
     ) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        if (computationIds.isEmpty()) {
-            return List.of();
-        }
-        return getComputationsByIds(fieldName, influxQueryFields, computationIds, computeMean);
+        return getComputationsByIds(fieldName, influxQueryFields, computationIds);
     }
 
-    public List<DataSeries> getNBestComputations(
+    public SeriesPack getNBestComputations(
             int n,
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields
     ) {
-        return analytics.getBestSeriesApi()
-                .nBestSeries(
-                        n,
-                        fieldName,
-                        optimization,
-                        influxQueryFields
-                );
+        var bestComputations = analytics.getBestSeriesApi()
+                .nBestSeries(n, fieldName, optimization, influxQueryFields);
+
+        var bestComputationsAverage = Optional
+                .of(MovingAverageInMemoryOps.movingAverageSeries(bestComputations, fieldName));
+
+        return new SeriesPack(bestComputations, bestComputationsAverage);
     }
 
-    public List<DataSeries> getNBestComputationsForConfiguration(
+    public SeriesPack getNBestComputationsForConfiguration(
             int n,
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
             ObjectId configurationId
     ) {
-        return analytics.getBestSeriesApi()
-                .nBestSeriesFrom(
-                        n,
-                        fieldName,
-                        optimization,
-                        influxQueryFields,
-                        metadataService.findAllComputationIdsForConfiguration(configurationId)
-                );
+        var computationsIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+        var bestComputations = analytics.getBestSeriesApi()
+                .nBestSeriesFrom(n, fieldName, optimization, influxQueryFields, computationsIds);
+
+        var bestComputationsAverage = Optional
+                .of(MovingAverageInMemoryOps.movingAverageSeries(bestComputations, fieldName));
+
+        return new SeriesPack(bestComputations, bestComputationsAverage);
     }
 
-    public List<DataSeries> getAverageAndStddevOfComputations(
+    public SeriesPack getAverageAndStddevOfComputations(
             String fieldName,
             ChronoInterval chronoInterval,
             List<ObjectId> computationsIds,
@@ -117,7 +96,7 @@ public class ComputationStatisticsService {
         );
     }
 
-    public List<DataSeries> getComputationsExceedingThresholds(
+    public SeriesPack getComputationsExceedingThresholds(
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,

@@ -22,6 +22,13 @@ public abstract class MovingAverageInMemoryOps {
     public static final String STDDEV_KEY = "stddev";
     public static final String AVERAGE_SERIES_NAME = "average";
 
+    public static DataSeries movingAverageSeries(
+            List<DataSeries> series,
+            String fieldName
+    ) {
+        return movingAverageSeries(series, fieldName, true, true);
+    }
+
     /**
      * @param useTimeShift         computes average series as if all series had the same starting point
      *                             (being start of first starting series)

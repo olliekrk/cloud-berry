@@ -11,13 +11,13 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class SeriesResponseDtoTest {
+class SeriesPackTest {
 
     ObjectMapper mapper = new JacksonConfig().objectMapper();
 
     @Test
     public void serializationTest() throws JsonProcessingException {
-        var emptyResponse = new SeriesResponseDto(List.of(), Optional.empty());
+        var emptyResponse = new SeriesPack(List.of(), Optional.empty());
         var emptyResponseString = mapper.writeValueAsString(emptyResponse);
 
         assertThat(emptyResponseString, Matchers.equalTo("{\"series\":[],\"averageSeries\":null}"));

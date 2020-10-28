@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
@@ -15,7 +15,6 @@ import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import com.cloudberry.cloudberry.service.api.ComputationStatisticsService;
 import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("statistics/computations")
@@ -35,42 +33,35 @@ public class ComputationStatisticsRest {
     private final ComputationStatisticsService computationStatisticsService;
 
     @PostMapping("/comparison")
-    public List<DataSeries> getComputationsByIds(
+    public SeriesPack getComputationsByIds(
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestBody List<String> computationIdsHex,
-            @RequestParam(required = false, defaultValue = "true") boolean computeMean
+            @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
-
         return computationStatisticsService.getComputationsByIds(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                computationIds,
-                computeMean
+                IdDispatcher.getComputationIds(computationIdsHex)
         );
     }
 
     @PostMapping("/comparisonForConfiguration")
-    public List<DataSeries> getComputationsByConfigurationId(
+    public SeriesPack getComputationsByConfigurationId(
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
             @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
-        val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
-
         return computationStatisticsService.getComputationsByConfigurationId(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                configurationId,
-                true
+                IdDispatcher.getConfigurationId(configurationIdHex)
         );
     }
 
     @GetMapping("/best")
-    public List<DataSeries> getNBestComputations(
+    public SeriesPack getNBestComputations(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -87,7 +78,7 @@ public class ComputationStatisticsRest {
     }
 
     @GetMapping("/bestForConfiguration")
-    public List<DataSeries> getNBestComputationsForConfiguration(
+    public SeriesPack getNBestComputationsForConfiguration(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -105,8 +96,10 @@ public class ComputationStatisticsRest {
         );
     }
 
+
+    // todo: remove completely?
     @PostMapping("/averageStddev")
-    public List<DataSeries> getAverageAndStddevOfComputations(
+    public SeriesPack getAverageAndStddevOfComputations(
             @RequestParam String fieldName,
             @RequestParam long interval,
             @RequestParam ChronoUnit unit,
@@ -114,38 +107,32 @@ public class ComputationStatisticsRest {
             @RequestParam(required = false) String bucketName,
             @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        var computationIds = IdDispatcher.getComputationIds(computationIdsHex);
-
         return computationStatisticsService.getAverageAndStddevOfComputations(
                 fieldName,
                 new ChronoInterval(interval, unit),
-                computationIds,
+                IdDispatcher.getComputationIds(computationIdsHex),
                 influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 
     @PostMapping("/exceedingThresholds")
-    public List<DataSeries> getComputationsExceedingThresholds(
+    public SeriesPack getComputationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
             @RequestBody Thresholds thresholds
     ) throws InvalidThresholdsException {
-        if (!thresholds.isValid()) {
-            throw new InvalidThresholdsException(thresholds);
-        }
-
         return computationStatisticsService.getComputationsExceedingThresholds(
                 fieldName,
-                thresholds,
+                thresholds.requireValid(),
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 
     @PostMapping("/exceedingThresholdsForConfiguration")
-    public List<DataSeries> getComputationsExceedingThresholds(
+    public SeriesPack getComputationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam String configurationIdHex,
@@ -155,7 +142,7 @@ public class ComputationStatisticsRest {
     ) throws InvalidThresholdsException, InvalidConfigurationIdException {
         return computationStatisticsService.getComputationsExceedingThresholdsForConfiguration(
                 fieldName,
-                requireValidThresholds(thresholds),
+                thresholds.requireValid(),
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
@@ -163,7 +150,7 @@ public class ComputationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholdsRelatively")
-    public List<DataSeries> getComputationsExceedingThresholdsRelatively(
+    public SeriesPack getComputationsExceedingThresholdsRelatively(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam String configurationIdHex,
@@ -174,19 +161,12 @@ public class ComputationStatisticsRest {
     ) throws InvalidThresholdsException, InvalidConfigurationIdException {
         return computationStatisticsService.getComputationsExceedingThresholdsRelatively(
                 fieldName,
-                requireValidThresholds(thresholds),
+                thresholds.requireValid(),
                 thresholdsType,
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
         );
     }
-
-    private Thresholds requireValidThresholds(Thresholds thresholds) throws InvalidThresholdsException {
-        return Optional.ofNullable(thresholds)
-                .filter(Thresholds::isValid)
-                .orElseThrow(() -> new InvalidThresholdsException(thresholds));
-    }
-
 
 }
