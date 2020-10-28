@@ -5,7 +5,8 @@ from .flavours import PlottingFlavour
 
 class PlotSeriesKind(Enum):
     SCATTER = 1
-    LINE = 2
+    SCATTERLINE = 2
+    LINE = 3
 
 
 class PlotLineKind(Enum):
@@ -30,7 +31,7 @@ class PlotProperties:
                  show_averages: bool = True,
                  show_trends: bool = True,
                  show_legend: bool = True,
-                 show_error_bars: bool = False,  # only if other error bars properties are properly configured
+                 show_error_bars: bool = True,
                  flavour: PlottingFlavour = PlottingFlavour.Plotly,
                  default_series_kind: PlotSeriesKind = PlotSeriesKind.SCATTER,
                  default_line_kind: PlotLineKind = PlotLineKind.CONTINUOUS

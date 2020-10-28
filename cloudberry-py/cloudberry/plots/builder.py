@@ -4,7 +4,7 @@ from .exceptions import DuplicatedSeriesName, InvalidPlotsConfiguration, Duplica
 from .flavour_plotly import PlotlyFlavourPlot
 from .flavours import PlottingFlavour
 from .properties import PlotProperties
-from .series import PlotSeries
+from .series import PlotSeries, PlotSeriesPack
 from .trendlines import TrendLine
 
 
@@ -27,6 +27,12 @@ class PlotBuilder:
             raise DuplicatedTrendLine(f"{trend_name} is already defined")
         else:
             self.__trends[trend_name] = trend
+
+    def add_pack(self, pack: PlotSeriesPack):
+        for s in pack.series:
+            self.add_series(s)
+        for a in pack.averages:
+            self.add_avg_series(a)
 
     def delete_series(self, name: str):
         PlotBuilder.__delete_series(name, self.__series)

@@ -1,3 +1,5 @@
+from typing import List
+
 from pandas import DataFrame
 
 
@@ -13,3 +15,11 @@ class PlotSeries:
         self.x_field = x_field
         self.y_field = y_field
         self.y_err_field = y_err_field
+
+
+class PlotSeriesPack:
+    def __init__(self,
+                 series: List[PlotSeries],
+                 averages: List[PlotSeries]):
+        self.series = series
+        self.averages = averages

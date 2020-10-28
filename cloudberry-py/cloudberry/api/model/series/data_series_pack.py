@@ -11,6 +11,6 @@ class DataSeriesPack:
     @staticmethod
     def from_json(json: dict):
         return DataSeriesPack(
-            series=json['series'],
-            average_series=json['averageSeries']
+            series=DataSeries.from_json_list(json['series']),
+            average_series=DataSeries.from_json(json['averageSeries'])
         )

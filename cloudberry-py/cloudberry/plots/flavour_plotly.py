@@ -62,17 +62,26 @@ class PlotlyFlavourPlot:
         return fig
 
     def __add_trace(self, series: PlotSeries, fig: pgo.Figure):
-        trace_mode = 'markers' if self.properties.default_series_kind == PlotSeriesKind.SCATTER else 'lines+markers'
+        show_error_y = self.properties.show_error_bars and \
+                       series.y_err_field is not None and \
+                       series.y_err_field in series.data.columns
+        trace_mode = {
+            PlotSeriesKind.SCATTER: 'markers',
+            PlotSeriesKind.SCATTERLINE: 'markers+lines',
+            PlotSeriesKind.LINE: 'lines',
+        }[self.properties.default_series_kind]
         trace = pgo.Scatter(
             name=series.name,
             mode=trace_mode,
             x=series.data[series.x_field],
             y=series.data[series.y_field],
-            error_y=None if series.y_err_field is None else {
+            error_y=None if not show_error_y else {
                 'type': 'data',
                 'visible': series.y_err_field is not None,
                 'array': series.data[series.y_err_field],
                 'color': 'red',
+                'thickness': 0.5,
+                'width': 1,
             },
             marker={
                 'symbol': 'circle',
