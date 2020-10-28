@@ -3,7 +3,7 @@ package com.cloudberry.cloudberry.db.influx.service;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.write.Point;
-import io.vavr.control.Try;
+import com.influxdb.exceptions.InfluxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -22,19 +22,15 @@ public class InfluxDataWriter {
     private final InfluxDBClient influxClient;
 
     public <M> void writeMeasurement(M measurement) {
-        Try.withResources(influxClient::getWriteApi)
-                .of(writeApi -> {
-                    writeApi.writeMeasurement(InfluxDefaults.WRITE_PRECISION, measurement);
-                    return null;
-                }).get();
+        writeMeasurements(List.of(measurement));
     }
 
     public <M> void writeMeasurements(Collection<M> measurements) {
-        Try.withResources(influxClient::getWriteApi)
-                .of(writeApi -> {
-                    writeApi.writeMeasurements(InfluxDefaults.WRITE_PRECISION, List.copyOf(measurements));
-                    return null;
-                }).get();
+        try (var writeApi = influxClient.getWriteApi()) {
+            writeApi.writeMeasurements(InfluxDefaults.WRITE_PRECISION, List.copyOf(measurements));
+        } catch (InfluxException e) {
+            log.warn("Writing {} measurements to Influx has failed: {}", measurements.size(), e.getMessage());
+        }
     }
 
     public void writePoint(@Nullable String bucketName, Point point) {
@@ -42,11 +38,12 @@ public class InfluxDataWriter {
     }
 
     public void writePoints(@Nullable String bucketName, Collection<Point> points) {
-        Try.withResources(influxClient::getWriteApi).of(writeApi -> {
+        try (var writeApi = influxClient.getWriteApi()) {
             var bucket = Optional.ofNullable(bucketName).orElse(influxPropertiesService.getDefaultBucketName());
             writeApi.writePoints(bucket, influxOrganizationService.getDefaultOrganizationId(), List.copyOf(points));
-            return null;
-        }).get();
+        } catch (InfluxException e) {
+            log.warn("Writing {} points to Influx has failed: {}", points.size(), e.getMessage());
+        }
     }
 
 }

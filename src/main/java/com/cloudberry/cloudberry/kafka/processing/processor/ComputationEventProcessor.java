@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
+import com.cloudberry.cloudberry.config.async.AsyncExecutors;
 import com.cloudberry.cloudberry.db.influx.data.PointBuilder;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
@@ -16,12 +17,12 @@ public class ComputationEventProcessor implements EventProcessor<ComputationEven
     private final InfluxDataWriter influxDataWriter;
 
     @Override
-    @Async
+    @Async(AsyncExecutors.influxProcessorsExecutor)
     public void process(ComputationEvent event) {
         process(event, null);
     }
 
-    @Async
+    @Async(AsyncExecutors.influxProcessorsExecutor)
     public void process(ComputationEvent event, String bucketName) {
         var point = pointBuilder.buildPoint(
                 event.getMeasurementName(),

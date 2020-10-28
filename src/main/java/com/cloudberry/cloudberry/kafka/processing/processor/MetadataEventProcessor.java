@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
+import com.cloudberry.cloudberry.config.async.AsyncExecutors;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.Experiment;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentConfiguration;
@@ -19,7 +20,7 @@ public class MetadataEventProcessor implements EventProcessor<MetadataEvent> {
     private final MetadataService metadataService;
 
     @Override
-    @Async
+    @Async(AsyncExecutors.influxProcessorsExecutor)
     public void process(MetadataEvent event) {
         Mono.just(extractExperimentData(event))
                 .flatMap(metadataService::getOrCreateExperiment)
