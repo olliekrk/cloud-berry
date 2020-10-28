@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
@@ -29,7 +29,7 @@ public class ConfigurationStatisticsRest {
     private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
 
     @PostMapping("/best")
-    public List<DataSeries> getNBestConfigurations(
+    public SeriesPack getNBestConfigurations(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -49,7 +49,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/bestForExperiment")
-    public List<DataSeries> getNBestConfigurationsForExperiment(
+    public SeriesPack getNBestConfigurationsForExperiment(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -68,14 +68,14 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/comparison")
-    public List<DataSeries> getConfigurationsMeans(
+    public SeriesPack getConfigurationsMeans(
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
             @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
         var configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
-        return configurationStatisticsService.getConfigurationsMeans(
+        return configurationStatisticsService.getConfigurations(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 configurationIds
@@ -83,13 +83,13 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/comparisonForExperiment")
-    public List<DataSeries> getConfigurationsMeansForExperiment(
+    public SeriesPack getConfigurationsMeansForExperiment(
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
             @RequestParam String experimentName
     ) {
-        return configurationStatisticsService.getConfigurationsMeansForExperiment(
+        return configurationStatisticsService.getConfigurationsForExperiment(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 experimentName
@@ -97,7 +97,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholds")
-    public List<DataSeries> getConfigurationsExceedingThresholds(
+    public SeriesPack getConfigurationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
@@ -120,7 +120,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholdsForExperiment")
-    public List<DataSeries> getConfigurationsExceedingThresholds(
+    public SeriesPack getConfigurationsExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,

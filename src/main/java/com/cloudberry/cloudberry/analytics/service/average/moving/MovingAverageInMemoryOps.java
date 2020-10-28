@@ -22,7 +22,7 @@ public abstract class MovingAverageInMemoryOps {
     public static final String STDDEV_KEY = "stddev";
     public static final String AVERAGE_SERIES_NAME = "average";
 
-    public static DataSeries movingAverageSeries(
+    public static Optional<DataSeries> movingAverageSeries(
             List<DataSeries> series,
             String fieldName
     ) {
@@ -35,7 +35,7 @@ public abstract class MovingAverageInMemoryOps {
      * @param skipIncompletePoints do not add point to result series if bucket did not contain at least 1 point from
      *                             each series
      */
-    public static DataSeries movingAverageSeries(
+    public static Optional<DataSeries> movingAverageSeries(
             List<DataSeries> series,
             String fieldName,
             boolean useTimeShift,
@@ -48,7 +48,7 @@ public abstract class MovingAverageInMemoryOps {
         var firstIntervalStartOpt = TimeShiftOps.minStartTime(series);
         if (firstIntervalStartOpt.isEmpty()) {
             log.warn("Moving average could not be performed - no time markers in series");
-            return DataSeries.empty(AVERAGE_SERIES_NAME);
+            return Optional.empty();
         }
 
         var firstIntervalStart = firstIntervalStartOpt.get();
@@ -100,7 +100,7 @@ public abstract class MovingAverageInMemoryOps {
                 })
                 .collect(Collectors.toList());
 
-        return new DataSeries(AVERAGE_SERIES_NAME, averageSeriesData);
+        return Optional.of(new DataSeries(AVERAGE_SERIES_NAME, averageSeriesData));
     }
 
     /**

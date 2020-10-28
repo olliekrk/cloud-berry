@@ -7,7 +7,6 @@ import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
-import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -39,7 +37,7 @@ public class ComputationStatisticsRest {
             @RequestParam(required = false) String bucketName,
             @RequestBody List<String> computationIdsHex
     ) throws InvalidComputationIdException {
-        return computationStatisticsService.getComputationsByIds(
+        return computationStatisticsService.getComputations(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getComputationIds(computationIdsHex)
@@ -53,7 +51,7 @@ public class ComputationStatisticsRest {
             @RequestParam(required = false) String bucketName,
             @RequestParam String configurationIdHex
     ) throws InvalidConfigurationIdException {
-        return computationStatisticsService.getComputationsByConfigurationId(
+        return computationStatisticsService.getComputations(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
@@ -93,25 +91,6 @@ public class ComputationStatisticsRest {
                 new Optimization(optimizationGoal, optimizationKind),
                 influxQueryFieldsResolver.get(measurementName, bucketName),
                 IdDispatcher.getConfigurationId(configurationIdHex)
-        );
-    }
-
-
-    // todo: remove completely?
-    @PostMapping("/averageStddev")
-    public SeriesPack getAverageAndStddevOfComputations(
-            @RequestParam String fieldName,
-            @RequestParam long interval,
-            @RequestParam ChronoUnit unit,
-            @RequestParam(required = false) String measurementName,
-            @RequestParam(required = false) String bucketName,
-            @RequestBody List<String> computationIdsHex
-    ) throws InvalidComputationIdException {
-        return computationStatisticsService.getAverageAndStddevOfComputations(
-                fieldName,
-                new ChronoInterval(interval, unit),
-                IdDispatcher.getComputationIds(computationIdsHex),
-                influxQueryFieldsResolver.get(measurementName, bucketName)
         );
     }
 

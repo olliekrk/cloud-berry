@@ -3,19 +3,21 @@ package com.cloudberry.cloudberry.service.api;
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
-import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageInMemoryOps;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,96 +27,101 @@ public class ConfigurationStatisticsService {
     private final MetadataService metadataService;
     private final ConfigurationSeriesCreator configurationSeriesCreator;
 
-    public List<DataSeries> getNBestConfigurations(
+    public SeriesPack getNBestConfigurations(
             int n,
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationIds
     ) {
-        var configurationsSeries = configurationIds.stream()
-                .map(id -> configurationSeriesCreator
-                        .createMovingAverageConfigurationSeries(fieldName, influxQueryFields, id))
+        var allSeries = configurationIds
+                .stream()
+                .flatMap(id -> configurationSeriesCreator
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .stream()
+                )
                 .collect(Collectors.toList());
 
-        return analyticsApi.getBestSeriesApi().nBestSeriesFrom(
-                n,
-                fieldName,
-                optimization,
-                configurationsSeries
-        );
+        var bestN = analyticsApi.getBestSeriesApi().nBestSeriesFrom(n, fieldName, optimization, allSeries);
+        var bestNAverage = MovingAverageInMemoryOps.movingAverageSeries(bestN, fieldName);
+
+        return new SeriesPack(bestN, bestNAverage);
     }
 
-    public List<DataSeries> getNBestConfigurationsForExperiment(
+    public SeriesPack getNBestConfigurationsForExperiment(
             int n,
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
             String experimentName
     ) {
-        return getNBestConfigurations(
-                n,
-                fieldName,
-                optimization,
-                influxQueryFields,
-                metadataService.findAllConfigurationIdsForExperiment(experimentName)
-        );
+        var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
+        var bestN = getNBestConfigurations(n, fieldName, optimization, influxQueryFields, configurationIds);
+        var bestNAverageRenamed = bestN.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+
+        return bestN.withAverageSeries(bestNAverageRenamed);
     }
 
-    public List<DataSeries> getConfigurationsExceedingThresholds(
+    public SeriesPack getConfigurationsExceedingThresholds(
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationIds
     ) {
-        return analyticsApi.getThresholdsApi().thresholdsExceedingSeriesFrom(
-                fieldName,
-                thresholds,
-                mode,
-                getConfigurationsSeries(fieldName, influxQueryFields, configurationIds)
-        );
+        var configurationSeries = getConfigurationsSeries(fieldName, influxQueryFields, configurationIds);
+
+        var exceeding = analyticsApi.getThresholdsApi()
+                .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, configurationSeries);
+        var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName);
+
+        return new SeriesPack(exceeding, exceedingAverage);
     }
 
-    public List<DataSeries> getConfigurationsExceedingThresholdsForExperiment(
+    public SeriesPack getConfigurationsExceedingThresholdsForExperiment(
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
             String experimentName
     ) {
-        return getConfigurationsExceedingThresholds(
-                fieldName,
-                thresholds,
-                mode,
-                influxQueryFields,
-                metadataService.findAllConfigurationIdsForExperiment(experimentName)
-        );
+        var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
+        var exceeding =
+                getConfigurationsExceedingThresholds(fieldName, thresholds, mode, influxQueryFields, configurationIds);
+        var exceedingAverageRenamed = exceeding.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+
+        return exceeding.withAverageSeries(exceedingAverageRenamed);
     }
 
 
-    public List<DataSeries> getConfigurationsMeans(
+    public SeriesPack getConfigurations(
             String fieldName,
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationIds
     ) {
-        return ListSyntax.mapped(
-                configurationIds,
-                configurationId -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
-                        fieldName,
-                        influxQueryFields,
-                        configurationId
+        var series = configurationIds.stream()
+                .flatMap(id -> configurationSeriesCreator
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .stream()
                 )
-        );
+                .collect(Collectors.toList());
+
+        var seriesAverage = MovingAverageInMemoryOps
+                .movingAverageSeries(series, fieldName);
+
+        return new SeriesPack(series, seriesAverage);
     }
 
-    public List<DataSeries> getConfigurationsMeansForExperiment(
+    public SeriesPack getConfigurationsForExperiment(
             String fieldName,
             InfluxQueryFields influxQueryFields,
             String experimentName
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        return getConfigurationsMeans(fieldName, influxQueryFields, configurationIds);
+        var series = getConfigurations(fieldName, influxQueryFields, configurationIds);
+        var seriesAverageRenamed = series.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+
+        return series.withAverageSeries(seriesAverageRenamed);
     }
 
     private Map<ObjectId, DataSeries> getConfigurationsSeries(
@@ -122,14 +129,13 @@ public class ConfigurationStatisticsService {
             InfluxQueryFields influxQueryFields,
             List<ObjectId> configurationsIds
     ) {
-        return configurationsIds.stream().collect(Collectors.toMap(
-                Function.identity(),
-                id -> configurationSeriesCreator.createMovingAverageConfigurationSeries(
-                        fieldName,
-                        influxQueryFields,
-                        id
+        return configurationsIds.stream()
+                .flatMap(id -> configurationSeriesCreator
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .map(configurationSeries -> Tuple.of(id, configurationSeries))
+                        .stream()
                 )
-        ));
+                .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
     }
 
 }

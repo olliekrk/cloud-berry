@@ -1,10 +1,9 @@
-import pandas as pd
 import requests
 
 from .backend import CloudberryApi, CloudberryConfig, CloudberryException, CloudberryConnectionException
 from .constants import *
 from .json_util import JSONUtil
-from .model import DataSeries, OptimizationGoal, OptimizationKind, TimeUnit, CriteriaMode, Thresholds, ThresholdsType
+from .model import DataSeries, OptimizationGoal, OptimizationKind, CriteriaMode, Thresholds, ThresholdsType
 from .model.metadata import *
 
 
@@ -84,16 +83,6 @@ class Analytics(CloudberryApi):
                                              bucket_name: str = None) -> List[DataSeries]:
         return self.configurations.best_n_for_experiment(n, field_name, experiment_name, goal, kind, measurement_name,
                                                          bucket_name)
-
-    def avg_and_stddev_for_computations(self,
-                                        computations: List[ExperimentComputation],
-                                        field_name: str,
-                                        interval: int,
-                                        time_unit: TimeUnit,
-                                        measurement_name: str = None,
-                                        bucket_name: str = None) -> DataSeries:
-        return self.computations.avg_and_std_dev(computations, field_name, interval, time_unit, measurement_name,
-                                                 bucket_name)
 
     def thresholds_exceeding_computations(self,
                                           field_name: str,
@@ -209,36 +198,6 @@ class ComputationsAnalytics(CloudberryApi):
             'optimizationKind': kind.name
         }, measurement_name, bucket_name)
         return AnalyticsUtil.wrap_series_request(lambda: requests.get(url=url, params=params))
-
-    def avg_and_std_dev(self,
-                        computations: List[ExperimentComputation],
-                        field_name: str,
-                        interval: int,
-                        time_unit: TimeUnit,
-                        measurement_name: str = None,
-                        bucket_name: str = None) -> DataSeries:
-        url = f'{self.base_url}/averageStddev'
-        params = AnalyticsUtil.append_influx_params({
-            'fieldName': field_name,
-            'interval': interval,
-            'unit': time_unit.name
-        }, measurement_name, bucket_name)
-
-        # todo: simplify code below?
-        series = AnalyticsUtil.wrap_series_request(lambda: requests.post(
-            url=url,
-            params=params,
-            json=get_ids_for_computations(computations)
-        ))
-
-        def get_series(name):
-            return list(filter(lambda s: s.series_name == name, series))[0] \
-                .as_data_frame \
-                .rename(columns={field_name: name}) \
-                .drop(columns=['series_name'])
-
-        merged_data = pd.merge(get_series('AVG'), get_series('STDDEV'), on='_time').T.to_dict().values()
-        return DataSeries(field_name, merged_data)
 
     def exceeding_thresholds(self,
                              field_name: str,
