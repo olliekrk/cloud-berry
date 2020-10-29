@@ -117,10 +117,16 @@ class PlotlyFlavourPlot:
     def __update_layout(self, fig: pgo.Figure):
         fig.update_layout(
             dict1={
-                'title': {
+                'title': None if not self.properties.show_title else {
                     'text': self.properties.title,
                 },
                 'showlegend': self.properties.show_legend,
+                'margin': {
+                    'l': 60,
+                    'r': 30,
+                    't': 30,
+                    'b': 60,
+                }
             },
             overwrite=True
         )
