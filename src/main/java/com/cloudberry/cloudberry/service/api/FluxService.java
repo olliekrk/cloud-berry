@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FluxService {
+    public static final String FLUX_SERIES_NAME = "flux_query";
     private final InfluxDBClient influxClient;
 
     public DataSeries queryForSeries(String rawQuery) {
@@ -21,7 +22,7 @@ public class FluxService {
                 .map(FluxRecord::getValues)
                 .collect(Collectors.toList());
 
-        return new DataSeries(rawQuery, rawQueryData);
+        return new DataSeries(FLUX_SERIES_NAME, rawQueryData);
     }
 
 }
