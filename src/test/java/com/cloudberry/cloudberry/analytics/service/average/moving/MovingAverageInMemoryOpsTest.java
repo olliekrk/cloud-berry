@@ -28,7 +28,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("1", List.of(Map.of(VALUE, 1., TIME, now)))
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(1.));
     }
@@ -43,7 +43,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("4", List.of(Map.of(VALUE, 4., TIME, now)))
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(2.5));
     }
@@ -58,7 +58,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("4", List.of(Map.of(VALUE, 3., TIME, now)))
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(3.));
         assertThat((double) result.getData().get(0).get(STDDEV), equalTo(0.));
@@ -81,7 +81,7 @@ class MovingAverageInMemoryOpsTest {
         ));
         var series = List.of(seriesOne);
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(seriesOne.getDataSize()));
         result.getData().forEach(p -> assertThat((double) p.get(STDDEV), equalTo(0.)));
     }
@@ -100,7 +100,7 @@ class MovingAverageInMemoryOpsTest {
                 Map.of(VALUE, 300., TIME, now.plusSeconds(2))
         ));
         var series = List.of(seriesOne, seriesTwo);
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         var resultData = result.getData();
         assertThat(resultData, hasSize(3));
         assertThat((double) resultData.get(0).get(VALUE), equalTo(50.5));
@@ -120,7 +120,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("3", List.of())
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(1.));
     }
@@ -129,7 +129,7 @@ class MovingAverageInMemoryOpsTest {
     void itShouldBeEmptyOnEmptySeries() {
         var series = List.<DataSeries>of();
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false);
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false);
         assertTrue(result.isEmpty());
     }
 
@@ -142,7 +142,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("3", List.of(Map.of(VALUE, 3., TIME, now)))
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(3.));
     }
@@ -156,7 +156,7 @@ class MovingAverageInMemoryOpsTest {
                 new DataSeries("3", List.of(Map.of(TIME, now, VALUE, 3.)))
         );
 
-        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false).get();
+        var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
         assertThat(result.getData(), hasSize(1));
         assertThat((double) result.getData().get(0).get(VALUE), equalTo(3.));
     }
