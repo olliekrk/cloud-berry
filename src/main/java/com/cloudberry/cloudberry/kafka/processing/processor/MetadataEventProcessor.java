@@ -41,6 +41,7 @@ public class MetadataEventProcessor implements EventProcessor<MetadataEvent> {
 
     private static ExperimentConfiguration extractConfigurationData(MetadataEvent event, ObjectId experimentId) {
         return new ExperimentConfiguration(
+                ObjectId.get(),
                 experimentId,
                 null,
                 event.getConfigurationParameters(),

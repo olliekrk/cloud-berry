@@ -21,10 +21,4 @@ public class ExperimentComputation implements Timed {
     @Indexed
     private ObjectId configurationId;
     private Instant time;
-
-    public ExperimentComputation(ObjectId configurationId, Instant time) {
-        this.id = new ObjectId();
-        this.configurationId = configurationId;
-        this.time = time;
-    }
 }

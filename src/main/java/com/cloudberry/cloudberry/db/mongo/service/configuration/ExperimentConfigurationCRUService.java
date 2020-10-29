@@ -42,15 +42,7 @@ public class ExperimentConfigurationCRUService {
     public Mono<ExperimentConfiguration> findOrCreateConfiguration(ExperimentConfiguration configuration) {
         return configurationRepository
                 .findById(configuration.getId())
-                .switchIfEmpty(
-                        configurationRepository
-                                .findAllByExperimentIdAndParameters(
-                                        configuration.getExperimentId(),
-                                        configuration.getParameters()
-                                )
-                                .limitRequest(1)
-                                .next()
-                )
+                .switchIfEmpty(findExistingConfiguration(configuration))
                 .doOnNext(next -> log.info("Existing configuration " + next.getId() + " was found"))
                 .switchIfEmpty(configurationRepository.save(configuration))
                 .doOnNext(next -> log.info("Created new configuration " + next.getId()));
@@ -85,6 +77,16 @@ public class ExperimentConfigurationCRUService {
                                             ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
                                             : prevParams);
         };
+    }
+
+    private Mono<ExperimentConfiguration> findExistingConfiguration(
+            ExperimentConfiguration configuration
+    ) {
+        return configurationRepository
+                .findAllByExperimentId(configuration.getExperimentId())
+                .filter(other -> other.getParameters().equals(configuration.getParameters()))
+                .limitRequest(1)
+                .next();
     }
 
 }
