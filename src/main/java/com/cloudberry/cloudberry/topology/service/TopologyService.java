@@ -31,6 +31,6 @@ public class TopologyService {
     }
 
     public List<Topology> findDefaultTopologies() {
-        return topologyRepository.findByUserDefinedIsFalse();
+        return topologyRepository.findByIsUserDefinedIsFalse();
     }
 }

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
+import org.jetbrains.annotations.NotNull;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,8 @@ public class TopologyBootstrapper {
     private final StreamsBuilder kStreamsBuilder;
     private final KafkaStreamsConfiguration kStreamsConfiguration;
 
-    public KafkaStreams configureStreams(Topology topology) throws TopologyException {
-        log.info("Topology '" + topology.getName() + "' bootstrapping has started.");
+    public KafkaStreams configureStreams(@NotNull Topology topology) throws TopologyException {
+        log.info("Topology '{}' bootstrapping has started.", topology.getName());
 
         var rootIds = topology.findRootIds();
         var rootNodes = rootIds.stream()

@@ -1,16 +1,17 @@
 package com.cloudberry.cloudberry.topology.model;
 
 
+import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bson.types.ObjectId;
+import org.jgrapht.graph.AbstractBaseGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,8 +40,9 @@ public class Topology {
      */
     private Map<ObjectId, Set<ObjectId>> edges;
 
+
     /**
-     * @return id of root vertices
+     * @return set with ids of root vertices
      */
     public Set<ObjectId> findRootIds() {
         var graph = constructGraph();
@@ -61,18 +63,7 @@ public class Topology {
     }
 
     public void addEdge(TopologyNode source, TopologyNode target) {
-        edges.compute(
-                source.getId(),
-                (sourceId, sourceOutEdges) -> {
-                    if (sourceOutEdges == null) {
-                        return Set.of(target.getId());
-                    } else {
-                        var updatedOutEdges = new HashSet<>(sourceOutEdges);
-                        updatedOutEdges.add(target.getId());
-                        return updatedOutEdges;
-                    }
-                }
-        );
+        edges.merge(source.getId(), Set.of(target.getId()), SetSyntax::merge);
     }
 
     public void addVertex(TopologyNode node) {
@@ -83,7 +74,7 @@ public class Topology {
         return edges.keySet();
     }
 
-    public DefaultDirectedGraph<ObjectId, DefaultEdge> constructGraph() {
+    public AbstractBaseGraph<ObjectId, DefaultEdge> constructGraph() {
         var graph = new DefaultDirectedGraph<ObjectId, DefaultEdge>(DefaultEdge.class);
         edges.keySet().forEach(graph::addVertex);
         edges.forEach((source, targets) -> targets.forEach(target -> graph.addEdge(source, target)));

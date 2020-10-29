@@ -30,6 +30,10 @@ public class TopologyInitializer {
 
     public Topology buildDefaultTopology() {
         var topologySetupData = getDefaultTopologySetupData();
+        return saveTopologySetupData(topologySetupData);
+    }
+
+    private Topology saveTopologySetupData(TopologySetupData topologySetupData) {
         var topology = saveTopology(topologySetupData.getTopology());
         saveNodes(topologySetupData.getNodes());
         return topology;
@@ -49,11 +53,11 @@ public class TopologyInitializer {
     }
 
     private Topology saveTopology(Topology topology) {
-        return this.topologyService.save(topology);
+        return topologyService.save(topology);
     }
 
     private void saveNodes(List<TopologyNode> nodes) {
-        this.topologyNodeService.saveAll(nodes);
+        topologyNodeService.saveAll(nodes);
     }
 
     public void purgeDefaults() {

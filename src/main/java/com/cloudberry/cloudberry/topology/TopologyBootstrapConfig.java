@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
 import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyBootstrapper;
 import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyInitializer;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
@@ -34,16 +35,16 @@ public class TopologyBootstrapConfig {
     }
 
     private KafkaStreams configureWithTopology(Topology topology) {
-        KafkaStreams streams = null;
-        try {
-            streams = topologyBootstrapper.configureStreams(topology);
+        return Try.of(() -> {
+            var streams = topologyBootstrapper.configureStreams(topology);
             streams.start();
-        } catch (TopologyException e) {
-            log.error("Bootstrapping has failed due to a topology exception:", e);
-        } catch (Throwable e) {
-            log.error("Bootstrapping has failed due to an unknown exception:", e);
-        }
-        return streams;
+            return streams;
+        }).onFailure(
+                TopologyException.class,
+                e -> log.error("Bootstrapping has failed due to a topology exception:", e)
+        ).onFailure(
+                e -> log.error("Bootstrapping has failed due to an unknown exception:", e)
+        ).getOrNull();
     }
 
 }
