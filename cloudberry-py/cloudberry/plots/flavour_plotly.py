@@ -24,7 +24,7 @@ class PlotlyTrendLine(TrendLine):
     def __init__(self,
                  related_series_name: str,
                  kind: PlotlyTrendLineKind,
-                 constant: int = None):
+                 constant: float = None):
         self.related_series_name = related_series_name
         self.kind = kind
         self.constant = constant
@@ -214,6 +214,7 @@ class PlotlyFlavourPlot:
             line={
                 'dash': 'dash',
                 'color': 'red',
+                'width': 0.4,
             }
         )
 

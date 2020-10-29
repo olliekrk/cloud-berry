@@ -12,5 +12,5 @@ class DataSeriesPack:
     def from_json(json: dict):
         return DataSeriesPack(
             series=DataSeries.from_json_list(json['series']),
-            average_series=DataSeries.from_json(json['averageSeries'])
+            average_series=None if json['averageSeries'] is None else DataSeries.from_json(json['averageSeries'])
         )

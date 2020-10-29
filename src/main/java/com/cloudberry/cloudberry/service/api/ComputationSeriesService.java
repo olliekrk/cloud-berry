@@ -99,6 +99,9 @@ public class ComputationSeriesService {
             ObjectId configurationId
     ) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
+        if (computationIds.isEmpty()) {
+            return SeriesPack.EMPTY;
+        }
         var exceeding = analytics.getThresholdsApi()
                 .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, influxQueryFields, computationIds);
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
