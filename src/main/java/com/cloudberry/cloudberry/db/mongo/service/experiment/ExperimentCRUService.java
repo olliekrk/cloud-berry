@@ -33,11 +33,7 @@ public class ExperimentCRUService {
     public Mono<Experiment> findOrCreateExperiment(Experiment experiment) {
         return experimentRepository
                 .findById(experiment.getId())
-                .switchIfEmpty(experimentRepository
-                                       .findAllByNameAndParameters(experiment.getName(), experiment.getParameters())
-                                       .limitRequest(1)
-                                       .next())
-                .doOnNext(next -> log.info("Existing experiment {} was found", next.getId()))
+                .switchIfEmpty(findExistingExperiment(experiment))
                 .switchIfEmpty(saveNewExperiment(experiment));
     }
 
@@ -54,12 +50,6 @@ public class ExperimentCRUService {
     }
 
     @NotNull
-    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
-        log.info("Created new experiment " + experiment.getId());
-        return experimentRepository.save(experiment);
-    }
-
-    @NotNull
     private Function<Experiment, Experiment> updateExperiment(
             @Nullable String name,
             @Nullable Map<String, Object> newParams,
@@ -73,6 +63,22 @@ public class ExperimentCRUService {
                                             ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
                                             : prevParams);
         };
+    }
+
+    @NotNull
+    private Mono<Experiment> saveNewExperiment(Experiment experiment) {
+        return experimentRepository.save(experiment)
+                .doOnNext(_e -> log.info("Created new experiment " + experiment.getId()));
+    }
+
+    private Mono<Experiment> findExistingExperiment(
+            Experiment experiment
+    ) {
+        return experimentRepository.findAllByName(experiment.getName())
+                .filter(other -> other.getParameters().equals(experiment.getParameters()))
+                .limitRequest(1)
+                .next()
+                .doOnNext(next -> log.info("Existing experiment {} was found", next.getId()));
     }
 
 }
