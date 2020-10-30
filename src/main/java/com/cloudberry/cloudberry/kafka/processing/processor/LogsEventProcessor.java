@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.kafka.processing.processor;
 
+import com.cloudberry.cloudberry.config.async.AsyncExecutors;
 import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.db.influx.service.InfluxPropertiesService;
 import com.cloudberry.cloudberry.db.influx.util.converter.LogsEventToPointConverter;
@@ -20,7 +21,7 @@ public class LogsEventProcessor implements EventProcessor<Event> {
     private final InfluxDataWriter influxDataWriter;
     private final LogsEventToPointConverter logsEventToPointConverter;
 
-    @Async
+    @Async(AsyncExecutors.influxProcessorsExecutor)
     public void process(Event event) {
         Point point = null;
         if (event instanceof WorkplaceEvent) {

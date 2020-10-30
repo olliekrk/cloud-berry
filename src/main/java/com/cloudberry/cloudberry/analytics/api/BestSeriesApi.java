@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics.api;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import org.bson.types.ObjectId;
 
 import java.util.Collection;

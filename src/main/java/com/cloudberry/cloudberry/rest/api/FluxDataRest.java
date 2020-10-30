@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.rest.api;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.service.api.FluxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

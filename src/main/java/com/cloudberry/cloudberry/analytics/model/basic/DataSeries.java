@@ -1,11 +1,11 @@
-package com.cloudberry.cloudberry.analytics.model;
+package com.cloudberry.cloudberry.analytics.model.basic;
 
 import com.cloudberry.cloudberry.analytics.model.time.TimeRange;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
+import lombok.With;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Slf4j
 @Value
+@With
 public class DataSeries {
     private static final String TIME_FIELD_NAME = InfluxDefaults.Columns.TIME;
 
@@ -49,7 +49,7 @@ public class DataSeries {
 
     public List<Map<String, Object>> getDataSortedByTime() {
         return data.stream()
-                .sorted(Comparator.comparing(dataPoint -> (Instant) dataPoint.get(TIME_FIELD_NAME), Instant::compareTo))
+                .sorted(InfluxDefaults.Comparators.byTime)
                 .collect(Collectors.toList());
     }
 
@@ -57,6 +57,15 @@ public class DataSeries {
         return data.stream()
                 .flatMap(point -> Optional.ofNullable((Instant) point.get(TIME_FIELD_NAME)).stream())
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Instant> getStartTime() {
+        return getTimePoints().stream().min(Instant::compareTo);
+    }
+
+
+    public Optional<Instant> getEndTime() {
+        return getTimePoints().stream().min(Instant::compareTo);
     }
 
     public Optional<TimeRange> getTimeRange() {
@@ -91,11 +100,14 @@ public class DataSeries {
                         var valueOpt = Optional.ofNullable((Double) point.get(fieldName));
                         return valueOpt.stream().map(value -> Tuple.of(time, value));
                     } catch (Exception e) {
-                        log.debug("Missing or invalid value for field: " + fieldName, e);
                         return Stream.empty();
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public int getDataSize() {
+        return this.data.size();
     }
 
 }

@@ -11,6 +11,7 @@ import com.cloudberry.cloudberry.metrics.MetricsIndex;
 import com.cloudberry.cloudberry.metrics.MetricsProvider;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
+import com.influxdb.exceptions.InfluxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -82,6 +83,10 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void logDefaultConfiguration() {
-        log.info("Default Influx organization ID: {}", influxOrganizationService.getDefaultOrganizationId());
+        try {
+            log.info("Default Influx organization ID: {}", influxOrganizationService.getDefaultOrganizationId());
+        } catch (InfluxException e) {
+            log.error("Influxdb configuration unavailable. Make sure InfluxDB is running: {}", e.getMessage());
+        }
     }
 }

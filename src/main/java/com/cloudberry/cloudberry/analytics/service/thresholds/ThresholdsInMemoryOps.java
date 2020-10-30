@@ -1,10 +1,10 @@
 package com.cloudberry.cloudberry.analytics.service.thresholds;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
+import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
 import com.google.common.collect.Streams;
-import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import org.springframework.stereotype.Component;
 
@@ -114,14 +114,23 @@ public abstract class ThresholdsInMemoryOps {
         var lowerOpt = Optional.ofNullable(thresholdsInfo.getThresholds().getLower());
         var upperOpt = Optional.ofNullable(thresholdsInfo.getThresholds().getUpper());
 
-        var absoluteOpts = switch (thresholdsInfo.getType()) {
-            case ABSOLUTE -> Tuple.of(lowerOpt, upperOpt);
-            case PERCENTS -> Tuple
-                    .of(lowerOpt.map(t -> relativeValue * (1. - t)), upperOpt.map(t -> relativeValue * (1. + t)));
-        };
+        if (thresholdsInfo.getType().equals(ThresholdsType.ABSOLUTE)) {
+            var lowerExceeded = lowerOpt.stream().anyMatch(l -> value < relativeValue - l);
+            var upperExceeded = upperOpt.stream().anyMatch(u -> value > relativeValue + u);
 
-        return absoluteOpts._1.stream().anyMatch(lower -> value < lower)
-                || absoluteOpts._2.stream().anyMatch(upper -> value > upper);
+            return lowerExceeded || upperExceeded;
+        } else if (thresholdsInfo.getType().equals(ThresholdsType.PERCENTS)) {
+            var lowerExceeded = lowerOpt.stream()
+                    .map(l -> l >= 0 && l <= 100 ? l / 100 : 0)
+                    .anyMatch(l -> value < relativeValue * (1 - l));
+            var upperExceeded = upperOpt.stream()
+                    .map(u -> u >= 0 && u <= 100 ? u / 100 : 0)
+                    .anyMatch(u -> value > relativeValue * (1 + u));
+
+            return lowerExceeded || upperExceeded;
+        } else {
+            return false;
+        }
     }
 
 

@@ -1,7 +1,7 @@
 package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
@@ -9,7 +9,7 @@ import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidConfigurationIdException;
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
-import com.cloudberry.cloudberry.service.api.ConfigurationStatisticsService;
+import com.cloudberry.cloudberry.service.api.ConfigurationSeriesService;
 import com.cloudberry.cloudberry.service.utility.InfluxQueryFieldsResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +23,42 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("statistics/configurations")
-public class ConfigurationStatisticsRest {
-    private final ConfigurationStatisticsService configurationStatisticsService;
+@RequestMapping("series/configurations")
+public class ConfigurationSeriesRest {
+    private final ConfigurationSeriesService configurationSeriesService;
     private final InfluxQueryFieldsResolver influxQueryFieldsResolver;
 
+    @PostMapping("/comparison")
+    public SeriesPack getByIds(
+            @RequestParam String fieldName,
+            @RequestParam(required = false) String measurementName,
+            @RequestParam(required = false) String bucketName,
+            @RequestBody List<String> configurationIdsHex
+    ) throws InvalidConfigurationIdException {
+        var configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
+        return configurationSeriesService.getConfigurations(
+                fieldName,
+                influxQueryFieldsResolver.get(measurementName, bucketName),
+                configurationIds
+        );
+    }
+
+    @PostMapping("/comparisonForExperiment")
+    public SeriesPack getByExperimentName(
+            @RequestParam String fieldName,
+            @RequestParam(required = false) String measurementName,
+            @RequestParam(required = false) String bucketName,
+            @RequestParam String experimentName
+    ) {
+        return configurationSeriesService.getConfigurationsForExperiment(
+                fieldName,
+                influxQueryFieldsResolver.get(measurementName, bucketName),
+                experimentName
+        );
+    }
+
     @PostMapping("/best")
-    public List<DataSeries> getNBestConfigurations(
+    public SeriesPack getBest(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -39,7 +68,7 @@ public class ConfigurationStatisticsRest {
             @RequestBody List<String> configurationIdsHex
     ) throws InvalidConfigurationIdException {
         var configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
-        return configurationStatisticsService.getNBestConfigurations(
+        return configurationSeriesService.getNBestConfigurations(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
@@ -49,7 +78,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/bestForExperiment")
-    public List<DataSeries> getNBestConfigurationsForExperiment(
+    public SeriesPack getBestForExperiment(
             @RequestParam int n,
             @RequestParam String fieldName,
             @RequestParam OptimizationGoal optimizationGoal,
@@ -58,7 +87,7 @@ public class ConfigurationStatisticsRest {
             @RequestParam(required = false) String bucketName,
             @RequestParam String experimentName
     ) {
-        return configurationStatisticsService.getNBestConfigurationsForExperiment(
+        return configurationSeriesService.getNBestConfigurationsForExperiment(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
@@ -67,37 +96,8 @@ public class ConfigurationStatisticsRest {
         );
     }
 
-    @PostMapping("/comparison")
-    public List<DataSeries> getConfigurationsMeans(
-            @RequestParam String fieldName,
-            @RequestParam(required = false) String measurementName,
-            @RequestParam(required = false) String bucketName,
-            @RequestBody List<String> configurationIdsHex
-    ) throws InvalidConfigurationIdException {
-        var configurationIds = IdDispatcher.getConfigurationIds(configurationIdsHex);
-        return configurationStatisticsService.getConfigurationsMeans(
-                fieldName,
-                influxQueryFieldsResolver.get(measurementName, bucketName),
-                configurationIds
-        );
-    }
-
-    @PostMapping("/comparisonForExperiment")
-    public List<DataSeries> getConfigurationsMeansForExperiment(
-            @RequestParam String fieldName,
-            @RequestParam(required = false) String measurementName,
-            @RequestParam(required = false) String bucketName,
-            @RequestParam String experimentName
-    ) {
-        return configurationStatisticsService.getConfigurationsMeansForExperiment(
-                fieldName,
-                influxQueryFieldsResolver.get(measurementName, bucketName),
-                experimentName
-        );
-    }
-
     @PostMapping("/exceedingThresholds")
-    public List<DataSeries> getConfigurationsExceedingThresholds(
+    public SeriesPack getExceedingThresholds(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
@@ -110,7 +110,7 @@ public class ConfigurationStatisticsRest {
             throw new InvalidThresholdsException(thresholds);
         }
 
-        return configurationStatisticsService.getConfigurationsExceedingThresholds(
+        return configurationSeriesService.getConfigurationsExceedingThresholds(
                 fieldName,
                 thresholds,
                 mode,
@@ -120,7 +120,7 @@ public class ConfigurationStatisticsRest {
     }
 
     @PostMapping("/exceedingThresholdsForExperiment")
-    public List<DataSeries> getConfigurationsExceedingThresholds(
+    public SeriesPack getExceedingThresholdsForExperiment(
             @RequestParam String fieldName,
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
@@ -132,7 +132,7 @@ public class ConfigurationStatisticsRest {
             throw new InvalidThresholdsException(thresholds);
         }
 
-        return configurationStatisticsService.getConfigurationsExceedingThresholdsForExperiment(
+        return configurationSeriesService.getConfigurationsExceedingThresholdsForExperiment(
                 fieldName,
                 thresholds,
                 mode,

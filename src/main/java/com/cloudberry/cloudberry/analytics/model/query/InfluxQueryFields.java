@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.analytics.model;
+package com.cloudberry.cloudberry.analytics.model.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;

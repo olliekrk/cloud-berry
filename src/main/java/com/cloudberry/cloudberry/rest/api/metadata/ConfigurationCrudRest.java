@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdE
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,10 +74,10 @@ public class ConfigurationCrudRest {
                                         @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
-        val experimentParameters = Optional.ofNullable(parameters).orElse(Map.of());
+        val parametersMap = Optional.ofNullable(parameters).orElse(Map.of());
         val now = Instant.now();
         val experimentConfiguration =
-                new ExperimentConfiguration(experimentId, configurationFileName, experimentParameters, now);
+                new ExperimentConfiguration(ObjectId.get(), experimentId, configurationFileName, parametersMap, now);
         return experimentConfigurationService.findOrCreateConfiguration(experimentConfiguration);
     }
 

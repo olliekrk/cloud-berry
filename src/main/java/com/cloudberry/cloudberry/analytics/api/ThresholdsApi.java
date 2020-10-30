@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.analytics.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import org.bson.types.ObjectId;

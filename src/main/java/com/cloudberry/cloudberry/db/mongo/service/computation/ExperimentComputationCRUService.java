@@ -19,13 +19,22 @@ public class ExperimentComputationCRUService {
     }
 
     public Mono<ExperimentComputation> findOrCreateComputation(ExperimentComputation computation) {
-        return computationRepository
-                .findById(computation.getId())
-                .doOnNext(experimentComputation ->
-                                  log.info("Existing computation " + experimentComputation.getId() + " was found"))
-                .switchIfEmpty(computationRepository.save(computation))
-                .doOnNext(
-                        experimentComputation -> log.info("Created new computation " + experimentComputation.getId()));
+        return findExistingComputation(computation)
+                .switchIfEmpty(saveNewComputation(computation));
+    }
+
+    private Mono<ExperimentComputation> saveNewComputation(
+            ExperimentComputation computation
+    ) {
+        return computationRepository.save(computation)
+                .doOnNext(_e -> log.info("Created new computation " + computation.getId()));
+    }
+
+    private Mono<ExperimentComputation> findExistingComputation(
+            ExperimentComputation computation
+    ) {
+        return computationRepository.findById(computation.getId())
+                .doOnNext(existing -> log.info("Existing computation " + existing.getId() + " was found"));
     }
 
 }

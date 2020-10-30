@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.analytics.service.best;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.google.common.collect.Iterables;

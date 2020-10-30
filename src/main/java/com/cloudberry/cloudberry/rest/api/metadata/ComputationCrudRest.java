@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidExperimentIdE
 import com.cloudberry.cloudberry.rest.util.IdDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.bson.types.ObjectId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,7 +58,7 @@ public class ComputationCrudRest {
     ExperimentComputation create(@RequestParam String configurationIdHex) throws InvalidConfigurationIdException {
         val configurationId = IdDispatcher.getConfigurationId(configurationIdHex);
         val now = Instant.now();
-        val computation = new ExperimentComputation(configurationId, now);
+        val computation = new ExperimentComputation(ObjectId.get(), configurationId, now);
         return experimentComputationService.getOrCreateComputation(computation);
     }
 

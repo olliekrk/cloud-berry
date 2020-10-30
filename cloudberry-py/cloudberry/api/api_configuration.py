@@ -13,7 +13,7 @@ class ApiConfiguration(CloudberryApi):
         return requests.get(url=self.__property_url(key)).text
 
     def set_property(self, key: str, value: str) -> None:
-        requests.put(url=self.__property_url(key), json=value)
+        requests.put(url=self.__property_url(key), data=value)
 
     def delete_property(self, key: str) -> None:
         requests.delete(url=self.__property_url(key))

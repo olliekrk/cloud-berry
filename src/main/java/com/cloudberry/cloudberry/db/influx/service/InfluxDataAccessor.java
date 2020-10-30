@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.influx.util.FluxQueryUtil;
@@ -36,7 +36,9 @@ public class InfluxDataAccessor {
         var tagRestrictions = RestrictionsFactory.everyTagEquals(dataFilters.getTagFilters());
         var tagPresenceRestrictions = RestrictionsFactory.hasEveryTag(dataFilters.getTagPresence());
         var allRestrictions =
-                Stream.of(measurementRestriction, tagPresenceRestrictions, tagRestrictions, fieldRestrictions);
+                Stream.of(measurementRestriction, tagPresenceRestrictions, tagRestrictions, fieldRestrictions)
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toList());
 
         var columnsToKeep = Stream.of(
                 dataFilters.getTagFilters().keySet().stream(),
@@ -45,10 +47,7 @@ public class InfluxDataAccessor {
         ).flatMap(i -> i).collect(Collectors.toSet());
 
         Flux query = FluxQueryUtil
-                .foldRestrictions(
-                        Flux.from(bucket).range(Instant.EPOCH),
-                        allRestrictions.flatMap(Optional::stream).collect(Collectors.toList())
-                )
+                .foldRestrictions(Flux.from(bucket).range(Instant.EPOCH), allRestrictions)
                 .pivot(columnsToKeep, Set.of(InfluxDefaults.Columns.FIELD), InfluxDefaults.Columns.VALUE)
                 .drop(InfluxDefaults.EXCLUDED_COLUMNS);
 

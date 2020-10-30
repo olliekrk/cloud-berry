@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.analytics.model.thresholds;
 
+import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
@@ -21,6 +22,14 @@ public class Thresholds {
     ) {
         this.upper = upper;
         this.lower = lower;
+    }
+
+    public Thresholds requireValid() throws InvalidThresholdsException {
+        if (isValid()) {
+            return this;
+        } else {
+            throw new InvalidThresholdsException(this);
+        }
     }
 
     public boolean isValid() {

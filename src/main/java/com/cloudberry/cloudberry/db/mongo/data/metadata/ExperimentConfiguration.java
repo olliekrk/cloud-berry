@@ -30,17 +30,6 @@ public class ExperimentConfiguration implements Parametrized<String, Object>, Ti
     @With
     private Map<String, Object> parameters;
     private Instant time;
-
-    public ExperimentConfiguration(
-            ObjectId experimentId, @Nullable String configurationFileName,
-            Map<String, Object> parameters, Instant time
-    ) {
-        this.id = new ObjectId();
-        this.experimentId = experimentId;
-        this.configurationFileName = configurationFileName;
-        this.parameters = parameters;
-        this.time = time;
-    }
 }
 
 

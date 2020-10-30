@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.analytics.util;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;

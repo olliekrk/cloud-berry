@@ -1,9 +1,9 @@
 package com.cloudberry.cloudberry.analytics.service.best;
 
 import com.cloudberry.cloudberry.analytics.api.BestSeriesApi;
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
 import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;

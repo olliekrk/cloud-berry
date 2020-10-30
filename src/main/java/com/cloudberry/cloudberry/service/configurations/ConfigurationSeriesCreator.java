@@ -1,43 +1,36 @@
 package com.cloudberry.cloudberry.service.configurations;
 
-import com.cloudberry.cloudberry.analytics.model.DataSeries;
-import com.cloudberry.cloudberry.analytics.model.InfluxQueryFields;
-import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
-import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageAvg;
+import com.cloudberry.cloudberry.analytics.api.SeriesApi;
+import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
+import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageInMemoryOps;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
-import com.cloudberry.cloudberry.service.api.InfluxUtilService;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class ConfigurationSeriesCreator {
-    private final MovingAverageAvg movingAverageApi;
+    private final SeriesApi seriesApi;
     private final MetadataService metadataService;
-    private final InfluxUtilService influxUtilService;
 
-    public DataSeries createMovingAverageConfigurationSeries(
+    public Optional<DataSeries> movingAverageConfigurationSeries(
             String fieldName,
             InfluxQueryFields influxQueryFields,
             ObjectId configurationId
     ) {
-        var seriesName = getConfigurationSeriesName(configurationId);
         var computationsIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        if (computationsIds.isEmpty()) {
-            return DataSeries.empty(seriesName);
-        } else {
-            var intervalNanos = influxUtilService.averageIntervalNanos(fieldName, computationsIds, influxQueryFields);
-            return movingAverageApi.getTimedMovingSeries(
-                    fieldName,
-                    ChronoInterval.ofNanos(intervalNanos),
-                    computationsIds,
-                    influxQueryFields
-            ).renamed(seriesName);
-        }
+        var computationsSeries = seriesApi.computationsSeries(fieldName, computationsIds, influxQueryFields);
+
+        return MovingAverageInMemoryOps
+                .movingAverageSeries(computationsSeries, fieldName)
+                .map(s -> s.withSeriesName(configurationSeriesName(configurationId)));
     }
 
-    private static String getConfigurationSeriesName(ObjectId configurationId) {
+    public static String configurationSeriesName(ObjectId configurationId) {
         return String.format("configuration_%s", configurationId.toHexString());
     }
 
