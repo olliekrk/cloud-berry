@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/raw")
@@ -106,7 +107,7 @@ public class RawDataRest {
         var uploadDetails = new CsvUploadDetails(
                 tagsParam == null ? List.of() : tagsParam,
                 configurationId,
-                computationId == null ? new ObjectId() : new ObjectId(computationId),
+                Optional.ofNullable(computationId).filter(ObjectId::isValid).map(ObjectId::new).orElse(null),
                 measurementName,
                 firstRecordAsHeaders || headersParam == null ? null : headersParam
         );

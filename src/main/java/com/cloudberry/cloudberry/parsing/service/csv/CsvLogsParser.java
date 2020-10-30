@@ -31,21 +31,25 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
     @Override
     public ParsedLogs parseFile(File file, CsvUploadDetails details, String defaultMeasurementName) throws IOException {
         var measurementName = Optional.ofNullable(details.getMeasurementName()).orElse(defaultMeasurementName);
-        var computationId = details.getComputationId().toHexString();
 
         return Try.withResources(() -> new BufferedReader(new FileReader(file)))
                 .of(reader -> Try.withResources(() -> details.determineCsvFormat().parse(reader))
                         .of(parser -> {
-                            var points = ListSyntax.mapped(parser.getRecords(), record -> {
-                                var recordValues = record.toMap();
-                                return Point.measurement(measurementName)
-                                        .time(
-                                                parseTime(recordValues.get(TIME_COLUMN_NAME)),
-                                                InfluxDefaults.WRITE_PRECISION
+                            var points = ListSyntax.flatMapped(parser.getRecords(), record -> {
+                                var recordMap = record.toMap();
+                                var recordTime = parseTime(recordMap.get(TIME_COLUMN_NAME));
+                                var recordTags = getTags(details, recordMap);
+                                var recordFields = getFields(details, recordMap);
+
+                                return recordFields.entrySet().stream()
+                                        .map(recordField -> Point
+                                                .measurement(measurementName)
+                                                .time(recordTime, InfluxDefaults.WRITE_PRECISION)
+                                                .addTags(recordTags)
+                                                .addField(InfluxDefaults.Columns.FIELD, recordField.getKey())
+                                                .addFields(Map.ofEntries(recordField))
                                         )
-                                        .addTags(getTags(details, recordValues))
-                                        .addTag(InfluxDefaults.CommonTags.COMPUTATION_ID, computationId)
-                                        .addFields(getFields(details, recordValues));
+                                        .collect(Collectors.toList());
                             });
 
                             log.info("Successfully read " + points.size() + " data row(s) from CSV file");

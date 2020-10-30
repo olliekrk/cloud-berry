@@ -9,9 +9,11 @@ import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogsWithMetadata;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
+import com.influxdb.client.write.Point;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,7 +30,7 @@ public class LogsMetadataAppender {
             ParsedLogs parsedLogs,
             String experimentName,
             ObjectId configurationId,
-            ObjectId computationId
+            @Nullable ObjectId computationId
     ) {
         final var now = Instant.now();
         return metadataService.getOrCreateExperiment(new Experiment(now, experimentName, Map.of()))
@@ -42,21 +44,27 @@ public class LogsMetadataAppender {
                         ))
                         .flatMap(configuration -> metadataService.getOrCreateComputation(
                                 new ExperimentComputation(
+                                        computationId == null ? ObjectId.get() : computationId,
                                         configuration.getId(),
-                                        computationId,
                                         now
                                 ))
-                                .map(computation -> new ParsedLogsWithMetadata(
-                                        influxPropertiesService.getDefaultBucketName(),
-                                        parsedLogs.getPoints(),
-                                        configuration,
-                                        computation
-                                ))
+                                .map(computation -> {
+                                    parsedLogs.getPoints().forEach(p -> tagPointWithComputationId(computation, p));
+                                    return new ParsedLogsWithMetadata(
+                                            influxPropertiesService.getDefaultBucketName(),
+                                            parsedLogs.getPoints(),
+                                            configuration,
+                                            computation
+                                    );
+                                })
                         )
                 ).block();
     }
 
-    public ParsedLogsWithMetadata appendMetadata(AgeParsedLogs parsedLogs, String experimentName) {
+    public ParsedLogsWithMetadata appendMetadata(
+            AgeParsedLogs parsedLogs,
+            String experimentName
+    ) {
         var now = Instant.now();
         return metadataService.getOrCreateExperiment(new Experiment(now, experimentName, Map.of()))
                 .flatMap(experiment -> metadataService.getOrCreateConfiguration(
@@ -74,11 +82,7 @@ public class LogsMetadataAppender {
                                         now
                                 ))
                                 .map(computation -> {
-                                    var computationIdHex = computation.getId().toHexString();
-                                    parsedLogs.getPoints().forEach(point -> point.addTag(
-                                            CommonTags.COMPUTATION_ID,
-                                            computationIdHex
-                                    ));
+                                    parsedLogs.getPoints().forEach(p -> tagPointWithComputationId(computation, p));
                                     return new ParsedLogsWithMetadata(
                                             influxPropertiesService.getDefaultBucketName(),
                                             parsedLogs.getPoints(),
@@ -88,6 +92,10 @@ public class LogsMetadataAppender {
                                 })
                         )
                 ).block();
+    }
+
+    private static void tagPointWithComputationId(ExperimentComputation computation, Point point) {
+        point.addTag(CommonTags.COMPUTATION_ID, computation.getId().toHexString());
     }
 
 }

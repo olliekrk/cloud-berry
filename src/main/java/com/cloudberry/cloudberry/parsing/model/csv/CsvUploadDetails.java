@@ -29,6 +29,7 @@ public class CsvUploadDetails implements UploadDetails {
     /**
      * Computation id of uploaded data. If none is given, then it is assumes that data is from new computation.
      */
+    @Nullable
     ObjectId computationId;
 
     /**
