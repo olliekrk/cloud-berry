@@ -102,7 +102,7 @@ public abstract class MovingAverageInMemoryOps {
                         var time = Optional.ofNullable((Instant) point.get(InfluxDefaults.Columns.TIME));
                         var value = Optional.ofNullable((Double) point.get(fieldName));
                         if (time.isEmpty() || value.isEmpty()) {
-                            log.debug("Data point ignored (missing time or %s)".formatted(fieldName));
+                            log.debug("Data point ignored (missing time or {})", fieldName);
                             return Stream.empty();
                         } else {
                             return Stream.of(Tuple.of(time.get(), seriesName, value.get()));
