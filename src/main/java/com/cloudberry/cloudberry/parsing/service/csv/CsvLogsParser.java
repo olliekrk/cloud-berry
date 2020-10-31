@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.parsing.service.csv;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.common.syntax.SetSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,21 +35,18 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return Try.withResources(() -> new BufferedReader(new FileReader(file)))
                 .of(reader -> Try.withResources(() -> details.determineCsvFormat().parse(reader))
                         .of(parser -> {
-                            var points = ListSyntax.flatMapped(parser.getRecords(), record -> {
+                            var points = ListSyntax.mapped(parser.getRecords(), record -> {
                                 var recordMap = record.toMap();
                                 var recordTime = parseTime(recordMap.get(TIME_COLUMN_NAME));
                                 var recordTags = getTags(details, recordMap);
                                 var recordFields = getFields(details, recordMap);
 
-                                return recordFields.entrySet().stream()
-                                        .map(recordField -> Point
-                                                .measurement(measurementName)
-                                                .time(recordTime, InfluxDefaults.WRITE_PRECISION)
-                                                .addTags(recordTags)
-                                                .addField(InfluxDefaults.Columns.FIELD, recordField.getKey())
-                                                .addFields(Map.ofEntries(recordField))
-                                        )
-                                        .collect(Collectors.toList());
+                                // warning: this point model will possibly be mapped to several influxdb points if
+                                //          recordsFields have more than 1 key
+                                return Point.measurement(measurementName)
+                                        .time(recordTime, InfluxDefaults.WRITE_PRECISION)
+                                        .addTags(recordTags)
+                                        .addFields(recordFields);
                             });
 
                             log.info("Successfully read " + points.size() + " data row(s) from CSV file");
@@ -73,12 +70,10 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
 
     @NotNull
     private Map<String, Object> getFields(CsvUploadDetails details, Map<String, String> values) {
+        var excluded = SetSyntax.with(details.getTagsNames(), TIME_COLUMN_NAME);
         return values.entrySet()
                 .stream()
-                .filter(entry ->
-                                !Objects.equals(entry.getKey(), TIME_COLUMN_NAME) &&
-                                        !details.getTagsNames().contains(entry.getKey())
-                )
+                .filter(entry -> !excluded.contains(entry.getKey()))
                 .map(entry -> Pair.of(entry.getKey(), parseField(entry.getValue())))
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
