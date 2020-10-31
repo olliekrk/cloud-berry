@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.rest.util;
 
+import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeIdException;
 import org.bson.types.ObjectId;
 
@@ -14,8 +15,20 @@ public class TopologyIdDispatcher {
 
     public static List<ObjectId> getTopologyNodesIds(List<String> topologyNodesIdsHex)
             throws InvalidTopologyNodeIdException {
-        var experimentIds = RestParametersUtil.getValidIds(topologyNodesIdsHex);
-        if (experimentIds.isEmpty()) { throw new InvalidTopologyNodeIdException(topologyNodesIdsHex); }
-        return experimentIds;
+        var topologyNodesIds = RestParametersUtil.getValidIds(topologyNodesIdsHex);
+        if (topologyNodesIds.isEmpty()) { throw new InvalidTopologyNodeIdException(topologyNodesIdsHex); }
+        return topologyNodesIds;
+    }
+
+    public static ObjectId getTopologyId(String topologyIdHex) throws InvalidTopologyIdException {
+        return RestParametersUtil.getValidId(topologyIdHex)
+                .orElseThrow(() -> new InvalidTopologyIdException(List.of(topologyIdHex)));
+    }
+
+    public static List<ObjectId> getTopologiesIds(List<String> topologiesIdsHex)
+            throws InvalidTopologyIdException {
+        var topologiesIds = RestParametersUtil.getValidIds(topologiesIdsHex);
+        if (topologiesIds.isEmpty()) { throw new InvalidTopologyIdException(topologiesIdsHex); }
+        return topologiesIds;
     }
 }

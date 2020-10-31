@@ -28,7 +28,7 @@ public class TopologyNodeService {
         return topologyNodeRepository.findById(id);
     }
 
-    public TopologyNode get(ObjectId id) {
+    public TopologyNode findByIdOrThrow(ObjectId id) {
         return topologyNodeRepository.findById(id).orElseThrow(() -> new NodeNotFoundException(id));
     }
 
@@ -44,7 +44,7 @@ public class TopologyNodeService {
         return topologyNodeRepository.findAllByName(name);
     }
 
-    public List<TopologyNode> removeByIds(List<ObjectId> ids) {
+    public List<TopologyNode> deleteAllByIds(List<ObjectId> ids) {
         return topologyNodeRepository.deleteAllByIdIn(ids);
     }
 }

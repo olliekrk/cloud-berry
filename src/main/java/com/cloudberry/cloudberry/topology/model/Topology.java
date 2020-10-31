@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.springframework.data.annotation.Id;
@@ -67,6 +66,10 @@ public class Topology {
 
     public void addEdge(TopologyNode source, TopologyNode target) {
         edges.merge(source.getId(), Set.of(target.getId()), SetSyntax::merge);
+    }
+
+    public boolean containsVertex(TopologyNode node) {
+        return edges.containsKey(node.getId());
     }
 
     public void addVertex(TopologyNode node) {

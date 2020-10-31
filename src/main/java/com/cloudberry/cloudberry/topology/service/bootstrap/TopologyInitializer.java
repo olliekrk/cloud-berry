@@ -26,8 +26,8 @@ public class TopologyInitializer {
 
     public void purgeDefaults() {
         var defaultTopologies = topologyService.findDefaultTopologies();
-        topologyService.removeByIds(ListSyntax.mapped(defaultTopologies, Topology::getId));
-        topologyNodeService.removeByIds(ListSyntax.flatMapped(defaultTopologies, Topology::getVertices));
+        topologyService.deleteAllByIds(ListSyntax.mapped(defaultTopologies, Topology::getId));
+        topologyNodeService.deleteAllByIds(ListSyntax.flatMapped(defaultTopologies, Topology::getVertices));
     }
 
     private Topology saveTopology(Topology topology) {

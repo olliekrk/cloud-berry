@@ -68,6 +68,6 @@ public class NodesRest {
     List<TopologyNode> deleteById(@RequestParam List<String> topologyNodesIdsHex)
             throws InvalidTopologyNodeIdException {
         val topologyNodesIds = TopologyIdDispatcher.getTopologyNodesIds(topologyNodesIdsHex);
-        return topologyNodeService.removeByIds(topologyNodesIds);
+        return topologyNodeService.deleteAllByIds(topologyNodesIds);
     }
 }

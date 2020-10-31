@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -64,7 +63,7 @@ public class TopologyBootstrapper {
                 metricsRegistry
         );
         var graph = topology.constructGraph();
-        graph.iterator().forEachRemaining(nodeId -> topologyNodeService.get(nodeId).accept(visitor));
+        graph.iterator().forEachRemaining(nodeId -> topologyNodeService.findByIdOrThrow(nodeId).accept(visitor));
     }
 
 }
