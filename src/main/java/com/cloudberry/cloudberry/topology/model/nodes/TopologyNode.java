@@ -12,7 +12,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class TopologyNode {
+public abstract class TopologyNode implements VisitableTopologyNode {
 
     @Id
     protected ObjectId id;

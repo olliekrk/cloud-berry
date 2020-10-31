@@ -8,7 +8,7 @@ import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.metrics.MetricsIndex;
-import com.cloudberry.cloudberry.metrics.MetricsProvider;
+import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import com.influxdb.exceptions.InfluxException;
@@ -31,7 +31,7 @@ public class OnStartupRunner implements ApplicationRunner {
 
     private final InfluxOrganizationService influxOrganizationService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final MetricsProvider metricsProvider;
+    private final MetricsRegistry metricsRegistry;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -79,7 +79,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void reportRestartMetrics() {
-        metricsProvider.incrementCounter(MetricsIndex.CLOUDBERRY_STARTUPS);
+        metricsRegistry.incrementCounter(MetricsIndex.CLOUDBERRY_STARTUPS);
     }
 
     private void logDefaultConfiguration() {

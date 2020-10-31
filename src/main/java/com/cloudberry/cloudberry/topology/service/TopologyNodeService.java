@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.topology.service;
 
+import com.cloudberry.cloudberry.topology.exception.NodeNotFoundException;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import com.cloudberry.cloudberry.topology.repository.TopologyNodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,12 @@ public class TopologyNodeService {
         return topologyNodeRepository.saveAll(nodes);
     }
 
-    public Optional<TopologyNode> getNodeById(ObjectId id) {
+    public Optional<TopologyNode> getOpt(ObjectId id) {
         return topologyNodeRepository.findById(id);
+    }
+
+    public TopologyNode get(ObjectId id) {
+        return topologyNodeRepository.findById(id).orElseThrow(() -> new NodeNotFoundException(id));
     }
 
     public void removeByIds(List<ObjectId> ids) {
