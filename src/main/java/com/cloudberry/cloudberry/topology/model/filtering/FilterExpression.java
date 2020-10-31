@@ -8,5 +8,6 @@ import java.util.List;
 @Data
 public class FilterExpression {
     private LogicalOperator operator;
-    private List<FilterExpression> predicates;
+    private List<FilterExpression> expressions; // may be empty
+    private List<FilterPredicate> predicates;
 }
