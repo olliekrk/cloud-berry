@@ -13,5 +13,5 @@ public interface TopologyNodeVisitor {
 
     void visit(CounterNode node);
 
-    void visit(FilterNode filterNode);
+    void visit(FilterNode node);
 }

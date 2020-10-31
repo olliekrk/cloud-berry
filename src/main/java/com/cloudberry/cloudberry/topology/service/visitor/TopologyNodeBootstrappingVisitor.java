@@ -3,11 +3,14 @@ package com.cloudberry.cloudberry.topology.service.visitor;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.processing.processor.ComputationEventProcessor;
 import com.cloudberry.cloudberry.metrics.MetricsRegistry;
+import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
+import com.cloudberry.cloudberry.topology.model.filtering.ExpressionChecker;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
+import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -30,6 +33,25 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
 
     @Override
     public void visit(SinkNode node) {
+        var mergedStream = mergePredecessors(node);
+        mergedStream.foreach((key, event) -> sinkProcessor.process(event, node.getOutputBucketName()));
+    }
+
+    @Override
+    public void visit(CounterNode node) {
+        var mergedStream = mergePredecessors(node);
+        var peekedStream = mergedStream.peek((key, event) -> metricsRegistry.incrementCounter(node.getMetricName()));
+        context.putStream(node.getId(), peekedStream);
+    }
+
+    @Override
+    public void visit(FilterNode node) {
+        var mergedStream = mergePredecessors(node);
+        var filteredStream = mergedStream.filter((key, event) -> ExpressionChecker.check(event, node.getExpression()));
+        context.putStream(node.getId(), filteredStream);
+    }
+
+    private KStream<String, ComputationEvent> mergePredecessors(TopologyNode node) {
         var predecessorsIds = context.getPredecessorNodesIds(node.getId());
         var mergedStreamOpt = predecessorsIds
                 .stream()
@@ -37,31 +59,7 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
                 .reduce(KStream::merge);
 
         predecessorsIds.forEach(context::removeStream);
-        mergedStreamOpt.ifPresent(stream -> stream
-                .foreach((key, event) -> sinkProcessor.process(event, node.getOutputBucketName()))
-        );
-    }
-
-    @Override
-    public void visit(CounterNode node) {
-        // CounterNode assumes that there is has only 1 incoming predecessor's edge.
-        context.getPredecessorNodesIds(node.getId())
-                .stream()
-                .findFirst()
-                .ifPresent(pId -> {
-                    var pStream = context.getStreamOrThrow(pId);
-                    var pStreamPeeked = pStream.peek(
-                            (_key, _event) -> metricsRegistry.incrementCounter(node.getMetricName())
-                    );
-
-                    context.putStream(pId, pStreamPeeked);
-                    context.putStream(node.getId(), pStreamPeeked);
-                });
-    }
-
-    @Override
-    public void visit(FilterNode filterNode) {
-        // todo: #70
+        return mergedStreamOpt.orElseThrow(() -> new BootstrappingException("Missing stream!") {}); // should not happen
     }
 
 }

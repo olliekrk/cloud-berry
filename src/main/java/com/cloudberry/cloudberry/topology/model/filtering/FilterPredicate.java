@@ -1,13 +1,13 @@
 package com.cloudberry.cloudberry.topology.model.filtering;
 
-import com.cloudberry.cloudberry.topology.model.operators.Operator;
+import com.cloudberry.cloudberry.topology.model.operators.EqualityOperator;
 import lombok.Data;
 
 @Data
 public class FilterPredicate {
-    String name;
-    String value;
-    Operator operator;
-    FilterType type;
-    boolean isField; // by default filter is applied to tags, not fields
+    private String name;
+    private String value;
+    private EqualityOperator operator;
+    private FilterType type;
+    private boolean isField; // by default filter is applied to tags, not fields
 }
