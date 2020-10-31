@@ -2,13 +2,15 @@ package com.cloudberry.cloudberry.topology.model;
 
 
 import com.cloudberry.cloudberry.common.syntax.SetSyntax;
+import com.cloudberry.cloudberry.topology.exception.NotADirectedAcyclicGraphException;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.jgrapht.graph.AbstractBaseGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 @Document
 @AllArgsConstructor
@@ -74,10 +77,15 @@ public class Topology {
         return edges.keySet();
     }
 
-    public AbstractBaseGraph<ObjectId, DefaultEdge> constructGraph() {
-        var graph = new DefaultDirectedGraph<ObjectId, DefaultEdge>(DefaultEdge.class);
-        edges.keySet().forEach(graph::addVertex);
-        edges.forEach((source, targets) -> targets.forEach(target -> graph.addEdge(source, target)));
-        return graph;
+    public DirectedAcyclicGraph<ObjectId, DefaultEdge> constructGraph() {
+        try {
+            var graphBuilder = DirectedAcyclicGraph.<ObjectId, DefaultEdge>createBuilder(DefaultEdge.class);
+            edges.keySet().forEach(graphBuilder::addVertex);
+            edges.forEach((source, targets) -> targets.forEach(target -> graphBuilder.addEdge(source, target)));
+            return graphBuilder.build();
+        } catch (IllegalArgumentException e) { // thrown when DAG cannot be built
+            log.warn("Topology is not an directed acyclic graph!", e);
+            throw new NotADirectedAcyclicGraphException("Topology must represent directed acyclic graph!");
+        }
     }
 }

@@ -6,8 +6,8 @@ import com.cloudberry.cloudberry.topology.model.Topology;
 import lombok.Data;
 import org.apache.kafka.streams.kstream.KStream;
 import org.bson.types.ObjectId;
-import org.jgrapht.graph.AbstractBaseGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedAcyclicGraph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Data
 public class BootstrappingContext {
     private Topology topology;
-    private AbstractBaseGraph<ObjectId, DefaultEdge> topologyGraph;
+    private DirectedAcyclicGraph<ObjectId, DefaultEdge> topologyGraph;
 
     /**
      * Node ID -> Node output KStream

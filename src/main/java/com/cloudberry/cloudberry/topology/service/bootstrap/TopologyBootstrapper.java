@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.stereotype.Service;
 
@@ -51,13 +50,13 @@ public class TopologyBootstrapper {
             throw new MissingRootNodeException(topology.getId());
         }
 
-        bootstrap(topology, rootNodes);
+        bootstrap(topology);
         var streams = new KafkaStreams(kStreamsBuilder.build(), kStreamsConfiguration.asProperties());
         log.info("Topology '" + topology.getName() + "' has been configured.");
         return streams;
     }
 
-    private void bootstrap(Topology topology, List<RootNode> rootNodes) {
+    private void bootstrap(Topology topology) {
         var visitor = new TopologyNodeBootstrappingVisitor(
                 new BootstrappingContext(topology),
                 kStreamsBuilder,
@@ -65,11 +64,7 @@ public class TopologyBootstrapper {
                 metricsRegistry
         );
         var graph = topology.constructGraph();
-        // todo: this would be better if graphs was a DAG and iteration was in the DAG order
-        rootNodes.forEach(rootNode -> {
-            var dfsIterator = new DepthFirstIterator<>(graph, rootNode.getId());
-            dfsIterator.forEachRemaining(nodeId -> topologyNodeService.get(nodeId).accept(visitor));
-        });
+        graph.iterator().forEachRemaining(nodeId -> topologyNodeService.get(nodeId).accept(visitor));
     }
 
 }
