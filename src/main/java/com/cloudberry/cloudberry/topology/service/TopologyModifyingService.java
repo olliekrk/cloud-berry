@@ -1,8 +1,6 @@
 package com.cloudberry.cloudberry.topology.service;
 
-import com.cloudberry.cloudberry.topology.exception.NodeNotInTopologyException;
 import com.cloudberry.cloudberry.topology.model.Topology;
-import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bson.types.ObjectId;
@@ -25,7 +23,6 @@ public class TopologyModifyingService {
         return topology;
     }
 
-
     public Topology addEdgeToTopology(
             ObjectId topologyId, ObjectId sourceNodeId, ObjectId targetNodeId, boolean addVertexToTopologyIfNotAdded
     ) {
@@ -34,25 +31,10 @@ public class TopologyModifyingService {
         val sourceNode = topologyNodeService.findByIdOrThrow(sourceNodeId);
         val targetNode = topologyNodeService.findByIdOrThrow(targetNodeId);
 
-        validateNodeExistsInTopology(topology, sourceNode, addVertexToTopologyIfNotAdded);
-        validateNodeExistsInTopology(topology, targetNode, addVertexToTopologyIfNotAdded);
-
-        topology.addEdge(sourceNode, targetNode);
+        topology.addEdge(sourceNode, targetNode, addVertexToTopologyIfNotAdded);
 
         topologyService.save(topology);
         return topology;
-    }
-
-    private void validateNodeExistsInTopology(
-            Topology topology, TopologyNode node, boolean addVertexToTopologyIfNotAdded
-    ) {
-        if (!topology.containsVertex(node)) {
-            if (addVertexToTopologyIfNotAdded) {
-                topology.addVertex(node);
-            } else {
-                throw new NodeNotInTopologyException(node.getId(), topology.getId());
-            }
-        }
     }
 
 }

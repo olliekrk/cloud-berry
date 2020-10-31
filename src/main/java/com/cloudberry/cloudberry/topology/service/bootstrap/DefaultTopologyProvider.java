@@ -52,12 +52,10 @@ public class DefaultTopologyProvider {
 
         val allNodes = List.of(rootNode, counterNode1, filterNode, counterNode2, sinkNode);
 
-        allNodes.forEach(topology::addVertex);
-
-        topology.addEdge(rootNode, counterNode1);
-        topology.addEdge(counterNode1, filterNode);
-        topology.addEdge(filterNode, counterNode2);
-        topology.addEdge(counterNode2, sinkNode);
+        topology.addEdge(rootNode, counterNode1, true);
+        topology.addEdge(counterNode1, filterNode, true);
+        topology.addEdge(filterNode, counterNode2, true);
+        topology.addEdge(counterNode2, sinkNode, true);
 
         return new TopologySetupData(topology, allNodes);
     }
