@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.kafka.processing.processor.ComputationEventProc
 import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
+import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,11 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
                     context.putStream(pId, pStreamPeeked);
                     context.putStream(node.getId(), pStreamPeeked);
                 });
+    }
+
+    @Override
+    public void visit(FilterNode filterNode) {
+        // todo: #70
     }
 
 }
