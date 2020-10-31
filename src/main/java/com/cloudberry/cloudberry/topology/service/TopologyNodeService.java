@@ -32,7 +32,19 @@ public class TopologyNodeService {
         return topologyNodeRepository.findById(id).orElseThrow(() -> new NodeNotFoundException(id));
     }
 
-    public void removeByIds(List<ObjectId> ids) {
-        topologyNodeRepository.removeAllByIdIn(ids);
+    public List<TopologyNode> findAll() {
+        return topologyNodeRepository.findAll();
+    }
+
+    public Optional<TopologyNode> findById(ObjectId id) {
+        return topologyNodeRepository.findById(id);
+    }
+
+    public List<TopologyNode> findAllByName(String name) {
+        return topologyNodeRepository.findAllByName(name);
+    }
+
+    public List<TopologyNode> removeByIds(List<ObjectId> ids) {
+        return topologyNodeRepository.deleteAllByIdIn(ids);
     }
 }

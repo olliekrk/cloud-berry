@@ -27,7 +27,7 @@ public class TopologyService {
     }
 
     public void removeByIds(List<ObjectId> ids) {
-        topologyRepository.removeAllByIdIn(ids);
+        topologyRepository.deleteAllByIdIn(ids);
     }
 
     public List<Topology> findDefaultTopologies() {
