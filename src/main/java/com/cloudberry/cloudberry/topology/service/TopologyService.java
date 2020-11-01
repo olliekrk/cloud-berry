@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.repository.TopologyRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,13 +15,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TopologyService {
     private final TopologyRepository topologyRepository;
+    private final static Sort sortByName = Sort.by("name");
 
     public Topology save(Topology topology) {
         return topologyRepository.save(topology);
     }
 
     public Optional<Topology> findAny() {
-        return topologyRepository.findAll().stream().findAny();
+        return topologyRepository.findAll(sortByName).stream().findAny();
+    }
+
+    public List<Topology> findAll() {
+        return topologyRepository.findAll(sortByName);
     }
 
     public Optional<Topology> findById(ObjectId id) {

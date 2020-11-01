@@ -28,11 +28,11 @@ public class TopologyBootstrapper {
     private final TopologyNodeService topologyNodeService;
     private final ComputationEventProcessor computationEventProcessor;
 
-    private final StreamsBuilder kStreamsBuilder;
     private final KafkaStreamsConfiguration kStreamsConfiguration;
     private final MetricsRegistry metricsRegistry;
 
     public KafkaStreams bootstrapStreams(@NotNull Topology topology) throws TopologyException {
+        var kStreamsBuilder = new StreamsBuilder();
         log.info("Topology '{}' bootstrapping has started.", topology.getName());
 
         var rootIds = topology.findRootIds();
@@ -49,13 +49,13 @@ public class TopologyBootstrapper {
             throw new MissingRootNodeException(topology.getId());
         }
 
-        bootstrap(topology);
+        bootstrap(kStreamsBuilder, topology);
         var streams = new KafkaStreams(kStreamsBuilder.build(), kStreamsConfiguration.asProperties());
         log.info("Topology '" + topology.getName() + "' has been configured.");
         return streams;
     }
 
-    private void bootstrap(Topology topology) {
+    private void bootstrap(StreamsBuilder kStreamsBuilder, Topology topology) {
         var visitor = new TopologyNodeBootstrappingVisitor(
                 new BootstrappingContext(topology),
                 kStreamsBuilder,

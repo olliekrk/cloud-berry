@@ -4,6 +4,8 @@ import com.cloudberry.cloudberry.properties.model.ApiProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ApiPropertiesService {
@@ -24,4 +26,7 @@ public class ApiPropertiesService {
         apiPropertyRepository.deleteById(key);
     }
 
+    public Optional<String> get(String id) {
+        return apiPropertyRepository.findById(id).map(ApiProperty::getValue);
+    }
 }
