@@ -2,7 +2,8 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.db.influx.service.InfluxPropertiesService;
 import com.cloudberry.cloudberry.properties.ApiPropertiesService;
-import com.cloudberry.cloudberry.properties.model.InfluxProperty;
+import com.cloudberry.cloudberry.properties.model.ApiPropertyId;
+import com.cloudberry.cloudberry.properties.model.InfluxPropertyId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,22 +21,22 @@ public class ApiConfigurationRest {
     private final ApiPropertiesService apiPropertiesService;
     private final InfluxPropertiesService influxPropertiesService;
 
-    @GetMapping("property/{key}")
-    public String getProperty(@PathVariable String key) {
-        return apiPropertiesService.getOrDefault(key, null);
+    @GetMapping("property/{id}")
+    public String getProperty(@PathVariable String id) {
+        return apiPropertiesService.getOrDefault(new ApiPropertyId(id), null);
     }
 
-    @PutMapping("property/{key}")
-    public void setProperty(@PathVariable String key, @RequestBody String value) {
-        InfluxProperty.byId(key).ifPresentOrElse(
+    @PutMapping("property/{id}")
+    public void setProperty(@PathVariable String id, @RequestBody String value) {
+        InfluxPropertyId.byId(id).ifPresentOrElse(
                 influxProperty -> influxPropertiesService.setProperty(influxProperty, value),
-                () -> apiPropertiesService.set(key, value)
+                () -> apiPropertiesService.set(new ApiPropertyId(id), value)
         );
     }
 
-    @DeleteMapping("property/{key}")
-    public void deleteProperty(@PathVariable String key) {
-        apiPropertiesService.reset(key);
+    @DeleteMapping("property/{id}")
+    public void deleteProperty(@PathVariable String id) {
+        apiPropertiesService.reset(new ApiPropertyId(id));
     }
 
 }

@@ -6,10 +6,12 @@ import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.service.TopologyModifyingService;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
+import com.cloudberry.cloudberry.topology.service.reconfiguration.TopologyReconfigurationService;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,10 +29,37 @@ import java.util.Map;
 public class TopologyRest {
     private final TopologyService topologyService;
     private final TopologyModifyingService topologyModifyingService;
+    private final TopologyReconfigurationService topologyReconfigurationService;
 
     @PostMapping("/create")
     Topology createTopology(@RequestParam String name) {
         return topologyService.save(new Topology(ObjectId.get(), name, true, Map.of()));
+    }
+
+    @GetMapping("/all")
+    List<Topology> findTopologies() {
+        return topologyService.findAll();
+    }
+
+    @GetMapping("/active")
+    Optional<Topology> findActiveTopology() {
+        return topologyReconfigurationService.getActiveTopology();
+    }
+
+    @GetMapping("/name/{name}")
+    List<Topology> findTopologiesByName(@PathVariable String name) {
+        return topologyService.findByName(name);
+    }
+
+    @GetMapping("/id/{id}")
+    Optional<Topology> findTopologyById(@PathVariable String id) throws InvalidTopologyIdException {
+        return topologyService.findById(TopologyIdDispatcher.getTopologyId(id));
+    }
+
+    @PostMapping("/id/{id}/use")
+    void useTopology(@PathVariable String id) throws InvalidTopologyIdException {
+        var topologyId = TopologyIdDispatcher.getTopologyId(id);
+        topologyReconfigurationService.useTopology(topologyId);
     }
 
     @PutMapping("/id/{id}/addNode")

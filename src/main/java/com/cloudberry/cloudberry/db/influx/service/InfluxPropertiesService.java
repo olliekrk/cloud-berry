@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.db.influx.service;
 
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
 import com.cloudberry.cloudberry.properties.ApiPropertiesService;
-import com.cloudberry.cloudberry.properties.model.InfluxProperty;
+import com.cloudberry.cloudberry.properties.model.InfluxPropertyId;
 import com.cloudberry.cloudberry.service.api.BucketsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +18,18 @@ public class InfluxPropertiesService {
 
     public String getDefaultBucketName() {
         return apiPropertiesService.getOrDefault(
-                InfluxProperty.OVERRIDDEN_DEFAULT_BUCKET_NAME.id,
+                InfluxPropertyId.OVERRIDDEN_DEFAULT_BUCKET_NAME,
                 influxConfig.getDefaultBucketName()
         );
     }
 
     public void setDefaultBucketName(String defaultBucketName) {
-        apiPropertiesService.set(InfluxProperty.OVERRIDDEN_DEFAULT_BUCKET_NAME.id, defaultBucketName);
+        apiPropertiesService.set(InfluxPropertyId.OVERRIDDEN_DEFAULT_BUCKET_NAME, defaultBucketName);
         bucketsService.createBucketIfNotExists(defaultBucketName);
     }
 
-    public void setProperty(InfluxProperty influxProperty, String value) {
-        if (influxProperty == InfluxProperty.OVERRIDDEN_DEFAULT_BUCKET_NAME) {
+    public void setProperty(InfluxPropertyId influxProperty, String value) {
+        if (influxProperty == InfluxPropertyId.OVERRIDDEN_DEFAULT_BUCKET_NAME) {
             setDefaultBucketName(value);
         }
     }
