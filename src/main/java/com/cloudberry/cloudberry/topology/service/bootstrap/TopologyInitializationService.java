@@ -3,7 +3,7 @@ package com.cloudberry.cloudberry.topology.service.bootstrap;
 
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.properties.ApiPropertiesService;
-import com.cloudberry.cloudberry.properties.model.CloudberryProperty;
+import com.cloudberry.cloudberry.properties.model.CloudberryPropertyId;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import com.cloudberry.cloudberry.topology.service.TopologyNodeService;
@@ -25,10 +25,10 @@ public class TopologyInitializationService {
     private final ApiPropertiesService apiPropertiesService;
 
     public Topology getInitialTopology() {
-        purgeDefaults();
+        // purgeDefaults();
 
         var defaultTopologyId = apiPropertiesService
-                .get(CloudberryProperty.OVERRIDDEN_DEFAULT_TOPOLOGY_ID.id)
+                .get(CloudberryPropertyId.OVERRIDDEN_DEFAULT_TOPOLOGY_ID)
                 .filter(ObjectId::isValid)
                 .map(ObjectId::new);
 
@@ -37,6 +37,7 @@ public class TopologyInitializationService {
                 .filter(Topology::isValid)
                 .orElseGet(() -> {
                     log.warn("No overridden default valid topology was found");
+                    apiPropertiesService.reset(CloudberryPropertyId.OVERRIDDEN_DEFAULT_TOPOLOGY_ID);
                     log.warn("Retrying bootstrapping with predefined default topology");
                     var defaults = defaultTopologyProvider.get();
                     saveNodes(defaults.getNodes());

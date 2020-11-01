@@ -3,17 +3,22 @@ package com.cloudberry.cloudberry.properties.model;
 import java.util.Arrays;
 import java.util.Optional;
 
-public enum CloudberryProperty {
+public enum CloudberryPropertyId implements PropertyId {
 
     OVERRIDDEN_DEFAULT_TOPOLOGY_ID("overriddenDefaultTopologyId");
 
-    public final String id;
+    private final String id;
 
-    CloudberryProperty(String id) {
+    CloudberryPropertyId(String id) {
         this.id = id;
     }
 
-    public static Optional<CloudberryProperty> byId(String id) {
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public static Optional<CloudberryPropertyId> byId(String id) {
         return Arrays.stream(values()).filter(p -> p.id.equals(id)).findFirst();
     }
 }

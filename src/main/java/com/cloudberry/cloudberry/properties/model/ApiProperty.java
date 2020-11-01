@@ -8,6 +8,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @Value
 public class ApiProperty {
     @MongoId
-    String key;
+    String id;
     String value;
 }

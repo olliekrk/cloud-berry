@@ -32,7 +32,7 @@ public class DefaultTopologyProvider {
     private static final FilterExpression FILTER_EXPRESSION = new FilterExpression(
             AND,
             List.of(),
-            List.of(new FilterPredicate("eventNumber", "4", EqualityOperator.GT, FilterType.NUMERIC, true))
+            List.of(new FilterPredicate("eventNumber", "1", EqualityOperator.LT, FilterType.NUMERIC, true))
     );
 
     public TopologySetupData get() {

@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.properties;
 
 import com.cloudberry.cloudberry.properties.model.ApiProperty;
+import com.cloudberry.cloudberry.properties.model.PropertyId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,21 +13,21 @@ public class ApiPropertiesService {
 
     private final ApiPropertyRepository apiPropertyRepository;
 
-    public String getOrDefault(String key, String defaultValue) {
-        return apiPropertyRepository.findById(key)
+    public String getOrDefault(PropertyId id, String defaultValue) {
+        return apiPropertyRepository.findById(id.getId())
                 .map(ApiProperty::getValue)
                 .orElse(defaultValue);
     }
 
-    public void set(String key, String value) {
-        apiPropertyRepository.save(new ApiProperty(key, value));
+    public void set(PropertyId id, String value) {
+        apiPropertyRepository.save(new ApiProperty(id.getId(), value));
     }
 
-    public void reset(String key) {
-        apiPropertyRepository.deleteById(key);
+    public void reset(PropertyId id) {
+        apiPropertyRepository.deleteById(id.getId());
     }
 
-    public Optional<String> get(String id) {
-        return apiPropertyRepository.findById(id).map(ApiProperty::getValue);
+    public Optional<String> get(PropertyId id) {
+        return apiPropertyRepository.findById(id.getId()).map(ApiProperty::getValue);
     }
 }

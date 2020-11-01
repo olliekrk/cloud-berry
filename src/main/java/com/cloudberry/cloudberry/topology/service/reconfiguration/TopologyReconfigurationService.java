@@ -1,5 +1,7 @@
 package com.cloudberry.cloudberry.topology.service.reconfiguration;
 
+import com.cloudberry.cloudberry.properties.ApiPropertiesService;
+import com.cloudberry.cloudberry.properties.model.CloudberryPropertyId;
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
@@ -18,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TopologyReconfigurationService {
     private final TopologyService topologyService;
     private final TopologyBootstrapper topologyBootstrapper;
+    private final ApiPropertiesService apiPropertiesService;
 
     private final AtomicReference<KafkaStreams> streamsRef = new AtomicReference<>();
     private final AtomicReference<Thread> streamsShutdownHookRef = new AtomicReference<>();
@@ -27,6 +30,7 @@ public class TopologyReconfigurationService {
     }
 
     public synchronized KafkaStreams useTopology(Topology topology) {
+        apiPropertiesService.set(CloudberryPropertyId.OVERRIDDEN_DEFAULT_TOPOLOGY_ID, topology.getId().toHexString());
         try {
             shutdownOldStreams();
             var streams = topologyBootstrapper.bootstrapStreams(topology);
