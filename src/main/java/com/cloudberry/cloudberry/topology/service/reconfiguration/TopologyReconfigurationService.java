@@ -26,7 +26,7 @@ public class TopologyReconfigurationService {
         useTopology(topologyService.findByIdOrThrow(topologyId));
     }
 
-    public KafkaStreams useTopology(Topology topology) {
+    public synchronized KafkaStreams useTopology(Topology topology) {
         try {
             shutdownOldStreams();
             var streams = topologyBootstrapper.bootstrapStreams(topology);
