@@ -12,6 +12,7 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -24,6 +25,11 @@ public class TopologyReconfigurationService {
 
     private final AtomicReference<KafkaStreams> streamsRef = new AtomicReference<>();
     private final AtomicReference<Thread> streamsShutdownHookRef = new AtomicReference<>();
+    private final AtomicReference<ObjectId> activeTopologyIdRef = new AtomicReference<>();
+
+    public Optional<Topology> getActiveTopology() {
+        return Optional.ofNullable(activeTopologyIdRef.get()).flatMap(topologyService::findById);
+    }
 
     public void useTopology(ObjectId topologyId) {
         useTopology(topologyService.findByIdOrThrow(topologyId));
@@ -34,6 +40,7 @@ public class TopologyReconfigurationService {
         try {
             shutdownOldStreams();
             var streams = topologyBootstrapper.bootstrapStreams(topology);
+            activeTopologyIdRef.set(topology.getId());
             setupNewStreams(streams);
             return streams;
         } catch (TopologyException e) {

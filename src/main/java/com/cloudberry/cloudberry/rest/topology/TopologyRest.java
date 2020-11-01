@@ -41,6 +41,11 @@ public class TopologyRest {
         return topologyService.findAll();
     }
 
+    @GetMapping("/active")
+    Optional<Topology> findActiveTopology() {
+        return topologyReconfigurationService.getActiveTopology();
+    }
+
     @GetMapping("/name/{name}")
     List<Topology> findTopologiesByName(@PathVariable String name) {
         return topologyService.findByName(name);
