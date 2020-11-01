@@ -36,7 +36,7 @@ public class Topology {
     /**
      * Whether this topology is default one generated on each system startup, or one defined or modified by user.
      */
-    private boolean isUserDefined;
+    private boolean userDefined;
 
     /**
      * Directed edges representing the topology.

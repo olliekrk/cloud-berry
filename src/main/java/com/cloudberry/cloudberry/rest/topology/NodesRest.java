@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/topology/node")
+@RequestMapping("/topologyNode")
 public class NodesRest {
     private final TopologyNodeService topologyNodeService;
 
@@ -53,19 +54,27 @@ public class NodesRest {
         return topologyNodeService.findAll();
     }
 
-    @GetMapping("/byId")
-    Optional<TopologyNode> findById(@RequestParam String topologyNodeIdHex) throws InvalidTopologyNodeIdException {
-        val topologyNodeId = TopologyIdDispatcher.getTopologyNodeId(topologyNodeIdHex);
-        return topologyNodeService.findById(topologyNodeId);
-    }
-
-    @GetMapping("/byName")
-    List<TopologyNode> findAllByName(@RequestParam String name) {
+    @GetMapping("/name/{name}")
+    List<TopologyNode> findAllByName(@PathVariable String name) {
         return topologyNodeService.findAllByName(name);
     }
 
+    @GetMapping("/id/{id}")
+    Optional<TopologyNode> findById(@PathVariable String id)
+            throws InvalidTopologyNodeIdException {
+        val topologyNodeId = TopologyIdDispatcher.getTopologyNodeId(id);
+        return topologyNodeService.findById(topologyNodeId);
+    }
+
+    @DeleteMapping("/id/{id}")
+    void deleteById(@PathVariable String id)
+            throws InvalidTopologyNodeIdException {
+        val topologyNodeId = TopologyIdDispatcher.getTopologyNodeId(id);
+        topologyNodeService.deleteById(topologyNodeId);
+    }
+
     @DeleteMapping
-    List<TopologyNode> deleteById(@RequestParam List<String> topologyNodesIdsHex)
+    List<TopologyNode> deleteByIds(@RequestParam List<String> topologyNodesIdsHex)
             throws InvalidTopologyNodeIdException {
         val topologyNodesIds = TopologyIdDispatcher.getTopologyNodesIds(topologyNodesIdsHex);
         return topologyNodeService.deleteAllByIds(topologyNodesIds);

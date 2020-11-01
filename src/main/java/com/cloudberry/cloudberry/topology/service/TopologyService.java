@@ -35,12 +35,15 @@ public class TopologyService {
         return topologyRepository.findByName(topologyName);
     }
 
+    public List<Topology> findDefaultTopologies() {
+        return topologyRepository.findByUserDefinedIsFalse();
+    }
+
+    public void deleteById(ObjectId topologyId) {
+        topologyRepository.deleteById(topologyId);
+    }
+
     public List<Topology> deleteAllByIds(List<ObjectId> ids) {
         return topologyRepository.deleteAllByIdIn(ids);
     }
-
-    public List<Topology> findDefaultTopologies() {
-        return topologyRepository.findByIsUserDefinedIsFalse();
-    }
-
 }

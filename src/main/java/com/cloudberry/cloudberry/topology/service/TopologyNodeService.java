@@ -47,4 +47,8 @@ public class TopologyNodeService {
     public List<TopologyNode> deleteAllByIds(List<ObjectId> ids) {
         return topologyNodeRepository.deleteAllByIdIn(ids);
     }
+
+    public void deleteById(ObjectId topologyNodeId) {
+        topologyNodeRepository.deleteById(topologyNodeId);
+    }
 }

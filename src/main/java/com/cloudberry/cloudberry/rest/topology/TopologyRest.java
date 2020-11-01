@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/topology/topology")
+@RequestMapping("/topology")
 public class TopologyRest {
     private final TopologyService topologyService;
     private final TopologyModifyingService topologyModifyingService;
@@ -31,9 +32,9 @@ public class TopologyRest {
         return topologyService.save(new Topology(ObjectId.get(), name, true, Map.of()));
     }
 
-    @PutMapping("/addNodeToTopology")
+    @PutMapping("/id/{id}/addNode")
     Topology addNodeToTopology(
-            @RequestParam String topologyIdHex,
+            @PathVariable("id") String topologyIdHex,
             @RequestParam String topologyNodeIdHex
     ) throws InvalidTopologyNodeIdException, InvalidTopologyIdException {
         val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
@@ -42,9 +43,9 @@ public class TopologyRest {
         return topologyModifyingService.addVertexToTopology(topologyId, topologyNodeId);
     }
 
-    @PutMapping("/adEdgeToTopology")
+    @PutMapping("/id/{id}/addEdge")
     Topology addEdgeToTopology(
-            @RequestParam String topologyIdHex,
+            @PathVariable("id") String topologyIdHex,
             @RequestParam String sourceNodeIdHex,
             @RequestParam String targetNodeIdHex,
             @RequestParam(defaultValue = "false") boolean addVertexToTopologyIfNotAdded
@@ -57,8 +58,14 @@ public class TopologyRest {
                 .addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
     }
 
+    @DeleteMapping("/id/{id}")
+    void deleteTopology(@PathVariable String id) throws InvalidTopologyIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(id);
+        topologyService.deleteById(topologyId);
+    }
+
     @DeleteMapping
-    List<Topology> deleteTopology(@RequestParam List<String> topologiesIdsHex) throws InvalidTopologyIdException {
+    List<Topology> deleteTopologies(@RequestParam List<String> topologiesIdsHex) throws InvalidTopologyIdException {
         val topologiesIds = TopologyIdDispatcher.getTopologiesIds(topologiesIdsHex);
         return topologyService.deleteAllByIds(topologiesIds);
     }
