@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.topology.service;
 
+import com.cloudberry.cloudberry.topology.exception.TopologyNotFoundException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.repository.TopologyRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +23,27 @@ public class TopologyService {
         return topologyRepository.findAll().stream().findAny();
     }
 
+    public Optional<Topology> findById(ObjectId id) {
+        return topologyRepository.findById(id);
+    }
+
+    public Topology findByIdOrThrow(ObjectId id) {
+        return findById(id).orElseThrow(() -> new TopologyNotFoundException(id));
+    }
+
     public List<Topology> findByName(String topologyName) {
         return topologyRepository.findByName(topologyName);
     }
 
-    public void removeByIds(List<ObjectId> ids) {
-        topologyRepository.removeAllByIdIn(ids);
+    public List<Topology> findDefaultTopologies() {
+        return topologyRepository.findByUserDefinedIsFalse();
     }
 
-    public List<Topology> findDefaultTopologies() {
-        return topologyRepository.findByIsUserDefinedIsFalse();
+    public void deleteById(ObjectId topologyId) {
+        topologyRepository.deleteById(topologyId);
+    }
+
+    public List<Topology> deleteAllByIds(List<ObjectId> ids) {
+        return topologyRepository.deleteAllByIdIn(ids);
     }
 }

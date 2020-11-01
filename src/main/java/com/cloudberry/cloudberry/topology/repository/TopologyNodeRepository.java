@@ -7,5 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface TopologyNodeRepository extends MongoRepository<TopologyNode, ObjectId> {
-    void removeAllByIdIn(List<ObjectId> ids);
+    List<TopologyNode> deleteAllByIdIn(List<ObjectId> ids);
+
+    List<TopologyNode> findAllByName(String name);
 }

@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.topology;
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
+import com.cloudberry.cloudberry.topology.service.bootstrap.DefaultTopologyProvider;
 import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyBootstrapper;
 import com.cloudberry.cloudberry.topology.service.bootstrap.TopologyInitializer;
 import io.vavr.control.Try;
@@ -19,6 +20,7 @@ public class TopologyBootstrapConfig {
     private final TopologyBootstrapper topologyBootstrapper;
     private final TopologyInitializer topologyInitializer;
     private final TopologyService topologyService;
+    private final DefaultTopologyProvider defaultTopologyProvider;
 
     @Bean
     public KafkaStreams kafkaStreams() {
@@ -29,14 +31,14 @@ public class TopologyBootstrapConfig {
                 .orElseGet(() -> {
                     log.warn("No overridden topology configuration was found");
                     log.warn("Retrying bootstrapping with predefined topology");
-                    return topologyInitializer.buildDefaultTopology();
+                    return topologyInitializer.saveTopologySetupData(defaultTopologyProvider.get());
                 });
         return configureWithTopology(topology);
     }
 
     private KafkaStreams configureWithTopology(Topology topology) {
         return Try.of(() -> {
-            var streams = topologyBootstrapper.configureStreams(topology);
+            var streams = topologyBootstrapper.bootstrapStreams(topology);
             streams.start();
             return streams;
         }).onFailure(

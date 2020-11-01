@@ -4,7 +4,7 @@ import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import org.springframework.http.HttpStatus;
 
 public class InvalidThresholdsException extends RestException {
-    public static final HttpStatus status = HttpStatus.BAD_REQUEST;
+    private static final HttpStatus status = HttpStatus.BAD_REQUEST;
 
     public InvalidThresholdsException(Thresholds thresholds) {
         super(

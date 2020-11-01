@@ -23,12 +23,12 @@ public class BucketsRest {
     }
 
     @PostMapping("{bucketName}")
-    public void createBucket(@PathVariable("bucketName") String bucketName) {
+    public void createBucket(@PathVariable String bucketName) {
         bucketsService.createBucketIfNotExists(bucketName);
     }
 
     @DeleteMapping("{bucketName}")
-    public void deleteBucket(@PathVariable("bucketName") String bucketName) {
+    public void deleteBucket(@PathVariable String bucketName) {
         bucketsService.deleteBucket(bucketName);
     }
 

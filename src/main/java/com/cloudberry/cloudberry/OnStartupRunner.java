@@ -8,7 +8,7 @@ import com.cloudberry.cloudberry.kafka.event.logs.SummaryEvent;
 import com.cloudberry.cloudberry.kafka.event.logs.WorkplaceEvent;
 import com.cloudberry.cloudberry.kafka.event.metadata.MetadataEvent;
 import com.cloudberry.cloudberry.metrics.MetricsIndex;
-import com.cloudberry.cloudberry.metrics.MetricsProvider;
+import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.model.solution.Solution;
 import com.cloudberry.cloudberry.model.solution.SolutionDetails;
 import com.influxdb.exceptions.InfluxException;
@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +28,12 @@ import java.util.stream.IntStream;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Order(1)
 public class OnStartupRunner implements ApplicationRunner {
 
     private final InfluxOrganizationService influxOrganizationService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final MetricsProvider metricsProvider;
+    private final MetricsRegistry metricsRegistry;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -43,11 +45,18 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void sendComputationEvents() {
+        var measurementName = "bootstrapping-streams-test-events";
         IntStream.range(0, 10)
                 .boxed()
-                .map(i -> new ComputationEvent(Instant.now(), "bootstrapping-streams-test",
-                                               Map.of("attempt", 1, "eventNumber", i), Map.of()
-                ))
+                .map(i -> {
+                    log.info("Sending computation event no. {} to '{}' measurement", i, measurementName);
+                    return new ComputationEvent(
+                            Instant.now().plusSeconds(i),
+                            measurementName,
+                            Map.of("attempt", 1, "eventNumber", i),
+                            Map.of()
+                    );
+                })
                 .forEach(event -> kafkaTemplate.send(KafkaTopics.Generic.COMPUTATION_TOPIC, event));
     }
 
@@ -79,7 +88,7 @@ public class OnStartupRunner implements ApplicationRunner {
     }
 
     private void reportRestartMetrics() {
-        metricsProvider.incrementCounter(MetricsIndex.CLOUDBERRY_STARTUPS);
+        metricsRegistry.incrementCounter(MetricsIndex.CLOUDBERRY_STARTUPS);
     }
 
     private void logDefaultConfiguration() {

@@ -6,6 +6,7 @@ import com.cloudberry.cloudberry.db.influx.service.InfluxDataWriter;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.kafka.processing.EventProcessor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class ComputationEventProcessor implements EventProcessor<ComputationEven
     }
 
     @Async(AsyncExecutors.influxProcessorsExecutor)
-    public void process(ComputationEvent event, String bucketName) {
+    public void process(ComputationEvent event, @Nullable String bucketName) {
         var point = pointBuilder.buildPoint(
                 event.getMeasurementName(),
                 event.getTime(),

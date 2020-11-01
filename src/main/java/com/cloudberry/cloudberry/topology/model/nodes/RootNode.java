@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.topology.model.nodes;
 
+import com.cloudberry.cloudberry.topology.service.visitor.TopologyNodeVisitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -14,5 +15,10 @@ public class RootNode extends TopologyNode {
     public RootNode(String name, String inputTopicName) {
         super(ObjectId.get(), name);
         this.inputTopicName = inputTopicName;
+    }
+
+    @Override
+    public void accept(TopologyNodeVisitor visitor) {
+        visitor.visit(this);
     }
 }

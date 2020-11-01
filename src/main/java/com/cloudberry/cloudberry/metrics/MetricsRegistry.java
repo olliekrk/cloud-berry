@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MetricsProvider {
+public class MetricsRegistry {
     private final MeterRegistry meterRegistry;
 
     public void incrementCounter(String counterName) {
