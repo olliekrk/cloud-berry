@@ -2,7 +2,6 @@ package com.cloudberry.cloudberry.topology.model.filtering;
 
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.operators.EqualityOperator;
-import com.cloudberry.cloudberry.topology.model.operators.LogicalOperator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Supplier;
@@ -11,21 +10,23 @@ import java.util.function.Supplier;
 public abstract class ExpressionChecker {
 
     public static boolean check(ComputationEvent event, FilterExpression exp) {
-        if (exp.getOperator() == LogicalOperator.OR) {
+        switch (exp.getOperator()) {
+        case OR -> {
             // using suppliers for laziness
             Supplier<Boolean> predicatesMet = () -> exp.getPredicates().stream().anyMatch(p -> check(event, p));
             Supplier<Boolean> expressionsMet = () -> exp.getExpressions().stream().anyMatch(e -> check(event, e));
             return predicatesMet.get() || expressionsMet.get();
-        } else if (exp.getOperator() == LogicalOperator.AND) {
+        }
+        case AND -> {
             var predicatesMet = exp.getPredicates().stream().allMatch(p -> check(event, p));
             var expressionsMet = exp.getExpressions().stream().allMatch(e -> check(event, e));
             return predicatesMet && expressionsMet;
-        } else {
-            return false;
+        }
+        default -> { return false; }
         }
     }
 
-    public static boolean check(ComputationEvent event, FilterPredicate exp) {
+    private static boolean check(ComputationEvent event, FilterPredicate exp) {
         var name = exp.getName();
         var value = exp.getValue();
         var eventValue = exp.isField() ? event.getFields().get(name) : event.getTags().get(name);

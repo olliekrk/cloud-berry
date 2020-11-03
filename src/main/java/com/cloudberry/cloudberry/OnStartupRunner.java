@@ -53,7 +53,7 @@ public class OnStartupRunner implements ApplicationRunner {
                     return new ComputationEvent(
                             Instant.now().plusSeconds(i),
                             measurementName,
-                            Map.of("attempt", 1, "eventNumber", i),
+                            Map.of("attempt", 1, "eventNumber", i, "valueToMap", 3.0),
                             Map.of()
                     );
                 })

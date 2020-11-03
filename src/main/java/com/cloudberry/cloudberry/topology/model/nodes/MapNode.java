@@ -1,6 +1,6 @@
 package com.cloudberry.cloudberry.topology.model.nodes;
 
-import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
+import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.service.visitor.TopologyNodeVisitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,12 +10,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "TopologyNode")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FilterNode extends TopologyNode {
-    private final FilterExpression expression;
+public class MapNode extends TopologyNode {
 
-    public FilterNode(String name, FilterExpression expression) {
+    private final MappingExpression mappingExpression;
+
+    public MapNode(String name, MappingExpression mappingExpression) {
         super(ObjectId.get(), name);
-        this.expression = expression;
+        this.mappingExpression = mappingExpression;
     }
 
     @Override

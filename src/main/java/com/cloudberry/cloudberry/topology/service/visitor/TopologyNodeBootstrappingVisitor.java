@@ -6,13 +6,16 @@ import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
 import com.cloudberry.cloudberry.topology.model.filtering.ExpressionChecker;
+import com.cloudberry.cloudberry.topology.model.mapping.Mapper;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
+import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 
@@ -49,6 +52,19 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
         var mergedStream = mergePredecessors(node);
         var filteredStream = mergedStream.filter((key, event) -> ExpressionChecker.check(event, node.getExpression()));
         context.putStream(node.getId(), filteredStream);
+    }
+
+    @Override
+    public void visit(MapNode node) {
+        var mergedStream = mergePredecessors(node);
+        var mappedStream = mergedStream.map(((key, event) -> KeyValue.pair(
+                key,
+                Mapper.calculateNewComputationEvent(
+                        event,
+                        node.getMappingExpression()
+                )
+        )));
+        context.putStream(node.getId(), mappedStream);
     }
 
     private KStream<String, ComputationEvent> mergePredecessors(TopologyNode node) {
