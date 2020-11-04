@@ -3,8 +3,10 @@ package com.cloudberry.cloudberry.rest.topology;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeIdException;
 import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
+import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
+import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
@@ -47,6 +49,11 @@ public class NodesRest {
     @PostMapping("/filter")
     TopologyNode createFilterNode(@RequestParam String name, @RequestBody FilterExpression filterExpression) {
         return topologyNodeService.save(new FilterNode(name, filterExpression));
+    }
+
+    @PostMapping("/map")
+    TopologyNode createMappingNode(@RequestParam String name, @RequestBody MappingExpression mappingExpression) {
+        return topologyNodeService.save(new MapNode(name, mappingExpression));
     }
 
     @GetMapping("/all")

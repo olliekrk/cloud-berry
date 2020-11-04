@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.topology.model.nodes;
 
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
+import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.service.visitor.TopologyNodeVisitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

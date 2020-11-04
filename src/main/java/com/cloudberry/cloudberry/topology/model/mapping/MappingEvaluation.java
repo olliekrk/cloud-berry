@@ -12,9 +12,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappingEvaluation {
+public class MappingEvaluation<T> {
     private String name;
     private ComputationEventMapType computationEventMapType;
     private OperationEnum operator;
-    private List<MappingArgument<?>> arguments;
+    private List<MappingArgument<T>> arguments;
 }

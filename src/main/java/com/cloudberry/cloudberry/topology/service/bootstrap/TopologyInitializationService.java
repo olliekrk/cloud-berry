@@ -25,7 +25,7 @@ public class TopologyInitializationService {
     private final ApiPropertiesService apiPropertiesService;
 
     public Topology getInitialTopology() {
-        // purgeDefaults();
+         purgeDefaults();
 
         var defaultTopologyId = apiPropertiesService
                 .get(CloudberryPropertyId.OVERRIDDEN_DEFAULT_TOPOLOGY_ID)

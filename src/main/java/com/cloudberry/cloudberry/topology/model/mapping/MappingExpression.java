@@ -10,6 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MappingExpression {
-    private List<MappingEvaluation> mappingEvaluations;
-
+    private List<MappingEvaluation<?>> mappingEvaluations;
 }
