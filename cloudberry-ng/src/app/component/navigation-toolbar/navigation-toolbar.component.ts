@@ -3,6 +3,7 @@ import {Router} from "@angular/router";
 import {NGXLogger} from "ngx-logger";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
 import {map} from "rxjs/operators";
+import {Observable} from "rxjs";
 
 @Component({
   selector: "app-navigation-toolbar",
@@ -11,7 +12,7 @@ import {map} from "rxjs/operators";
 })
 export class NavigationToolbarComponent implements OnInit {
 
-  readonly activeTopology = this.activeTopologyStoreService
+  readonly activeTopologyHeader$: Observable<string> = this.activeTopologyStoreService
     .stateUpdates()
     .pipe(map(t => `${t.name} (${t.id})`));
 

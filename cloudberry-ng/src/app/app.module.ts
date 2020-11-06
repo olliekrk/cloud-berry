@@ -20,6 +20,7 @@ import {NavigationToolbarComponent} from "./component/navigation-toolbar/navigat
 import {LoggerConfig, LoggerModule} from "ngx-logger";
 import {HttpClientModule} from "@angular/common/http";
 import {TopologyDashboardComponent} from "./component/topology-dashboard/topology-dashboard.component";
+import {CytoscapeWrapperComponent} from "./component/cytoscape-wrapper/cytoscape-wrapper.component";
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import {TopologyDashboardComponent} from "./component/topology-dashboard/topolog
     TopologyDashboardComponent,
     ConfigurationDashboardComponent,
     NavigationToolbarComponent,
+    CytoscapeWrapperComponent,
   ],
   imports: [
     BrowserModule,

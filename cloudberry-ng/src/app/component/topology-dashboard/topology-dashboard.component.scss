@@ -1,0 +1,8 @@
+:host {
+  display: flex;
+  height: calc(100vh - 104px);
+}
+
+app-cytoscape-wrapper {
+  flex: 1;
+}

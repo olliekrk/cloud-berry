@@ -1,7 +1,3 @@
-<p *ngIf="activeTopology$ | async as activeTopology">
-  topology-dashboard works!
-  {{activeTopology | json}}
-
-  aAAAA\n<br><br><br>
-  {{activeTopologyNodes$ | async | json}}
-</p>
+<app-cytoscape-wrapper [topology]="activeTopology$ | async"
+                       [topologyNodes]="activeTopologyNodes$ | async">
+</app-cytoscape-wrapper>

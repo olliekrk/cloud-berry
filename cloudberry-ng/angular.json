@@ -26,7 +26,11 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "cytoscape",
+              "cytoscape-klay"
+            ]
           },
           "configurations": {
             "production": {

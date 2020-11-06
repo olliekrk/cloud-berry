@@ -15,6 +15,6 @@
     <button mat-icon-button (click)="reloadActiveTopology()">
       <mat-icon>refresh</mat-icon>
     </button>
-    <span>Currently running topology configuration is: {{(activeTopology | async) || '...'}}</span>
+    <span>Currently running topology configuration is: {{(activeTopologyHeader$ | async) || '...'}}</span>
   </mat-toolbar-row>
 </mat-toolbar>

@@ -5,6 +5,7 @@ import {ActiveTopologyStoreService} from "../../service/active-topology-store.se
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {switchMap} from "rxjs/operators";
 
+
 @Component({
   selector: "app-topology-dashboard",
   templateUrl: "./topology-dashboard.component.html",
@@ -23,5 +24,7 @@ export class TopologyDashboardComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+
 
 }
