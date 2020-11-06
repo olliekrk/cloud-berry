@@ -1,11 +1,10 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import * as cytoscape from "cytoscape";
-import {Topology, TopologyNode} from "../../model";
+import {TopologyData} from "../../model";
 import {TypedSimpleChange} from "../../util";
 
 type ComponentSimpleChanges = SimpleChanges & {
-  topology?: TypedSimpleChange<Topology>;
-  topologyNodes?: TypedSimpleChange<TopologyNode[]>;
+  topologyData?: TypedSimpleChange<TopologyData>;
 };
 
 @Component({
@@ -17,8 +16,7 @@ export class CytoscapeWrapperComponent implements OnInit, OnChanges {
 
   @ViewChild("cy", {static: true}) cyContainer: ElementRef;
 
-  @Input() topology: Topology;
-  @Input() topologyNodes: TopologyNode[];
+  @Input() topologyData: TopologyData;
 
   cyCore?: cytoscape.Core;
 
@@ -51,20 +49,20 @@ export class CytoscapeWrapperComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges({topology, topologyNodes}: ComponentSimpleChanges): void {
-    if (topologyNodes?.currentValue) {
-      this.fillWithTopologyNodesData(topologyNodes.currentValue);
-    }
-    if (topology?.currentValue) {
-      this.fillWithTopologyData(topology.currentValue);
+  ngOnChanges({topologyData}: ComponentSimpleChanges): void {
+    if (topologyData?.currentValue) {
+      this.fillWithData(topologyData.currentValue);
     }
   }
 
-  // fixme: merge @Inputs into one struct so that nodes are always added first, otherwise it throws errors
-  //  (cannot create edge with missing node)
+  private fillWithData({topology, topologyNodes}: TopologyData): void {
+    const nodes: cytoscape.NodeDefinition[] = topologyNodes.map(node => ({
+      data: {
+        id: node.id,
+        name: node.name,
+      }
+    }));
 
-  private fillWithTopologyData(topology: Topology): void {
-    console.log("adding edges");
     const edgesArrays: cytoscape.EdgeDefinition[][] = Object.entries(topology.edges)
       .map(([source, targets]) => targets
         .map(target => ({
@@ -79,23 +77,10 @@ export class CytoscapeWrapperComponent implements OnInit, OnChanges {
 
     const edges: cytoscape.EdgeDefinition[] = [].concat.apply([], edgesArrays);
     if (this.cyCore) {
-      this.cyCore.edges().remove();
-      this.cyCore.add(edges);
-    }
-  }
-
-  private fillWithTopologyNodesData(topologyNodes: TopologyNode[]): void {
-    console.log("adding nodes");
-    const nodes: cytoscape.NodeDefinition[] = topologyNodes.map(node => ({
-      data: {
-        id: node.id,
-        name: node.name,
-      }
-    }));
-
-    if (this.cyCore) {
       this.cyCore.nodes().remove();
       this.cyCore.add(nodes);
+      this.cyCore.edges().remove();
+      this.cyCore.add(edges);
     }
   }
 

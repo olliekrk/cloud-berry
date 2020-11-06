@@ -12,3 +12,8 @@ export interface TopologyNode {
   id: TopologyNodeId;
   name: string;
 }
+
+export interface TopologyData {
+  topology: Topology;
+  topologyNodes: TopologyNode[];
+}

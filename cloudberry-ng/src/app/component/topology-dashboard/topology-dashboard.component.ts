@@ -1,9 +1,9 @@
 import {Component, OnInit} from "@angular/core";
-import {Topology, TopologyNode} from "../../model";
+import {Topology, TopologyData} from "../../model";
 import {Observable} from "rxjs";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
-import {switchMap} from "rxjs/operators";
+import {map, switchMap} from "rxjs/operators";
 
 
 @Component({
@@ -14,17 +14,18 @@ import {switchMap} from "rxjs/operators";
 export class TopologyDashboardComponent implements OnInit {
 
   readonly activeTopology$: Observable<Topology>;
-  readonly activeTopologyNodes$: Observable<TopologyNode[]>;
+  readonly activeTopologyData$: Observable<TopologyData>;
 
   constructor(private activeTopologyStoreService: ActiveTopologyStoreService,
               private topologyNodeApiService: TopologyNodeApiService) {
     this.activeTopology$ = this.activeTopologyStoreService.stateUpdates();
-    this.activeTopologyNodes$ = this.activeTopology$.pipe(switchMap(t => this.topologyNodeApiService.getTopologyNodes(t.id)));
+    this.activeTopologyData$ = this.activeTopology$.pipe(switchMap(topology =>
+      this.topologyNodeApiService.getTopologyNodes(topology.id).pipe(map(topologyNodes => ({topology, topologyNodes}))
+      )));
   }
 
   ngOnInit(): void {
   }
-
 
 
 }
