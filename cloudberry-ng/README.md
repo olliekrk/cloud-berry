@@ -30,3 +30,15 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 #### How to use production configuration (e.g. inside docker)
 `ng build --configuration=production`
+
+
+### How to setup development environment:
+
+#### Prerequisites:
+* NodeJS installed
+* npm installed
+* Angular CLI installed (version 10)
+
+#### Setup:
+1. run `npm install` in the main project directory
+2. for development use `ng start`
