@@ -9,7 +9,7 @@ plugins {
 
 group = "com.cloudberry"
 version = "0.0.1"
-sourceCompatibility = "14"
+sourceCompatibility = "15"
 
 bootJar {
     archiveFileName = "${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}"
@@ -87,6 +87,22 @@ dependencies {
     testImplementation group: 'com.github.fakemongo', name: 'fongo', version: '2.1.1'
 }
 
+compileJava {
+    options.compilerArgs += ['--enable-preview']
+}
+
+tasks.withType(JavaExec) {
+    jvmArgs += '--enable-preview'
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += '--enable-preview'
+}
+
+tasks.withType(Test) {
+    jvmArgs += "--enable-preview"
+}
+
 pmd {
     ignoreFailures = true
     consoleOutput = true
@@ -94,7 +110,7 @@ pmd {
 }
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.6"
 }
 
 jacocoTestCoverageVerification {
