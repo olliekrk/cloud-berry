@@ -1,25 +1,2 @@
-<nav class="navbar navbar-sticky-top navbar-dark bg-primary">
-  <div class="container">
-    <a class="navbar-brand" href="#">Cloudberry NG</a>
-    <button class="navbar-toggler" type="button"
-            data-toggle="collapse"
-            data-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav" routerLinkActive="active">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="dashboard">Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="topology">Topology</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="configuration">Configuration</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
+<app-navigation-toolbar></app-navigation-toolbar>
 <router-outlet></router-outlet>

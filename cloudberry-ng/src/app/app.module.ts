@@ -16,12 +16,18 @@ import {MatGridListModule} from "@angular/material/grid-list";
 import {MatCardModule} from "@angular/material/card";
 import {MatMenuModule} from "@angular/material/menu";
 import {ConfigurationDashboardComponent} from "./component/configuration-dashboard/configuration-dashboard.component";
+import {NavigationToolbarComponent} from "./component/navigation-toolbar/navigation-toolbar.component";
+import {LoggerConfig, LoggerModule} from "ngx-logger";
+import {HttpClientModule} from "@angular/common/http";
+import {TopologyDashboardComponent} from "./component/topology-dashboard/topology-dashboard.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     MainDashboardComponent,
+    TopologyDashboardComponent,
     ConfigurationDashboardComponent,
+    NavigationToolbarComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,9 +42,13 @@ import {ConfigurationDashboardComponent} from "./component/configuration-dashboa
     MatListModule,
     MatGridListModule,
     MatCardModule,
-    MatMenuModule
+    MatMenuModule,
+    LoggerModule,
+    HttpClientModule,
   ],
-  providers: [],
+  providers: [
+    LoggerConfig,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

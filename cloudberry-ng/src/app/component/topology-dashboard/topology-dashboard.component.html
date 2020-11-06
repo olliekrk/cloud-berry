@@ -1,1 +1,7 @@
-<p>topology-dashboard works!</p>
+<p *ngIf="activeTopology$ | async as activeTopology">
+  topology-dashboard works!
+  {{activeTopology | json}}
+
+  aAAAA\n<br><br><br>
+  {{activeTopologyNodes$ | async | json}}
+</p>

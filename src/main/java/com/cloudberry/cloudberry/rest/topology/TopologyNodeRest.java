@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.rest.topology;
 
+import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeIdException;
 import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/topologyNode")
-public class NodesRest {
+public class TopologyNodeRest {
     private final TopologyNodeService topologyNodeService;
 
     @PostMapping("/root")
@@ -64,6 +65,12 @@ public class NodesRest {
     @GetMapping("/name/{name}")
     List<TopologyNode> findAllByName(@PathVariable String name) {
         return topologyNodeService.findAllByName(name);
+    }
+
+    @GetMapping("/topology/{topologyIdHex}")
+    List<TopologyNode> findAllByTopologyId(@PathVariable String topologyIdHex) throws InvalidTopologyIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        return topologyNodeService.findNodesUsedInTopology(topologyId);
     }
 
     @GetMapping("/id/{id}")

@@ -1,0 +1,26 @@
+@import "../../../styles";
+
+.top-toolbar-row {
+  display: flex;
+  justify-content: space-between;
+
+  h1 {
+    padding: 0 10px;
+  }
+}
+
+.small-toolbar-row {
+  height: 40px;
+  background-color: #5c5757;
+
+  span {
+    font-size: 12px;
+  }
+
+}
+
+.top-toolbar-links {
+  display: flex;
+  justify-content: space-around;
+  width: 400px;
+}

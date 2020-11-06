@@ -14,11 +14,11 @@
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$cloudberry-ng-primary: mat-palette($mat-teal);
+$cloudberry-ng-primary: mat-palette($mat-red);
 $cloudberry-ng-accent: mat-palette($mat-amber, A200, A100, A400);
 
 // The warn palette is optional (defaults to red).
-$cloudberry-ng-warn: mat-palette($mat-red);
+$cloudberry-ng-warn: mat-palette($mat-yellow);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
@@ -44,4 +44,8 @@ html, body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+a:hover {
+  color: mat-color($cloudberry-ng-accent);
 }

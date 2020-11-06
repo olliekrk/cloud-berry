@@ -1,6 +1,8 @@
 package com.cloudberry.cloudberry.topology.service;
 
 import com.cloudberry.cloudberry.topology.exception.NodeNotFoundException;
+import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import com.cloudberry.cloudberry.topology.repository.TopologyNodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TopologyNodeService {
+    private final TopologyService topologyService;
     private final TopologyNodeRepository topologyNodeRepository;
 
     public TopologyNode save(TopologyNode node) {
@@ -44,11 +48,24 @@ public class TopologyNodeService {
         return topologyNodeRepository.findAllByName(name);
     }
 
-    public List<TopologyNode> deleteAllByIds(List<ObjectId> ids) {
+    public List<TopologyNode> findAllByIds(Collection<ObjectId> ids) {
+        return topologyNodeRepository.findAllByIdIn(ids);
+    }
+
+    public List<TopologyNode> deleteAllByIds(Collection<ObjectId> ids) {
         return topologyNodeRepository.deleteAllByIdIn(ids);
     }
 
     public void deleteById(ObjectId topologyNodeId) {
         topologyNodeRepository.deleteById(topologyNodeId);
+    }
+
+    public List<TopologyNode> findNodesUsedInTopology(ObjectId topologyId) {
+        return topologyService.findById(topologyId)
+                .map(Topology::getVertices)
+                .stream()
+                .flatMap(nodesIds -> findAllByIds(nodesIds).stream())
+                .filter(n -> !(n instanceof MapNode)) // TODO: po naprawieniu serializacji MapNode wywalic ten filtr
+                .collect(Collectors.toList());
     }
 }
