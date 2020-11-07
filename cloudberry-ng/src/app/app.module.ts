@@ -21,11 +21,14 @@ import {LoggerConfig, LoggerModule} from "ngx-logger";
 import {HttpClientModule} from "@angular/common/http";
 import {TopologyDashboardComponent} from "./component/topology-dashboard/topology-dashboard.component";
 import {CytoscapeWrapperComponent} from "./component/cytoscape-wrapper/cytoscape-wrapper.component";
+import {DialogContentExampleDialog} from "./component/node-info-dialog/dialog-node-info";
+import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
     AppComponent,
     MainDashboardComponent,
+    DialogContentExampleDialog,
     TopologyDashboardComponent,
     ConfigurationDashboardComponent,
     NavigationToolbarComponent,
@@ -47,6 +50,7 @@ import {CytoscapeWrapperComponent} from "./component/cytoscape-wrapper/cytoscape
     MatMenuModule,
     LoggerModule,
     HttpClientModule,
+    MatDialogModule,
   ],
   providers: [
     LoggerConfig,
