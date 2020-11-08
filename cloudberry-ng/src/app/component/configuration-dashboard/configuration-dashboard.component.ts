@@ -1,4 +1,7 @@
 import {Component, OnInit} from "@angular/core";
+import {ConfigurationApiService} from "../../service/configuration-api.service";
+import {Observable} from "rxjs";
+import {ApiProperty} from "../../model";
 
 @Component({
   selector: "app-configuration-dashboard",
@@ -7,7 +10,10 @@ import {Component, OnInit} from "@angular/core";
 })
 export class ConfigurationDashboardComponent implements OnInit {
 
-  constructor() {
+  readonly apiProperties$: Observable<ApiProperty[]>;
+
+  constructor(private configurationApiService: ConfigurationApiService) {
+    this.apiProperties$ = configurationApiService.getAllProperties();
   }
 
   ngOnInit(): void {

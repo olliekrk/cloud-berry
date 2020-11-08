@@ -1,1 +1,7 @@
-<p>configuration-dashboard works!</p>
+<h1>Configured API properties:</h1>
+<dl *ngIf="apiProperties$ | async as apiProperties" class="grid-properties">
+  <ng-container *ngFor="let property of apiProperties">
+    <dt>{{property.id}}:</dt>
+    <dd>{{property.value}}</dd>
+  </ng-container>
+</dl>

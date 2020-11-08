@@ -1,0 +1,9 @@
+h1 {
+  margin: 10px;
+}
+
+.grid-properties {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
