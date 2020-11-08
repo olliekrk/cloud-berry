@@ -28,7 +28,10 @@ export class TopologyRestService {
   }
 
   deleteTopology(topologyId: TopologyId): Observable<void> {
-    return this.httpClient.delete<void>(`${this.baseUrl}/id/${topologyId}`);
+    return this.httpClient.post<void>(`${this.baseUrl}/id/${topologyId}/delete`, null);
   }
 
+  createTopology(topologyName: string): Observable<void> {
+    return this.httpClient.post<void>(`${this.baseUrl}/create`, null, {params: {name: topologyName}});
+  }
 }

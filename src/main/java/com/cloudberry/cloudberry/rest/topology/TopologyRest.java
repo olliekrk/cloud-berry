@@ -88,7 +88,7 @@ public class TopologyRest {
                 .addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
     }
 
-    @DeleteMapping("/id/{id}")
+    @PostMapping("/id/{id}/delete")
     void deleteTopology(@PathVariable String id) throws InvalidTopologyIdException {
         val topologyId = TopologyIdDispatcher.getTopologyId(id);
         topologyService.deleteById(topologyId);

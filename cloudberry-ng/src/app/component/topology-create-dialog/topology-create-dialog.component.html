@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>Create topology</h1>
+
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <input matInput
+           placeholder="Enter topology name"
+           formControlName="name">
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-raised-button [mat-dialog-close]="form.value.name">Submit</button>
+</mat-dialog-actions>

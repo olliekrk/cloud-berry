@@ -27,4 +27,8 @@ export class TopologyApiService {
   deleteTopology(topologyId: TopologyId): Observable<void> {
     return this.rest.deleteTopology(topologyId).pipe(share());
   }
+
+  createTopology(topologyName: string) {
+    return this.rest.createTopology(topologyName).pipe(share());
+  }
 }

@@ -18,11 +18,19 @@ import {MatMenuModule} from "@angular/material/menu";
 import {ConfigurationDashboardComponent} from "./component/configuration-dashboard/configuration-dashboard.component";
 import {NavigationToolbarComponent} from "./component/navigation-toolbar/navigation-toolbar.component";
 import {LoggerConfig, LoggerModule} from "ngx-logger";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {TopologyDashboardComponent} from "./component/topology-dashboard/topology-dashboard.component";
 import {TopologyGraphComponent} from "./component/topology-graph/topology-graph.component";
 import {TopologyNodeDetailsInfoDialogComponent} from "./component/node-info-dialog/topology-node-details-info-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
+import {FlexLayoutModule} from "@angular/flex-layout";
+import {DefaultHttpHeadersInterceptor} from "./interceptor/default-http-headers-interceptor";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatTooltipModule} from "@angular/material/tooltip";
+import {TopologyCreateDialogComponent} from "./component/topology-create-dialog/topology-create-dialog.component";
+import {ReactiveFormsModule} from "@angular/forms";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatInputModule} from "@angular/material/input";
 
 @NgModule({
   declarations: [
@@ -33,6 +41,7 @@ import {MatDialogModule} from "@angular/material/dialog";
     ConfigurationDashboardComponent,
     NavigationToolbarComponent,
     TopologyGraphComponent,
+    TopologyCreateDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,10 +59,21 @@ import {MatDialogModule} from "@angular/material/dialog";
     MatMenuModule,
     LoggerModule,
     HttpClientModule,
+    MatTooltipModule,
     MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FlexLayoutModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule
   ],
   providers: [
     LoggerConfig,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: DefaultHttpHeadersInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

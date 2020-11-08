@@ -3,6 +3,10 @@ import {Observable} from "rxjs";
 import {Topology, TopologyId} from "../../model";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
+import {switchMap} from "rxjs/operators";
+import {MatDialog} from "@angular/material/dialog";
+import {TopologyCreateDialogComponent} from "../topology-create-dialog/topology-create-dialog.component";
+import {notNull} from "../../util";
 
 @Component({
   selector: "app-main-dashboard",
@@ -11,13 +15,14 @@ import {ActiveTopologyStoreService} from "../../service/active-topology-store.se
 })
 export class MainDashboardComponent implements OnInit {
 
-  readonly availableTopologies$: Observable<Topology[]>;
-  readonly activeTopology$: Observable<Topology>;
+  availableTopologies$: Observable<Topology[]>;
+  activeTopology$: Observable<Topology>;
 
   constructor(private topologyApiService: TopologyApiService,
-              private activeTopologyStoreService: ActiveTopologyStoreService) {
-    this.availableTopologies$ = topologyApiService.getAvailableTopologies();
+              private activeTopologyStoreService: ActiveTopologyStoreService,
+              private dialog: MatDialog) {
     this.activeTopology$ = activeTopologyStoreService.stateUpdates();
+    this.availableTopologies$ = this.fetchAvailableTopologies();
   }
 
   ngOnInit(): void {
@@ -28,7 +33,19 @@ export class MainDashboardComponent implements OnInit {
   }
 
   deleteTopology(id: TopologyId): void {
-    this.topologyApiService.deleteTopology(id).subscribe();
+    this.availableTopologies$ = this.topologyApiService.deleteTopology(id)
+      .pipe(switchMap(() => this.fetchAvailableTopologies()));
   }
 
+  private fetchAvailableTopologies(): Observable<Topology[]> {
+    return this.topologyApiService.getAvailableTopologies();
+  }
+
+  openAddTopologyDialog(): void {
+    this.dialog.open(TopologyCreateDialogComponent).afterClosed()
+      .pipe(notNull(), switchMap(name => this.topologyApiService.createTopology(name)))
+      .subscribe(() => {
+        this.availableTopologies$ = this.fetchAvailableTopologies();
+      });
+  }
 }

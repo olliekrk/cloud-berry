@@ -1,10 +1,19 @@
+.upper-section {
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
 .cards-container {
   padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .topology-card {
   width: 400px;
   height: 400px;
+  margin: 16px;
 
   mat-card-content {
     display: flex;
@@ -19,4 +28,15 @@
 .topology-img {
   width: 75%;
   height: 75%;
+}
+
+.spinner-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+
+  mat-spinner {
+    margin: 100px;
+  }
 }
