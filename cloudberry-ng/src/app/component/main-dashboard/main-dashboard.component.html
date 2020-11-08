@@ -5,7 +5,13 @@
   <ng-container *ngIf="availableTopologies$ | async as availableTopologies; else loading">
     <mat-card class="topology-card" *ngFor="let topology of availableTopologies">
       <mat-card-header>
-        <mat-card-title [class.active]="activeTopology.id === topology.id">{{topology.name}}</mat-card-title>
+        <mat-card-title [class.active]="activeTopology.id === topology.id"
+                        [class.invalid]="!topology.valid"
+                        [matTooltip]="activeTopology.id === topology.id ? 'Active topology'
+                        : !topology.valid ? 'This topology is invalid'
+                        : ''">
+          {{topology.name}}
+        </mat-card-title>
         <mat-card-subtitle>{{topology.id}}</mat-card-subtitle>
       </mat-card-header>
       <mat-divider></mat-divider>
@@ -15,7 +21,7 @@
       <mat-card-actions>
         <button mat-stroked-button
                 (click)="useTopology(topology.id)"
-                [disabled]="topology.id === activeTopology.id"
+                [disabled]="topology.id === activeTopology.id || !topology.valid"
                 [matTooltip]="'Sets this topology as active one'">
           USE
         </button>

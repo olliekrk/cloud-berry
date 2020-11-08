@@ -20,8 +20,13 @@
     justify-content: space-around;
   }
 
-  mat-card-title.active {
-    color: lightgreen;
+  mat-card-title {
+    &.active {
+      color: lightgreen;
+    }
+    &.invalid {
+      color: darkred;
+    }
   }
 }
 
