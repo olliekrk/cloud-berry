@@ -4,9 +4,11 @@ import {TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
 import * as cytoscape from "cytoscape";
-import * as cxtmenu from "cytoscape-cxtmenu";
+import cxtmenu from "cytoscape-cxtmenu";
 import dagre from "cytoscape-dagre";
+import edgehandles from "cytoscape-edgehandles";
 
+cytoscape.use(edgehandles);
 cytoscape.use(dagre);
 cytoscape.use(cxtmenu);
 
@@ -77,6 +79,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         layout: this.layoutOptions
       });
       this.cyCore.cxtmenu(this.getCxtMenuConfig());
+      this.cyCore.edgehandles(this.getEdgeHandlesConfig());
     }
   }
 
@@ -142,4 +145,16 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
+  private getEdgeHandlesConfig(): any {
+    return {
+      loopAllowed: node => false,
+      handleNodes: node => { // whether node can be start of an edge
+        return true;
+      },
+      complete: (source, target, added) => { // after an edge is added
+        this.cyCore.remove(`edge[id="${added.id()}"]`);
+        console.log("new edge: ", source.id(), target.id());
+      }
+    };
+  }
 }
