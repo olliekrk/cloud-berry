@@ -1,0 +1,22 @@
+.cards-container {
+  padding: 16px;
+}
+
+.topology-card {
+  width: 400px;
+  height: 400px;
+
+  mat-card-content {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  mat-card-title.active {
+    color: lightgreen;
+  }
+}
+
+.topology-img {
+  width: 75%;
+  height: 75%;
+}

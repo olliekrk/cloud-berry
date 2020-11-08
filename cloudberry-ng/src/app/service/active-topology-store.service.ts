@@ -1,9 +1,9 @@
 import {Injectable} from "@angular/core";
 import {Store} from "rxjs-observable-store";
-import {Topology} from "../model";
+import {Topology, TopologyId} from "../model";
 import {TopologyApiService} from "./topology-api.service";
 import {interval, Observable, Subject} from "rxjs";
-import {distinctUntilKeyChanged, shareReplay, startWith, switchMap} from "rxjs/operators";
+import {distinctUntilKeyChanged, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {notNull} from "../util";
 
 @Injectable({
@@ -29,6 +29,10 @@ export class ActiveTopologyStoreService extends Store<Topology | null> {
 
   doUpdate(): void {
     this.doUpdate$.next();
+  }
+
+  setAsActive(topologyId: TopologyId): Observable<void> {
+    return this.topologyApiService.useTopology(topologyId).pipe(tap(() => this.doUpdate()));
   }
 
   stateUpdates(): Observable<Topology> {

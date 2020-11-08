@@ -1,43 +1,51 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from "@angular/core";
-import * as cytoscape from "cytoscape";
 import {TopologyData} from "../../model";
 import {TypedSimpleChange} from "../../util";
-import * as cxtmenu from "cytoscape-cxtmenu";
-
-import dagre from "cytoscape-dagre";
 import {MatDialog} from "@angular/material/dialog";
-import {DialogContentExampleDialog} from "../node-info-dialog/dialog-node-info";
+import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
+import * as cytoscape from "cytoscape";
+import * as cxtmenu from "cytoscape-cxtmenu";
+import dagre from "cytoscape-dagre";
 
 cytoscape.use(dagre);
 cytoscape.use(cxtmenu);
-
 
 type ComponentSimpleChanges = SimpleChanges & {
   topologyData?: TypedSimpleChange<TopologyData>;
 };
 
 @Component({
-  selector: "app-cytoscape-wrapper",
+  selector: "app-topology-graph",
   template: "<div #cy class=cy-container></div>",
-  styleUrls: ["./cytoscape-wrapper.component.scss"]
+  styleUrls: ["./topology-graph.component.scss"]
 })
-export class CytoscapeWrapperComponent implements OnInit, OnChanges {
-
-  constructor(public dialog: MatDialog) {
-  }
+export class TopologyGraphComponent implements OnInit, OnChanges {
 
   @ViewChild("cy", {static: true}) cyContainer: ElementRef;
 
   @Input() topologyData: TopologyData;
 
-  cyCore?: cytoscape.Core;
+  cyCore?: cytoscape.Core & any;
 
-  layout = {
+  readonly layoutOptions = {
     name: "dagre",
     rankDir: "LR"
   };
 
+  constructor(public dialog: MatDialog) {
+  }
+
   ngOnInit(): void {
+    this.initializeCytoscape();
+  }
+
+  ngOnChanges({topologyData}: ComponentSimpleChanges): void {
+    if (topologyData?.currentValue) {
+      this.fillWithData(topologyData.currentValue);
+    }
+  }
+
+  private initializeCytoscape(): void {
     if (this.cyContainer) {
       this.cyCore = cytoscape({
         container: this.cyContainer.nativeElement,
@@ -59,66 +67,43 @@ export class CytoscapeWrapperComponent implements OnInit, OnChanges {
             selector: "edge",
             style: {
               width: 1,
-              // label: "data(id)",
               "line-color": "#e2004f",
               "target-arrow-shape": "triangle",
               "target-arrow-color": "#ff0000",
-              "curve-style": "bezier"
+              "curve-style": "unbundled-bezier"
             }
           }
         ],
-        layout: this.layout
+        layout: this.layoutOptions
       });
-
+      this.cyCore.cxtmenu(this.getCxtMenuConfig());
     }
   }
 
-
-  ngOnChanges({topologyData}: ComponentSimpleChanges): void {
-    if (topologyData?.currentValue) {
-      console.log(topologyData);
-      this.fillWithData(topologyData.currentValue);
-    }
-    if (this.cyCore) {
-      let matDialog = this.dialog;
-      let data = this.topologyData;
-      let defaults = this.getCxtMenuConfig(data, matDialog);
-      // @ts-ignore
-      this.cyCore.cxtmenu(defaults);
-    }
-  }
-
-  private getCxtMenuConfig(topologyData: TopologyData, matDialog: MatDialog) {
+  private getCxtMenuConfig(): any {
     return {
-      menuRadius: 100, // the radius of the circular menu in pixels
+      menuRadius: 80, // the radius of the circular menu in pixels
       selector: "node", // elements matching this Cytoscape.js selector will trigger cxtmenus
       commands: [
         {
-          content: "View node details",
-          select: function(node) {
-            let foundNodeData = topologyData.topologyNodes.filter(function(fitoFilter) {
-              return fitoFilter.id === node.id();
-            })[0];
-            const dialogRef = matDialog.open(DialogContentExampleDialog, {
-              data: {
-                topologyNode: foundNodeData,
-                rawString: JSON.stringify(foundNodeData)
-              }
-            });
-            dialogRef.afterClosed().subscribe(result => {
-            });
+          content: "Show details",
+          select: node => {
+            const topologyNode = this.topologyData?.topologyNodes.find(tn => tn.id === node.id());
+            if (topologyNode) {
+              this.dialog.open(TopologyNodeDetailsInfoDialogComponent, {data: {topologyNode}});
+            }
           }
         },
         {
-          content: "Edit node",
-          select: function(node) {
-            console.log(node.id());
+          content: "Edit",
+          select: node => {
+            console.log("Edit:", node.id());
           }
         },
         {
-          content: "Remove node",
-          select: function(node) {
-            console.log(node.id());
+          content: "Delete",
+          select: node => {
+            console.log("Delete:", node.id());
           }
         },
       ],
@@ -153,9 +138,7 @@ export class CytoscapeWrapperComponent implements OnInit, OnChanges {
       this.cyCore.add(nodes);
       this.cyCore.edges().remove();
       this.cyCore.add(edges);
-
-      let lay = this.cyCore.nodes().layout(this.layout);
-      lay.run();
+      this.cyCore.nodes().layout(this.layoutOptions).run();
     }
   }
 

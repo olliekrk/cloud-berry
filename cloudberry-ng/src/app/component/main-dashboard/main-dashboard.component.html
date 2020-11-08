@@ -1,1 +1,23 @@
-<p>dashboard works!</p>
+<div *ngIf="activeTopology$ | async as activeTopology" class="cards-container">
+  <mat-card class="topology-card" *ngFor="let topology of availableTopologies$ | async">
+    <mat-card-header>
+      <mat-card-title [class.active]="activeTopology.id === topology.id">{{topology.name}}</mat-card-title>
+      <mat-card-subtitle>{{topology.id}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <img mat-card-image class="topology-img" src="assets/timeline-black-48dp.svg" alt="Topology">
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button
+              (click)="useTopology(topology.id)"
+              [disabled]="topology.id === activeTopology.id">
+        USE
+      </button>
+      <button mat-button
+              (click)="deleteTopology(topology.id)"
+              [disabled]="topology.id === activeTopology.id || !topology.userDefined">
+        DELETE
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

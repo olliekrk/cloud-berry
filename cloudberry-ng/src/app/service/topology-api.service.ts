@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {TopologyRestService} from "../rest/topology-rest.service";
 import {Observable} from "rxjs";
-import {Topology} from "../model";
+import {Topology, TopologyId} from "../model";
 import {share} from "rxjs/operators";
 
 @Injectable({
@@ -16,4 +16,15 @@ export class TopologyApiService {
     return this.rest.getActiveTopology().pipe(share());
   }
 
+  getAvailableTopologies(): Observable<Topology[]> {
+    return this.rest.getAvailableTopologies().pipe(share());
+  }
+
+  useTopology(topologyId: TopologyId): Observable<void> {
+    return this.rest.useTopology(topologyId).pipe(share());
+  }
+
+  deleteTopology(topologyId: TopologyId): Observable<void> {
+    return this.rest.deleteTopology(topologyId).pipe(share());
+  }
 }

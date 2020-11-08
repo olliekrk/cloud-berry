@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  min-width: 600px;
+}
+
+.grid-properties {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+}
+
+

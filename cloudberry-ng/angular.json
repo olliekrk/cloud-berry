@@ -26,10 +26,12 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
+            "scripts": [
+              "src/scripts/cytoscape-init.js"
+            ],
             "allowedCommonJsDependencies": [
               "cytoscape",
-              "cytoscape-klay"
+              "cytoscape-dagre"
             ]
           },
           "configurations": {

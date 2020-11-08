@@ -20,19 +20,19 @@ import {NavigationToolbarComponent} from "./component/navigation-toolbar/navigat
 import {LoggerConfig, LoggerModule} from "ngx-logger";
 import {HttpClientModule} from "@angular/common/http";
 import {TopologyDashboardComponent} from "./component/topology-dashboard/topology-dashboard.component";
-import {CytoscapeWrapperComponent} from "./component/cytoscape-wrapper/cytoscape-wrapper.component";
-import {DialogContentExampleDialog} from "./component/node-info-dialog/dialog-node-info";
+import {TopologyGraphComponent} from "./component/topology-graph/topology-graph.component";
+import {TopologyNodeDetailsInfoDialogComponent} from "./component/node-info-dialog/topology-node-details-info-dialog.component";
 import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
     AppComponent,
     MainDashboardComponent,
-    DialogContentExampleDialog,
+    TopologyNodeDetailsInfoDialogComponent,
     TopologyDashboardComponent,
     ConfigurationDashboardComponent,
     NavigationToolbarComponent,
-    CytoscapeWrapperComponent,
+    TopologyGraphComponent,
   ],
   imports: [
     BrowserModule,

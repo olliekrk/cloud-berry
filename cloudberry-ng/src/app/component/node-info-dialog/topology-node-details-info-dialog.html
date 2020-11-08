@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>Node details - {{data.topologyNode.name}}</h1>
+
+<dl mat-dialog-content class="grid-properties">
+  <dt>Id:</dt>
+  <dd>{{data.topologyNode.id}}</dd>
+  <dt>Name:</dt>
+  <dd>{{data.topologyNode.name}}</dd>
+  <dt>Raw JSON:</dt>
+  <dd><pre>{{data | json}}</pre></dd>
+</dl>
+
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="true">OK</button>
+</mat-dialog-actions>
