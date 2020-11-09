@@ -9,6 +9,7 @@ import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
+import {AddNodeDialogComponent} from "../add-node-dialog/add-node-dialog.component";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -20,7 +21,7 @@ type ComponentSimpleChanges = SimpleChanges & {
 
 @Component({
   selector: "app-topology-graph",
-  template: "<div #cy class=cy-container></div>",
+  templateUrl: "./topology-graph.component.html",
   styleUrls: ["./topology-graph.component.scss"]
 })
 export class TopologyGraphComponent implements OnInit, OnChanges {
@@ -264,5 +265,9 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
     this.cyCore.remove(`edge[id="${edge.id()}"]`);
     this.cyCore.add([newNodeDefinition, sourceToNewEdgeDefinition, newToTargetEdgeDefinition]);
+  }
+
+  openAddNodeDialog(): void {
+    this.dialog.open(AddNodeDialogComponent, null);
   }
 }

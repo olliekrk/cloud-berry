@@ -8,8 +8,8 @@ interface DialogData {
 
 @Component({
   selector: "app-topology-node-details-info-dialog",
-  styleUrls: ["./topology-node-details-info-dialog.scss"],
-  templateUrl: "./topology-node-details-info-dialog.html",
+  styleUrls: ["./topology-node-details-info-dialog.component.scss"],
+  templateUrl: "./topology-node-details-info-dialog.component.html",
 })
 export class TopologyNodeDetailsInfoDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {

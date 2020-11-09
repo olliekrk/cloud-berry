@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>Create node</h1>
+
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <input matInput
+           placeholder="Enter node name"
+           formControlName="name">
+  </mat-form-field>
+  <mat-form-field>
+    <textarea matInput
+              placeholder="Enter JSON"
+              formControlName="json">
+    </textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-raised-button [mat-dialog-close]="form.value">Create</button>
+</mat-dialog-actions>
