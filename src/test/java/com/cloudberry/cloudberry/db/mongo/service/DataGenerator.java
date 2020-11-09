@@ -38,27 +38,27 @@ public final class DataGenerator {
     public static final ObjectId CONFIGURATION_ID_2_A = ObjectId.get();
     public static final ObjectId CONFIGURATION_ID_2_B_NO_COMPUTATIONS = ObjectId.get();
 
-    public static final String CONFIGURATION_FILE_NAME_1_A = "config_1_A";
-    public static final String CONFIGURATION_FILE_NAME_1_B = "config_1_B";
-    public static final String CONFIGURATION_FILE_NAME_2_A = "config_2_A";
-    public static final String CONFIGURATION_FILE_NAME_2_B = "config_2_B";
+    public static final String CONFIGURATION_NAME_1_A = "config_1_A";
+    public static final String CONFIGURATION_NAME_1_B = "config_1_B";
+    public static final String CONFIGURATION_NAME_2_A = "config_2_A";
+    public static final String CONFIGURATION_NAME_2_B = "config_2_B";
 
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_A =
-            new ExperimentConfiguration(CONFIGURATION_ID_1_A, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_A,
+            new ExperimentConfiguration(CONFIGURATION_ID_1_A, EXPERIMENT_ID_1, CONFIGURATION_NAME_1_A,
                                         Map.of("price", 3000), ofEpochSecond(10)
             );
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_B =
-            new ExperimentConfiguration(CONFIGURATION_ID_1_B, EXPERIMENT_ID_1, CONFIGURATION_FILE_NAME_1_B,
+            new ExperimentConfiguration(CONFIGURATION_ID_1_B, EXPERIMENT_ID_1, CONFIGURATION_NAME_1_B,
                                         Map.of(), ofEpochSecond(20)
             );
 
     public static final ExperimentConfiguration TEST_CONFIGURATION_2_A =
-            new ExperimentConfiguration(CONFIGURATION_ID_2_A, EXPERIMENT_ID_2, CONFIGURATION_FILE_NAME_2_A,
+            new ExperimentConfiguration(CONFIGURATION_ID_2_A, EXPERIMENT_ID_2, CONFIGURATION_NAME_2_A,
                                         Map.of("owner", "Andrew"), ofEpochSecond(30)
             );
     public static final ExperimentConfiguration TEST_CONFIGURATION_2_B_NO_COMPUTATIONS =
             new ExperimentConfiguration(CONFIGURATION_ID_2_B_NO_COMPUTATIONS, EXPERIMENT_ID_2,
-                                        CONFIGURATION_FILE_NAME_2_B, Map.of(), ofEpochSecond(30)
+                                        CONFIGURATION_NAME_2_B, Map.of(), ofEpochSecond(30)
             );
 
     public static final List<ExperimentConfiguration> ALL_CONFIGURATIONS =

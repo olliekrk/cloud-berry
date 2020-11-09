@@ -6,7 +6,7 @@ from ..constants import *
 from ..model.metadata import Experiment, ExperimentComputation, ExperimentConfiguration
 
 EXPERIMENT_NAME = 'experimentName'
-CONFIGURATION_FILE_NAME = 'configurationFileName'
+CONFIGURATION_NAME = 'configurationName'
 OVERRIDE_PARAMS = 'overrideParams'
 
 
@@ -37,9 +37,9 @@ class ExperimentConfigurationApi:
         response = requests.get(url, params=params, json={})
         return ExperimentConfigurationApi._experiment_configuration_list_from_json(response.json())
 
-    def find_by_configuration_file_name(self, configuration_file_name: str) -> List[ExperimentConfiguration]:
-        url = f'{self.base_url}/byConfigurationFileName'
-        response = requests.get(url, params={CONFIGURATION_FILE_NAME: configuration_file_name}, json={})
+    def find_by_configuration_name(self, configuration_name: str) -> List[ExperimentConfiguration]:
+        url = f'{self.base_url}/byConfigurationName'
+        response = requests.get(url, params={CONFIGURATION_NAME: configuration_name}, json={})
         return ExperimentConfigurationApi._experiment_configuration_list_from_json(response.json())
 
     def find_by_experiment_name(self, name: str) -> List[ExperimentConfiguration]:
@@ -47,21 +47,21 @@ class ExperimentConfigurationApi:
         response = requests.get(url, params={EXPERIMENT_NAME: name}, json={})
         return ExperimentConfigurationApi._experiment_configuration_list_from_json(response.json())
 
-    def find_or_create(self, experiment: Experiment, configuration_file_name: str = None,
+    def find_or_create(self, experiment: Experiment, configuration_name: str = None,
                        parameters: dict = None) -> ExperimentConfiguration:
         url = f'{self.base_url}/findOrCreate'
         response = requests.post(url,
                                  params={EXPERIMENT_ID_HEX: experiment.experiment_id_hex,
-                                         CONFIGURATION_FILE_NAME: configuration_file_name},
+                                         CONFIGURATION_NAME: configuration_name},
                                  json=parameters)
         return ExperimentConfiguration.from_json(response.json())
 
-    def update(self, configuration: ExperimentConfiguration, configuration_file_name: str = None,
+    def update(self, configuration: ExperimentConfiguration, configuration_name: str = None,
                parameters: dict = None,
                override_params: bool = None) -> ExperimentConfiguration:
         url = f'{self.base_url}/update'
         params = {CONFIGURATION_ID_HEX: configuration.experiment_configuration_id_hex,
-                  CONFIGURATION_FILE_NAME: configuration_file_name,
+                  CONFIGURATION_NAME: configuration_name,
                   OVERRIDE_PARAMS: override_params}
         response = requests.put(url, params=params, json=parameters)
         return ExperimentConfiguration.from_json(response.json())

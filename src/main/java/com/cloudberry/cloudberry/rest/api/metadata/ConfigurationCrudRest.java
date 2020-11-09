@@ -58,9 +58,9 @@ public class ConfigurationCrudRest {
         return experimentConfigurationService.findByExperimentId(experimentId);
     }
 
-    @GetMapping(value = "/byConfigurationFileName")
-    List<ExperimentConfiguration> findByConfigurationFileName(@RequestParam String configurationFileName) {
-        return experimentConfigurationService.findByConfigurationFileName(configurationFileName);
+    @GetMapping(value = "/byConfigurationName")
+    List<ExperimentConfiguration> findByConfigurationName(@RequestParam String configurationName) {
+        return experimentConfigurationService.findByConfigurationName(configurationName);
     }
 
     @GetMapping(value = "/byExperimentName")
@@ -69,29 +69,30 @@ public class ConfigurationCrudRest {
     }
 
     @PostMapping("/findOrCreate")
-    ExperimentConfiguration findOrCreate(@RequestParam String experimentIdHex,
-                                        @RequestParam(required = false) String configurationFileName,
-                                        @RequestBody(required = false) Map<String, Object> parameters
+    ExperimentConfiguration findOrCreate(
+            @RequestParam String experimentIdHex,
+            @RequestParam(required = false) String configurationName,
+            @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidExperimentIdException {
         val experimentId = IdDispatcher.getExperimentId(experimentIdHex);
         val parametersMap = Optional.ofNullable(parameters).orElse(Map.of());
         val now = Instant.now();
         val experimentConfiguration =
-                new ExperimentConfiguration(ObjectId.get(), experimentId, configurationFileName, parametersMap, now);
+                new ExperimentConfiguration(ObjectId.get(), experimentId, configurationName, parametersMap, now);
         return experimentConfigurationService.findOrCreateConfiguration(experimentConfiguration);
     }
 
     @PutMapping("/update")
     ExperimentConfiguration update(
             @RequestParam String configurationIdHex,
-            @RequestParam(required = false) String configurationFileName,
+            @RequestParam(required = false) String configurationName,
             @RequestParam(defaultValue = "false") boolean overrideParams,
             @RequestBody(required = false) Map<String, Object> parameters
     ) throws InvalidConfigurationIdException {
         val configurationId = IdDispatcher.getConfigurationId((configurationIdHex));
 
         return experimentConfigurationService
-                .update(configurationId, configurationFileName, parameters, overrideParams);
+                .update(configurationId, configurationName, parameters, overrideParams);
     }
 
     @DeleteMapping("/deleteById")

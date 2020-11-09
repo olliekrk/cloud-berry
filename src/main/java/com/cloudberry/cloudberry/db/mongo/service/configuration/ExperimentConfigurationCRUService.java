@@ -29,8 +29,8 @@ public class ExperimentConfigurationCRUService {
         return configurationRepository.findAll();
     }
 
-    public Flux<ExperimentConfiguration> findByConfigurationFileName(String configurationFileName) {
-        return configurationRepository.findAllByConfigurationFileName(configurationFileName);
+    public Flux<ExperimentConfiguration> findByConfigurationName(String configurationName) {
+        return configurationRepository.findAllByConfigurationName(configurationName);
     }
 
     public Flux<ExperimentConfiguration> findByExperimentName(String experimentName) {
@@ -48,29 +48,29 @@ public class ExperimentConfigurationCRUService {
 
     public Mono<ExperimentConfiguration> update(
             ObjectId configurationId,
-            @Nullable String configurationFileName,
+            @Nullable String configurationName,
             @Nullable Map<String, Object> newParams,
             boolean overrideParams
     ) {
         return configurationRepository.findById(configurationId)
-                .map(updateConfiguration(configurationFileName, newParams, overrideParams))
+                .map(updateConfiguration(configurationName, newParams, overrideParams))
                 .flatMap(configurationRepository::save)
                 .doOnNext(experiment -> log.info("Experiment configuration {} updated", experiment));
     }
 
     @NotNull
     private Function<ExperimentConfiguration, ExperimentConfiguration> updateConfiguration(
-            @Nullable String configurationFileName,
+            @Nullable String configurationName,
             @Nullable Map<String, Object> newParams,
             boolean overrideParams
     ) {
         return configuration -> {
             val prevParams = configuration.getParameters();
             return configuration
-                    .withConfigurationFileName(
-                            configurationFileName != null
-                                    ? configurationFileName
-                                    : configuration.getConfigurationFileName())
+                    .withConfigurationName(
+                            configurationName != null
+                                    ? configurationName
+                                    : configuration.getConfigurationName())
                     .withParameters(newParams != null
                                             ? MapSyntax.getNewParamsMap(newParams, prevParams, overrideParams)
                                             : prevParams);

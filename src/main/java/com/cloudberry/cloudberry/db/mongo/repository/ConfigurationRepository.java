@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 public interface ConfigurationRepository extends ReactiveSortingRepository<ExperimentConfiguration, ObjectId> {
     Flux<ExperimentConfiguration> findAllByExperimentId(ObjectId experimentId);
 
-    Flux<ExperimentConfiguration> findAllByConfigurationFileName(String configurationFileName);
+    Flux<ExperimentConfiguration> findAllByConfigurationName(String configurationName);
 
     Flux<Void> deleteByExperimentId(ObjectId experimentId);
 

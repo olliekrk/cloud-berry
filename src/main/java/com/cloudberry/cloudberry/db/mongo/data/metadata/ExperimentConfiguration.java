@@ -26,7 +26,7 @@ public class ExperimentConfiguration implements Parametrized<String, Object>, Ti
     private ObjectId experimentId;
     @Nullable
     @With
-    private String configurationFileName;
+    private String configurationName;
     @With
     private Map<String, Object> parameters;
     private Instant time;

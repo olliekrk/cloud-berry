@@ -52,10 +52,10 @@
 - `find_by_id(configuration_id)`
 - `find_by_computation(computation)`
 - `find_by_experiment(experiment)`
-- `find_by_configuration_file_name(configuration_file_name)`
+- `find_by_configuration_name(configuration_name)`
 - `find_by_experiment_name(name)`
-- `find_or_create (experiment: Experiment, configuration_file_name: str = None, parameters: dict = None)`
-- `update(configuration: ExperimentConfiguration, configuration_file_name: str = None, parameters: dict = None, override_params: bool = None)`
+- `find_or_create (experiment: Experiment, configuration_name: str = None, parameters: dict = None)`
+- `update(configuration: ExperimentConfiguration, configuration_name: str = None, parameters: dict = None, override_params: bool = None)`
 - `delete(configuration)`
 
 #### experiment computation - cb_meta_experiment_computation

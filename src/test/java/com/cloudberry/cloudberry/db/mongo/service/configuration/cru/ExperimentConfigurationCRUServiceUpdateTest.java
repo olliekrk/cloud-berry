@@ -32,12 +32,12 @@ public class ExperimentConfigurationCRUServiceUpdateTest extends ExperimentConfi
 
     @Test
     void updateName() {
-        final String newFileName = "new name";
+        final String newConfigurationName = "new name";
 
         var updatedExperiment = experimentConfigurationCRUService
-                .update(TEST_CONFIGURATION.getId(), newFileName, null, false).block();
+                .update(TEST_CONFIGURATION.getId(), newConfigurationName, null, false).block();
 
-        assertEquals(TEST_CONFIGURATION.withConfigurationFileName(newFileName), updatedExperiment);
+        assertEquals(TEST_CONFIGURATION.withConfigurationName(newConfigurationName), updatedExperiment);
         assertExperimentInDatabase(updatedExperiment);
     }
 

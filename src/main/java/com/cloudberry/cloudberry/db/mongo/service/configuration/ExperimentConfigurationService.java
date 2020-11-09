@@ -25,8 +25,8 @@ public class ExperimentConfigurationService {
         return experimentConfigurationByDifferentIdsService.findById(configurationId).block();
     }
 
-    public List<ExperimentConfiguration> findByConfigurationFileName(String configurationFileName) {
-        return experimentConfigurationCRUService.findByConfigurationFileName(configurationFileName).collectList()
+    public List<ExperimentConfiguration> findByConfigurationName(String configurationName) {
+        return experimentConfigurationCRUService.findByConfigurationName(configurationName).collectList()
                 .block();
     }
 
@@ -48,12 +48,12 @@ public class ExperimentConfigurationService {
 
     public ExperimentConfiguration update(
             ObjectId configurationId,
-            @Nullable String configurationFileName,
+            @Nullable String configurationName,
             @Nullable Map<String, Object> newParams,
             boolean overrideParams
     ) {
         return experimentConfigurationCRUService
-                .update(configurationId, configurationFileName, newParams, overrideParams)
+                .update(configurationId, configurationName, newParams, overrideParams)
                 .block();
     }
 

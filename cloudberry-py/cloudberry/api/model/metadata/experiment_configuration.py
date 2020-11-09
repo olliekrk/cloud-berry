@@ -8,12 +8,12 @@ class ExperimentConfiguration:
     def __init__(self,
                  experiment_configuration_id_hex,
                  experiment_id_hex,
-                 configuration_file_name,
+                 configuration_name,
                  parameters,
                  time):
         self.experiment_configuration_id_hex = experiment_configuration_id_hex
         self.experiment_id_hex = experiment_id_hex
-        self.configuration_file_name = configuration_file_name
+        self.configuration_name = configuration_name
         self.parameters = parameters
         self.time = time
 
@@ -22,7 +22,7 @@ class ExperimentConfiguration:
         return ExperimentConfiguration(
             json_dict['id'],
             json_dict['experimentId'],
-            json_dict['configurationFileName'],
+            json_dict['configurationName'],
             json_dict['parameters'],
             json_dict['time'],
         )

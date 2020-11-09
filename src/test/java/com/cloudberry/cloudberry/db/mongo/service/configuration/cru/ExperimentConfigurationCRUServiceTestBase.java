@@ -18,10 +18,10 @@ import java.util.Map;
 @EmbeddedMongoTest
 abstract class ExperimentConfigurationCRUServiceTestBase {
     public static final ObjectId EXPERIMENT_ID = ObjectId.get();
-    public static final String CONFIGURATION_FILE_NAME = "fileName";
+    public static final String CONFIGURATION_NAME = "custom config file name";
     public static final Map<String, Object> PARAMETERS = Map.of("price", 3000);
     protected static final ExperimentConfiguration TEST_CONFIGURATION =
-            new ExperimentConfiguration(ObjectId.get(), EXPERIMENT_ID, CONFIGURATION_FILE_NAME, PARAMETERS,
+            new ExperimentConfiguration(ObjectId.get(), EXPERIMENT_ID, CONFIGURATION_NAME, PARAMETERS,
                                         Instant.ofEpochSecond(10)
             );
 
