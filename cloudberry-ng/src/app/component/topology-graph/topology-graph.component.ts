@@ -1,5 +1,5 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from "@angular/core";
-import {TopologyData} from "../../model";
+import {Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
+import {TopologyData, TopologyNode} from "../../model";
 import {TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
@@ -28,6 +28,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   @ViewChild("cy", {static: true}) cyContainer: ElementRef;
 
   @Input() topologyData: TopologyData;
+  @Output() topologyModified: EventEmitter<void> = new EventEmitter<void>();
 
   cyCore?: cytoscape.Core & any;
 
@@ -83,9 +84,9 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
             selector: ".eh-handle",
             style: {
               "background-color": "#0800ff",
-              "width": 12,
-              "height": 12,
-              "shape": "ellipse",
+              width: 12,
+              height: 12,
+              shape: "ellipse",
               "overlay-opacity": 0,
               "border-width": 12, // makes the handle easier to hit
               "border-opacity": 0
@@ -123,7 +124,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
           {
             selector: ".eh-ghost-edge.eh-preview-active",
             style: {
-              "opacity": 0
+              opacity: 0
             }
           }
         ],
@@ -167,7 +168,6 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   }
 
   private getCxtMenuEdgeConfig(): any {
-
     return {
       menuRadius: 80, // the radius of the circular menu in pixels
       selector: "edge", // elements matching this Cytoscape.js selector will trigger cxtmenus
@@ -176,12 +176,14 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
           content: "Add counter node",
           select: edge => {
             this.topologyNodeApiService.addCounterNode("nowy", "metryka").subscribe(newNode => {
-              let sourceId = edge.source().id();
-              let targetId = edge.target().id();
-              let topologyId = this.topologyData.topology.id;
-              this.topologyApiService.addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
+              const topologyId = this.topologyData.topology.id;
+              const sourceId = edge.source().id();
+              const targetId = edge.target().id();
+              this.topologyApiService
+                .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
                 .subscribe(() => {
-                  //todo reload topology
+                  this.addNodeToGraphOnEdge(edge, newNode);
+                  this.topologyModified.emit();
                 });
             });
           }
@@ -234,5 +236,33 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         console.log("new edge: ", source.id(), target.id());
       }
     };
+  }
+
+  private addNodeToGraphOnEdge(edge: any, createdNode: TopologyNode): void {
+    const sourceId = edge.source().id();
+    const targetId = edge.target().id();
+    const newNodeDefinition: cytoscape.NodeDefinition = {
+      data: {
+        id: createdNode.id,
+        name: createdNode.name,
+      }
+    };
+    const sourceToNewEdgeDefinition: cytoscape.EdgeDefinition = {
+      data: {
+        id: `${sourceId}_${createdNode.id}`,
+        source: sourceId,
+        target: createdNode.id,
+      }
+    };
+    const newToTargetEdgeDefinition: cytoscape.EdgeDefinition = {
+      data: {
+        id: `${createdNode.id}_${targetId}`,
+        source: createdNode.id,
+        target: targetId,
+      }
+    };
+
+    this.cyCore.remove(`edge[id="${edge.id()}"]`);
+    this.cyCore.add([newNodeDefinition, sourceToNewEdgeDefinition, newToTargetEdgeDefinition]);
   }
 }

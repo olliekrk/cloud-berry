@@ -9,4 +9,6 @@
   </mat-form-field>
 </app-top-action-bar>
 
-<app-topology-graph [topologyData]="selectedTopologyData$ | async"></app-topology-graph>
+<app-topology-graph [topologyData]="selectedTopologyData$ | async"
+                    (topologyModified)="reloadSelectedTopology()">
+</app-topology-graph>

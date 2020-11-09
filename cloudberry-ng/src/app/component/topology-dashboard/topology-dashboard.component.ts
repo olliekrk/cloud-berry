@@ -1,9 +1,9 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {Topology, TopologyData, TopologyId} from "../../model";
 import {BehaviorSubject, Observable} from "rxjs";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
-import {map, switchMap, take, tap} from "rxjs/operators";
+import {map, switchMap, take} from "rxjs/operators";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {notNull} from "../../util";
 
@@ -13,7 +13,7 @@ import {notNull} from "../../util";
   templateUrl: "./topology-dashboard.component.html",
   styleUrls: ["./topology-dashboard.component.scss"]
 })
-export class TopologyDashboardComponent implements OnInit {
+export class TopologyDashboardComponent implements OnInit, OnDestroy {
 
   selectedTopology$: BehaviorSubject<Topology | null> = new BehaviorSubject(null);
   selectedTopologyData$: Observable<TopologyData>;
@@ -22,12 +22,14 @@ export class TopologyDashboardComponent implements OnInit {
   constructor(private activeTopologyStoreService: ActiveTopologyStoreService,
               private topologyNodeApiService: TopologyNodeApiService,
               private topologyApiService: TopologyApiService) {
+  }
+
+  ngOnInit(): void {
     this.topologyApiService.getAvailableTopologies()
       .subscribe(topologies => this.availableTopologies = topologies);
 
     this.activeTopologyStoreService.stateUpdates()
       .pipe(take(1))
-      .pipe(tap(x => console.log(x)))
       .subscribe(topology => this.selectedTopology$.next(topology));
 
     this.selectedTopologyData$ = this.selectedTopology$.asObservable()
@@ -41,7 +43,9 @@ export class TopologyDashboardComponent implements OnInit {
       );
   }
 
-  ngOnInit(): void {
+  ngOnDestroy(): void {
+    this.selectedTopology$.complete();
+    this.selectedTopology$.unsubscribe();
   }
 
   updateSelectedTopology(topologyId: TopologyId): void {
@@ -49,5 +53,8 @@ export class TopologyDashboardComponent implements OnInit {
     this.selectedTopology$.next(newTopology);
   }
 
+  reloadSelectedTopology(): void {
+
+  }
 
 }
