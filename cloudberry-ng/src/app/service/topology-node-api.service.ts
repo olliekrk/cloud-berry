@@ -15,4 +15,8 @@ export class TopologyNodeApiService {
   getTopologyNodes(topologyId: TopologyId): Observable<TopologyNode[]> {
     return this.rest.getTopologyNodes(topologyId).pipe(share());
   }
+
+  addCounterNode(nodeName: string, metricName: string): Observable<TopologyNode> {
+    return this.rest.addCounterNode(nodeName, metricName).pipe(share());
+  }
 }

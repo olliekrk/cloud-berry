@@ -7,6 +7,8 @@ import * as cytoscape from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
+import {TopologyNodeApiService} from "../../service/topology-node-api.service";
+import {TopologyApiService} from "../../service/topology-api.service";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -34,7 +36,9 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     rankDir: "LR"
   };
 
-  constructor(public dialog: MatDialog) {
+  constructor(private dialog: MatDialog,
+              private topologyNodeApiService: TopologyNodeApiService,
+              private topologyApiService: TopologyApiService) {
   }
 
   ngOnInit(): void {
@@ -69,21 +73,69 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
             selector: "edge",
             style: {
               width: 1,
-              "line-color": "#e2004f",
+              "line-color": "#ff0000",
               "target-arrow-shape": "triangle",
               "target-arrow-color": "#ff0000",
               "curve-style": "unbundled-bezier"
+            }
+          },
+          {
+            selector: ".eh-handle",
+            style: {
+              "background-color": "#0800ff",
+              "width": 12,
+              "height": 12,
+              "shape": "ellipse",
+              "overlay-opacity": 0,
+              "border-width": 12, // makes the handle easier to hit
+              "border-opacity": 0
+            }
+          },
+          {
+            selector: ".eh-hover",
+            style: {
+              "background-color": "#0800ff"
+            }
+          },
+          {
+            selector: ".eh-source",
+            style: {
+              "border-width": 2,
+              "border-color": "#0800ff"
+            }
+          },
+          {
+            selector: ".eh-target",
+            style: {
+              "border-width": 2,
+              "border-color": "#0800ff"
+            }
+          },
+
+          {
+            selector: ".eh-preview, .eh-ghost-edge",
+            style: {
+              "line-color": "#0800ff",
+              "target-arrow-color": "#0800ff",
+              "source-arrow-color": "#0800ff"
+            }
+          },
+          {
+            selector: ".eh-ghost-edge.eh-preview-active",
+            style: {
+              "opacity": 0
             }
           }
         ],
         layout: this.layoutOptions
       });
-      this.cyCore.cxtmenu(this.getCxtMenuConfig());
+      this.cyCore.cxtmenu(this.getCxtMenuNodeConfig());
+      this.cyCore.cxtmenu(this.getCxtMenuEdgeConfig());
       this.cyCore.edgehandles(this.getEdgeHandlesConfig());
     }
   }
 
-  private getCxtMenuConfig(): any {
+  private getCxtMenuNodeConfig(): any {
     return {
       menuRadius: 80, // the radius of the circular menu in pixels
       selector: "node", // elements matching this Cytoscape.js selector will trigger cxtmenus
@@ -109,6 +161,31 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
             console.log("Delete:", node.id());
           }
         },
+      ],
+      openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
+    };
+  }
+
+  private getCxtMenuEdgeConfig(): any {
+
+    return {
+      menuRadius: 80, // the radius of the circular menu in pixels
+      selector: "edge", // elements matching this Cytoscape.js selector will trigger cxtmenus
+      commands: [
+        {
+          content: "Add counter node",
+          select: edge => {
+            this.topologyNodeApiService.addCounterNode("nowy", "metryka").subscribe(newNode => {
+              let sourceId = edge.source().id();
+              let targetId = edge.target().id();
+              let topologyId = this.topologyData.topology.id;
+              this.topologyApiService.addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
+                .subscribe(() => {
+                  //todo reload topology
+                });
+            });
+          }
+        }
       ],
       openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
     };
@@ -147,10 +224,11 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private getEdgeHandlesConfig(): any {
     return {
-      loopAllowed: node => false,
+      loopAllowed: () => false,
       handleNodes: node => { // whether node can be start of an edge
         return true;
       },
+      snap: true,
       complete: (source, target, added) => { // after an edge is added
         this.cyCore.remove(`edge[id="${added.id()}"]`);
         console.log("new edge: ", source.id(), target.id());

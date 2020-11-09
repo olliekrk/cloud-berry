@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {TopologyRestService} from "../rest/topology-rest.service";
 import {Observable} from "rxjs";
-import {Topology, TopologyId} from "../model";
+import {Topology, TopologyId, TopologyNodeId} from "../model";
 import {share} from "rxjs/operators";
 
 @Injectable({
@@ -30,5 +30,15 @@ export class TopologyApiService {
 
   createTopology(topologyName: string) {
     return this.rest.createTopology(topologyName).pipe(share());
+  }
+
+  addEdgeToTopology(topologyId: TopologyId, sourceNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
+                    addVertexToTopologyIfNotAdded: boolean = true) {
+    return this.rest.addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
+  }
+
+  addNodeBetweenNodes(topologyId: TopologyId, sourceNodeId: TopologyNodeId, insertedNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
+                      addVertexToTopologyIfNotAdded: boolean = true) {
+    return this.rest.addNodeBetweenNodes(topologyId, sourceNodeId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
   }
 }

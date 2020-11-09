@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {environment} from "../../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {TopologyId, TopologyNode} from "../model";
 
@@ -16,6 +16,14 @@ export class TopologyNodeRestService {
 
   getTopologyNodes(topologyId: TopologyId): Observable<TopologyNode[]> {
     return this.httpClient.get<TopologyNode[]>(`${this.baseUrl}/topology/${topologyId}`);
+  }
+
+  addCounterNode(nodeName: string, metricName: string): Observable<TopologyNode> {
+    const params = new HttpParams()
+      .set("name", nodeName)
+      .set("metricName", metricName);
+
+    return this.httpClient.post<TopologyNode>(`${this.baseUrl}/counter`, null, {params});
   }
 
 }
