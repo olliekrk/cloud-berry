@@ -31,6 +31,9 @@ import {TopologyCreateDialogComponent} from "./component/topology-create-dialog/
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
+import {TopActionBarComponent} from "./component/top-action-bar/top-action-bar.component";
+import {MatOptionModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -42,31 +45,34 @@ import {MatInputModule} from "@angular/material/input";
     NavigationToolbarComponent,
     TopologyGraphComponent,
     TopologyCreateDialogComponent,
+    TopActionBarComponent,
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    RouterModule,
-    LayoutModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatListModule,
-    MatGridListModule,
-    MatCardModule,
-    MatMenuModule,
-    LoggerModule,
-    HttpClientModule,
-    MatTooltipModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FlexLayoutModule,
-    MatProgressSpinnerModule,
-    ReactiveFormsModule
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        RouterModule,
+        LayoutModule,
+        MatToolbarModule,
+        MatButtonModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatListModule,
+        MatGridListModule,
+        MatCardModule,
+        MatMenuModule,
+        LoggerModule,
+        HttpClientModule,
+        MatTooltipModule,
+        MatSelectModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FlexLayoutModule,
+        MatProgressSpinnerModule,
+        ReactiveFormsModule,
+        MatOptionModule
+    ],
   providers: [
     LoggerConfig,
     {

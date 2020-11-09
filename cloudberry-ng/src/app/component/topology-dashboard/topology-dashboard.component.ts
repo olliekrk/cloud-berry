@@ -1,9 +1,11 @@
 import {Component, OnInit} from "@angular/core";
-import {Topology, TopologyData} from "../../model";
-import {Observable} from "rxjs";
+import {Topology, TopologyData, TopologyId} from "../../model";
+import {BehaviorSubject, Observable} from "rxjs";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
-import {map, switchMap} from "rxjs/operators";
+import {map, switchMap, take, tap} from "rxjs/operators";
+import {TopologyApiService} from "../../service/topology-api.service";
+import {notNull} from "../../util";
 
 
 @Component({
@@ -13,18 +15,38 @@ import {map, switchMap} from "rxjs/operators";
 })
 export class TopologyDashboardComponent implements OnInit {
 
-  readonly activeTopology$: Observable<Topology>;
-  readonly activeTopologyData$: Observable<TopologyData>;
+  selectedTopology$: BehaviorSubject<Topology | null> = new BehaviorSubject(null);
+  selectedTopologyData$: Observable<TopologyData>;
+  availableTopologies: Topology[];
 
   constructor(private activeTopologyStoreService: ActiveTopologyStoreService,
-              private topologyNodeApiService: TopologyNodeApiService) {
-    this.activeTopology$ = this.activeTopologyStoreService.stateUpdates();
-    this.activeTopologyData$ = this.activeTopology$.pipe(switchMap(topology =>
-      this.topologyNodeApiService.getTopologyNodes(topology.id).pipe(map(topologyNodes => ({topology, topologyNodes}))
-      )));
+              private topologyNodeApiService: TopologyNodeApiService,
+              private topologyApiService: TopologyApiService) {
+    this.topologyApiService.getAvailableTopologies()
+      .subscribe(topologies => this.availableTopologies = topologies);
+
+    this.activeTopologyStoreService.stateUpdates()
+      .pipe(take(1))
+      .pipe(tap(x => console.log(x)))
+      .subscribe(topology => this.selectedTopology$.next(topology));
+
+    this.selectedTopologyData$ = this.selectedTopology$.asObservable()
+      .pipe(
+        notNull(),
+        switchMap((topology: Topology) => this.topologyNodeApiService.getTopologyNodes(topology.id)
+          .pipe(
+            map(topologyNodes => ({topology, topologyNodes}))
+          )
+        )
+      );
   }
 
   ngOnInit(): void {
+  }
+
+  updateSelectedTopology(topologyId: TopologyId): void {
+    const newTopology = this.availableTopologies?.find(topology => topology.id === topologyId);
+    this.selectedTopology$.next(newTopology);
   }
 
 

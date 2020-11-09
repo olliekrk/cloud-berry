@@ -31,7 +31,9 @@
             ],
             "allowedCommonJsDependencies": [
               "cytoscape",
-              "cytoscape-dagre"
+              "cytoscape-dagre",
+              "cytoscape-cxtmenu",
+              "cytoscape-edgehandles"
             ]
           },
           "configurations": {

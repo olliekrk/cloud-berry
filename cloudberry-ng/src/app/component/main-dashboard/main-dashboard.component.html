@@ -1,6 +1,7 @@
-<div class="upper-section">
-  <button mat-stroked-button (click)="openAddTopologyDialog()">Create new topology</button>
-</div>
+<app-top-action-bar>
+  <button mat-raised-button (click)="openAddTopologyDialog()">Create new topology</button>
+</app-top-action-bar>
+
 <div *ngIf="activeTopology$ | async as activeTopology; else loading" class="cards-container">
   <ng-container *ngIf="availableTopologies$ | async as availableTopologies; else loading">
     <mat-card class="topology-card" *ngFor="let topology of availableTopologies">
