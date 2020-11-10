@@ -10,7 +10,7 @@ import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
 import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageInMemoryOps;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
-import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesCreator;
+import com.cloudberry.cloudberry.service.configurations.ConfigurationSeriesNameResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -24,6 +24,7 @@ import java.util.List;
 public class ComputationSeriesService {
     private final AnalyticsApi analytics;
     private final MetadataService metadataService;
+    private final ConfigurationSeriesNameResolver configurationSeriesNameResolver;
 
     public SeriesPack getComputations(
             String fieldName,
@@ -45,7 +46,7 @@ public class ComputationSeriesService {
         var pack = getComputations(fieldName, influxQueryFields, computationIds);
         var packAverageRenamed = pack
                 .getAverageSeries()
-                .map(s -> s.withSeriesName(ConfigurationSeriesCreator.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
 
         return pack.withAverageSeries(packAverageRenamed);
     }
@@ -73,7 +74,7 @@ public class ComputationSeriesService {
         var bestN = analytics.getBestSeriesApi()
                 .nBestSeriesFrom(n, fieldName, optimization, influxQueryFields, computationsIds);
         var bestNAverage = MovingAverageInMemoryOps.movingAverageSeries(bestN, fieldName)
-                .map(s -> s.withSeriesName(ConfigurationSeriesCreator.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
 
         return new SeriesPack(bestN, bestNAverage);
     }
@@ -105,7 +106,7 @@ public class ComputationSeriesService {
         var exceeding = analytics.getThresholdsApi()
                 .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, influxQueryFields, computationIds);
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
-                .map(s -> s.withSeriesName(ConfigurationSeriesCreator.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
         return new SeriesPack(exceeding, exceedingAverage);
     }
 
@@ -131,7 +132,7 @@ public class ComputationSeriesService {
                 series.getAverageSeries().get()
         );
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
-                .map(s -> s.withSeriesName(ConfigurationSeriesCreator.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
 
         return new SeriesPack(exceeding, exceedingAverage);
     }

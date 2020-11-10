@@ -16,6 +16,7 @@ import java.util.Optional;
 public class ConfigurationSeriesCreator {
     private final SeriesApi seriesApi;
     private final MetadataService metadataService;
+    private final ConfigurationSeriesNameResolver configurationSeriesNameResolver;
 
     public Optional<DataSeries> movingAverageConfigurationSeries(
             String fieldName,
@@ -27,11 +28,7 @@ public class ConfigurationSeriesCreator {
 
         return MovingAverageInMemoryOps
                 .movingAverageSeries(computationsSeries, fieldName)
-                .map(s -> s.withSeriesName(configurationSeriesName(configurationId)));
-    }
-
-    public static String configurationSeriesName(ObjectId configurationId) {
-        return String.format("configuration_%s", configurationId.toHexString());
+                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
     }
 
 }
