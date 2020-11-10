@@ -63,4 +63,9 @@ export class TopologyRestService {
       .set("addVertexToTopologyIfNotAdded", addVertexToTopologyIfNotAdded.toString());
     return this.httpClient.put<void>(`${this.baseUrl}/id/${topologyId}/addNodeBetweenNodes`, null, {params});
   }
+
+  deleteNode(topologyId: TopologyId, nodeId: TopologyNodeId): Observable<void> {
+    const params = {nodeIdHex: nodeId};
+    return this.httpClient.delete<void>(`${this.baseUrl}/id/${topologyId}/deleteNode`, {params});
+  }
 }

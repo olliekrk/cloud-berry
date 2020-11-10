@@ -49,6 +49,17 @@ public class TopologyModifyingService {
         return topology;
     }
 
+    public void deleteNodeFromTopology(ObjectId topologyId, ObjectId nodeId) {
+        val topology = topologyService.findByIdOrThrow(topologyId);
+        topology.removeNode(nodeId);
+        log.info("Deleted node: %s of topology: %s".formatted(nodeId, topologyId));
+        topologyService.save(topology);
+        if (!topologyService.isNodeUsedAnywhere(nodeId)){
+            log.info("Deleted node: %s completely".formatted(nodeId));
+            topologyNodeService.deleteById(nodeId);
+        }
+    }
+
     public Topology addNodeBetweenNodes(
             ObjectId topologyId, ObjectId sourceNodeId, ObjectId insertedNodeId, ObjectId targetNodeId,
             boolean addVertexToTopologyIfNotAdded
@@ -57,5 +68,4 @@ public class TopologyModifyingService {
         addEdgeToTopology(topologyId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
         return deleteEdge(topologyId, sourceNodeId, targetNodeId);
     }
-
 }

@@ -79,6 +79,14 @@ public class Topology {
         edges.merge(source, Set.of(), (a, b) -> SetSyntax.without(SetSyntax.merge(a, b), target));
     }
 
+    public void removeNode(ObjectId nodeId) {
+        edges.remove(nodeId);
+        edges = edges.entrySet()
+                .stream()
+                .map(entry -> Map.entry(entry.getKey(), SetSyntax.without(entry.getValue(), nodeId)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     public boolean containsVertex(TopologyNode node) {
         return edges.containsKey(node.getId());
     }

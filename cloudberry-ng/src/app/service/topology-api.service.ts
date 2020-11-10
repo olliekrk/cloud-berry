@@ -49,4 +49,8 @@ export class TopologyApiService {
                       addVertexToTopologyIfNotAdded: boolean = true): Observable<void> {
     return this.rest.addNodeBetweenNodes(topologyId, sourceNodeId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
   }
+
+  deleteNodeFromTopology(topologyId: TopologyId, nodeId: TopologyNodeId): Observable<void> {
+    return this.rest.deleteNode(topologyId, nodeId).pipe(share());
+  }
 }

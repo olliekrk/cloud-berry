@@ -163,9 +163,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         },
         {
           content: "Delete",
-          select: node => {
-            console.log("Delete:", node.id());
-          }
+          select: node => this.deleteNode(node),
         },
       ],
       openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
@@ -287,5 +285,15 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private deleteEdgeOnGraph(edge: any): void {
     this.cyCore.remove(`edge[id="${edge.id()}"]`);
+  }
+
+  private deleteNode(node: any): void {
+    this.topologyApiService
+      .deleteNodeFromTopology(this.topologyData.topology.id, node.id())
+      .subscribe(() => this.deleteNodeOnGraph(node));
+  }
+
+  private deleteNodeOnGraph(node: any): void {
+    this.cyCore.remove(`node[id="${node.id()}"]`);
   }
 }
