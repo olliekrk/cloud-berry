@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
-import {TopologyData, TopologyNode, TopologyNodeType} from "../../model";
+import {TopologyData, TopologyNodeType} from "../../model";
 import {notNull, TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
@@ -60,7 +60,11 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       .afterClosed()
       .pipe(
         notNull(),
-        switchMap(({nodeType, json}: AddNodeDialogResult) => this.topologyApiService.addNode(this.topologyData.topology.id, nodeType, json))
+        switchMap(({nodeType, json}: AddNodeDialogResult) =>
+          this.topologyNodeApiService
+            .createNode(nodeType, json)
+            .pipe(switchMap(node => this.topologyApiService.addNode(this.topologyData.topology.id, node.id)))
+        )
       )
       .subscribe(() => this.emitTopologyModified());
   }
@@ -180,52 +184,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       });
   }
 
-  private createMockCounterNodeOnGraph(edge: any, createdNode: TopologyNode): void {
-    const sourceId = edge.source().id();
-    const targetId = edge.target().id();
-    const newNodeDefinition: cytoscape.NodeDefinition = {
-      data: {
-        id: createdNode.id,
-        name: createdNode.name,
-      }
-    };
-    const sourceToNewEdgeDefinition: cytoscape.EdgeDefinition = {
-      data: {
-        id: `${sourceId}_${createdNode.id}`,
-        source: sourceId,
-        target: createdNode.id,
-      }
-    };
-    const newToTargetEdgeDefinition: cytoscape.EdgeDefinition = {
-      data: {
-        id: `${createdNode.id}_${targetId}`,
-        source: createdNode.id,
-        target: targetId,
-      }
-    };
-
-    this.deleteEdgeOnGraph(edge);
-    this.cyCore.add([newNodeDefinition, sourceToNewEdgeDefinition, newToTargetEdgeDefinition]);
-  }
-
-  private deleteEdge(edge: any): void {
-    this.topologyApiService
-      .deleteEdge(this.topologyData.topology.id, edge.source().id(), edge.target().id())
-      .subscribe(() => this.emitTopologyModified());
-  }
-
-  private deleteEdgeOnGraph(edge: any): void {
-    this.cyCore.remove(`edge[id="${edge.id()}"]`);
-  }
-
   private deleteNode(node: any): void {
     this.topologyApiService
       .deleteNodeFromTopology(this.topologyData.topology.id, node.id())
       .subscribe(() => this.emitTopologyModified());
-  }
-
-  private deleteNodeOnGraph(node: any): void {
-    this.cyCore.remove(`node[id="${node.id()}"]`);
   }
 
   private addEdge(source: any, target: any): void {
@@ -234,15 +196,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       .subscribe(() => this.emitTopologyModified());
   }
 
-  private addEdgeOnGraph(source: any, target: any): void {
-    const edge: cytoscape.EdgeDefinition = {
-      data: {
-        id: `${source.id()}_${target.id()}`,
-        source: source.id(),
-        target: target.id(),
-      }
-    };
-    this.cyCore.add([edge]);
+  private deleteEdge(edge: any): void {
+    this.topologyApiService
+      .deleteEdge(this.topologyData.topology.id, edge.source().id(), edge.target().id())
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private isEdgeValid(source: any, target: any): boolean {

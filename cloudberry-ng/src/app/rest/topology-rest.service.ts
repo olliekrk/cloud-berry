@@ -68,4 +68,9 @@ export class TopologyRestService {
     const params = {nodeIdHex: nodeId};
     return this.httpClient.delete<void>(`${this.baseUrl}/id/${topologyId}/deleteNode`, {params});
   }
+
+  addNode(topologyId: TopologyId, nodeId: TopologyNodeId): Observable<void> {
+    const params = {nodeIdHex: nodeId};
+    return this.httpClient.post<void>(`${this.baseUrl}/id/${topologyId}/addNode`, null, {params});
+  }
 }

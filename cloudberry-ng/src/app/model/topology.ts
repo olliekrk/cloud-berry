@@ -28,6 +28,9 @@ export enum TopologyNodeType {
   Counter = "Counter"
 }
 
+export type FilterExpression = object;
+export type MappingExpression = object;
+
 export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> = {
   [TopologyNodeType.Root]: ["name", "inputTopicName"],
   [TopologyNodeType.Sink]: ["name", "outputBucketName"],

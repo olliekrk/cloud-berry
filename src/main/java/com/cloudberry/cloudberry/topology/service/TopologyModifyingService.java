@@ -75,4 +75,12 @@ public class TopologyModifyingService {
         addEdgeToTopology(topologyId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
         return deleteEdge(topologyId, sourceNodeId, targetNodeId);
     }
+
+    public void addNodeToTopology(ObjectId topologyId, ObjectId nodeId) {
+        val topology = topologyService.findByIdOrThrow(topologyId);
+        val node = topologyNodeService.findByIdOrThrow(nodeId);
+        topology.addVertex(node);
+        log.info("Added node: %s to topology: %s".formatted(nodeId, topologyId));
+        topologyService.save(topology);
+    }
 }

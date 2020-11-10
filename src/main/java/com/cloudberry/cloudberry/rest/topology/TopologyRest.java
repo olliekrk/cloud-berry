@@ -100,6 +100,16 @@ public class TopologyRest {
         return topologyModifyingService.deleteEdge(topologyId, sourceNodeId, targetNodeId);
     }
 
+    @PostMapping("/id/{id}/addNode")
+    void addNode(
+            @PathVariable("id") String topologyIdHex,
+            @RequestParam String nodeIdHex
+    ) throws InvalidTopologyIdException, InvalidTopologyNodeIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        val nodeId = TopologyIdDispatcher.getTopologyNodeId(nodeIdHex);
+        topologyModifyingService.addNodeToTopology(topologyId, nodeId);
+    }
+
     @DeleteMapping("/id/{id}/deleteNode")
     void deleteNode(
             @PathVariable("id") String topologyIdHex,

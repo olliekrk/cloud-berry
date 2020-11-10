@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {TopologyRestService} from "../rest/topology-rest.service";
-import {Observable, of} from "rxjs";
-import {Topology, TopologyId, TopologyNodeId, TopologyNodeType} from "../model";
+import {Observable} from "rxjs";
+import {Topology, TopologyId, TopologyNodeId} from "../model";
 import {share} from "rxjs/operators";
 
 @Injectable({
@@ -54,7 +54,7 @@ export class TopologyApiService {
     return this.rest.deleteNode(topologyId, nodeId).pipe(share());
   }
 
-  addNode(topologyId: TopologyId, nodeType: TopologyNodeType, nodeJson: Record<string, any>): Observable<void> {
-    return of(null); // todo
+  addNode(topologyId: TopologyId, nodeId: TopologyNodeId): Observable<void> {
+    return this.rest.addNode(topologyId, nodeId).pipe(share());
   }
 }
