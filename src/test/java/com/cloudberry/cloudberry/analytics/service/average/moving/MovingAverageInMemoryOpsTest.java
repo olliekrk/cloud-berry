@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class MovingAverageInMemoryOpsTest {
     void itShouldReturnOnePointAverageForOneSeriesAndOnePoint() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(VALUE, 1., TIME, now)))
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(VALUE, 1., TIME, now)))
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
@@ -37,10 +38,10 @@ class MovingAverageInMemoryOpsTest {
     void itShouldReturnOnePointAverageForMultiSeriesWithOnePoint() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(VALUE, 1., TIME, now))),
-                new DataSeries("2", List.of(Map.of(VALUE, 2., TIME, now))),
-                new DataSeries("3", List.of(Map.of(VALUE, 3., TIME, now))),
-                new DataSeries("4", List.of(Map.of(VALUE, 4., TIME, now)))
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(VALUE, 1., TIME, now))),
+                new DataSeries(new SeriesInfo("2"), List.of(Map.of(VALUE, 2., TIME, now))),
+                new DataSeries(new SeriesInfo("3"), List.of(Map.of(VALUE, 3., TIME, now))),
+                new DataSeries(new SeriesInfo("4"), List.of(Map.of(VALUE, 4., TIME, now)))
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
@@ -52,10 +53,10 @@ class MovingAverageInMemoryOpsTest {
     void itShouldReturnOnePointAverageAndZeroStdForMultiSeriesWithOnePoint() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(VALUE, 3., TIME, now))),
-                new DataSeries("2", List.of(Map.of(VALUE, 3., TIME, now))),
-                new DataSeries("3", List.of(Map.of(VALUE, 3., TIME, now))),
-                new DataSeries("4", List.of(Map.of(VALUE, 3., TIME, now)))
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(VALUE, 3., TIME, now))),
+                new DataSeries(new SeriesInfo("2"), List.of(Map.of(VALUE, 3., TIME, now))),
+                new DataSeries(new SeriesInfo("3"), List.of(Map.of(VALUE, 3., TIME, now))),
+                new DataSeries(new SeriesInfo("4"), List.of(Map.of(VALUE, 3., TIME, now)))
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
@@ -69,7 +70,7 @@ class MovingAverageInMemoryOpsTest {
     @Test
     void itShouldReturnIdenticalSeriesForOneSeries() {
         var now = Instant.now();
-        var seriesOne = new DataSeries("1", List.of(
+        var seriesOne = new DataSeries(new SeriesInfo("1"), List.of(
                 Map.of(VALUE, 3., TIME, now),
                 Map.of(VALUE, 4., TIME, now.plusSeconds(1)),
                 Map.of(VALUE, 5., TIME, now.plusSeconds(2)),
@@ -89,12 +90,12 @@ class MovingAverageInMemoryOpsTest {
     @Test
     void itShouldComputeAverageAndStdProperlyForMultiSeries() {
         var now = Instant.now();
-        var seriesOne = new DataSeries("1", List.of(
+        var seriesOne = new DataSeries(new SeriesInfo("1"), List.of(
                 Map.of(VALUE, 1., TIME, now),
                 Map.of(VALUE, 2., TIME, now.plusSeconds(1)),
                 Map.of(VALUE, 3., TIME, now.plusSeconds(2))
         ));
-        var seriesTwo = new DataSeries("1", List.of(
+        var seriesTwo = new DataSeries(new SeriesInfo("1"), List.of(
                 Map.of(VALUE, 100., TIME, now),
                 Map.of(VALUE, 200., TIME, now.plusSeconds(1)),
                 Map.of(VALUE, 300., TIME, now.plusSeconds(2))
@@ -115,9 +116,9 @@ class MovingAverageInMemoryOpsTest {
     void itShouldIgnoreEmptySeries() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(VALUE, 1., TIME, now))),
-                new DataSeries("2", List.of()),
-                new DataSeries("3", List.of())
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(VALUE, 1., TIME, now))),
+                new DataSeries(new SeriesInfo("2"), List.of()),
+                new DataSeries(new SeriesInfo("3"), List.of())
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
@@ -137,9 +138,9 @@ class MovingAverageInMemoryOpsTest {
     void itShouldIgnoreSeriesWithNoTimestamps() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(VALUE, 1.))),
-                new DataSeries("2", List.of(Map.of(VALUE, 2.))),
-                new DataSeries("3", List.of(Map.of(VALUE, 3., TIME, now)))
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(VALUE, 1.))),
+                new DataSeries(new SeriesInfo("2"), List.of(Map.of(VALUE, 2.))),
+                new DataSeries(new SeriesInfo("3"), List.of(Map.of(VALUE, 3., TIME, now)))
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
@@ -151,9 +152,9 @@ class MovingAverageInMemoryOpsTest {
     void itShouldIgnoreSeriesWithNoValues() {
         var now = Instant.now();
         var series = List.of(
-                new DataSeries("1", List.of(Map.of(TIME, now))),
-                new DataSeries("2", List.of(Map.of(TIME, now))),
-                new DataSeries("3", List.of(Map.of(TIME, now, VALUE, 3.)))
+                new DataSeries(new SeriesInfo("1"), List.of(Map.of(TIME, now))),
+                new DataSeries(new SeriesInfo("2"), List.of(Map.of(TIME, now))),
+                new DataSeries(new SeriesInfo("3"), List.of(Map.of(TIME, now, VALUE, 3.)))
         );
 
         var result = MovingAverageInMemoryOps.movingAverageSeries(series, VALUE, false, false, false).get();
