@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class DataSeries {
     private static final String TIME_FIELD_NAME = InfluxDefaults.Columns.TIME;
 
-    String seriesName;
+    SeriesInfo seriesInfo;
 
     List<Map<String, Object>> data;
 
@@ -34,11 +34,11 @@ public class DataSeries {
     }
 
     public DataSeries renamed(String newSeriesName) {
-        return new DataSeries(newSeriesName, data);
+        return new DataSeries(seriesInfo.withName(newSeriesName), data);
     }
 
-    public static DataSeries empty(String seriesName) {
-        return new DataSeries(seriesName, Collections.emptyList());
+    public static DataSeries empty(SeriesInfo seriesInfo) {
+        return new DataSeries(seriesInfo, Collections.emptyList());
     }
 
     public List<Map<String, Object>> getDataSortedBy(String fieldName) {

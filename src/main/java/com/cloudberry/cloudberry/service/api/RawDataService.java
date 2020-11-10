@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.common.syntax.ListSyntax;
 import com.cloudberry.cloudberry.config.influx.InfluxConfig;
@@ -37,7 +38,7 @@ public class RawDataService {
     private final InfluxDataAccessor influxDataAccessor;
     private final LogsImporter logsImporter;
     private final InfluxConfig influxConfig;
-    public static final String rawDataSeriesName = "raw_data";
+    public static final String RAW_DATA_SERIES_NAME = "raw_data";
 
     public void saveData(
             InfluxQueryFields influxQueryFields,
@@ -62,7 +63,7 @@ public class RawDataService {
     ) {
         var records = influxDataAccessor.findData(influxQueryFields, filters);
         var data = ListSyntax.mapped(records, FluxRecord::getValues);
-        return new DataSeries(rawDataSeriesName, data);
+        return new DataSeries(new SeriesInfo(RAW_DATA_SERIES_NAME), data);
     }
 
     public void deleteData(InfluxQueryFields influxQueryFields, DataFilters filters) {

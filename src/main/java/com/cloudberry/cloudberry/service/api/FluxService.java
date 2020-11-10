@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.service.api;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class FluxService {
                 .map(FluxRecord::getValues)
                 .collect(Collectors.toList());
 
-        return new DataSeries(FLUX_SERIES_NAME, rawQueryData);
+        return new DataSeries(new SeriesInfo(FLUX_SERIES_NAME), rawQueryData);
     }
 
 }

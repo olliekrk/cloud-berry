@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
@@ -37,7 +38,7 @@ public class MovingAverageStd extends MovingAverage {
                 .stddev()
                 .group(); // ungroup
 
-        return queryTimeValueSeries(query, STDDEV_SERIES_NAME, fieldName);
+        return queryTimeValueSeries(query, new SeriesInfo(STDDEV_SERIES_NAME), fieldName);
     }
 
 }

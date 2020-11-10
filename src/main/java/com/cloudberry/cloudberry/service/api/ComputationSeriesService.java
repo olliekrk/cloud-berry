@@ -46,7 +46,7 @@ public class ComputationSeriesService {
         var pack = getComputations(fieldName, influxQueryFields, computationIds);
         var packAverageRenamed = pack
                 .getAverageSeries()
-                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
 
         return pack.withAverageSeries(packAverageRenamed);
     }
@@ -74,7 +74,7 @@ public class ComputationSeriesService {
         var bestN = analytics.getBestSeriesApi()
                 .nBestSeriesFrom(n, fieldName, optimization, influxQueryFields, computationsIds);
         var bestNAverage = MovingAverageInMemoryOps.movingAverageSeries(bestN, fieldName)
-                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
 
         return new SeriesPack(bestN, bestNAverage);
     }
@@ -106,7 +106,7 @@ public class ComputationSeriesService {
         var exceeding = analytics.getThresholdsApi()
                 .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, influxQueryFields, computationIds);
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
-                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
         return new SeriesPack(exceeding, exceedingAverage);
     }
 
@@ -132,7 +132,7 @@ public class ComputationSeriesService {
                 series.getAverageSeries().get()
         );
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
-                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
 
         return new SeriesPack(exceeding, exceedingAverage);
     }

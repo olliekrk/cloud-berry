@@ -2,10 +2,19 @@ from typing import List
 
 import pandas as pd
 
+from ..str_generator import auto_str
+
+
+@auto_str
+class SeriesInfo:
+    def __init__(self, series_name: str, series_id: str):
+        self.series_name = series_name
+        self.series_id = series_id
+
 
 class DataSeries:
-    def __init__(self, series_name: str, data: list, meta_ids=None) -> None:
-        self.series_name = series_name
+    def __init__(self, series_info: SeriesInfo, data: list, meta_ids=None) -> None:
+        self.series_info = series_info
         self.data = data
         self.meta_ids = meta_ids  # MetaIds
 
@@ -16,12 +25,15 @@ class DataSeries:
         one_df = self.as_data_frame
         second_df = other_series.as_data_frame
         result_df = pd.concat([one_df, second_df]).pivot(index=merging_key, columns='series_name')
-        return DataSeries(new_series_name or self.series_name, result_df.to_dict())
+        new_series_info = self.series_info
+        if new_series_name is not None:
+            new_series_info.series_name = new_series_name
+        return DataSeries(new_series_info, result_df.to_dict())
 
     @property
     def as_data_frame(self) -> pd.DataFrame:
         df = pd.DataFrame(self.data)
-        df['series_name'] = self.series_name
+        df['series_name'] = self.series_info.series_name
         if self.meta_ids is not None:
             df['experiment_id'] = self.meta_ids.experiment_id
             df['configuration_id'] = self.meta_ids.configuration_id
@@ -42,5 +54,6 @@ class DataSeries:
 
     @staticmethod
     def from_json(data_series_json: dict):
-        return DataSeries(series_name=data_series_json['seriesName'],
+        series_info_ = data_series_json['seriesInfo']
+        return DataSeries(series_info=SeriesInfo(series_info_['name'], series_info_['id']),
                           data=data_series_json['data'])

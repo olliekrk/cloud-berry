@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.time.ChronoInterval;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
@@ -36,6 +37,6 @@ public class MovingAverageAvg extends MovingAverage {
                 .expression(timedMovingAverageFluxRaw(timeInterval))
                 .keep(Set.of(InfluxDefaults.Columns.TIME, InfluxDefaults.Columns.VALUE));
 
-        return queryTimeValueSeries(query, MovingAverage.AVG_SERIES_NAME, fieldName);
+        return queryTimeValueSeries(query, new SeriesInfo(MovingAverage.AVG_SERIES_NAME), fieldName);
     }
 }

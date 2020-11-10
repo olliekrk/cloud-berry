@@ -28,7 +28,7 @@ public class ConfigurationSeriesCreator {
 
         return MovingAverageInMemoryOps
                 .movingAverageSeries(computationsSeries, fieldName)
-                .map(s -> s.withSeriesName(configurationSeriesNameResolver.configurationSeriesName(configurationId)));
+                .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
     }
 
 }

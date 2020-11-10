@@ -1,6 +1,7 @@
 package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.analytics.service.util.time.IntervalOps;
 import com.cloudberry.cloudberry.analytics.service.util.time.TimeShiftOps;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
@@ -55,7 +56,8 @@ public abstract class MovingAverageInMemoryOps {
         }
 
         var firstBucketStart = firstIntervalStartOpt.get();
-        var allSeriesIds = series.stream().map(DataSeries::getSeriesName).collect(Collectors.toSet());
+        var allSeriesIds =
+                series.stream().map(DataSeries::getSeriesInfo).map(SeriesInfo::getId).collect(Collectors.toSet());
         var bucketDuration = IntervalOps.suitableMovingBucketDuration(series);
         var fieldData = flatFieldDataSortedByTime(series, fieldName);
 
@@ -85,19 +87,19 @@ public abstract class MovingAverageInMemoryOps {
                 })
                 .collect(Collectors.toList());
 
-        return Optional.of(new DataSeries(AVERAGE_SERIES_NAME, averageSeriesData));
+        return Optional.of(new DataSeries(new SeriesInfo(AVERAGE_SERIES_NAME), averageSeriesData));
     }
 
     /**
-     * @return list of tuples, each containing (point timestamp, series name, point field value)
+     * @return list of tuples, each containing (point timestamp, seriesInfo, point field value)
      */
-    private static List<Tuple3<Instant, String, Double>> flatFieldDataSortedByTime(
+    private static List<Tuple3<Instant, SeriesInfo, Double>> flatFieldDataSortedByTime(
             List<DataSeries> series,
             String fieldName
     ) {
         return series.stream()
                 .flatMap(s -> {
-                    var seriesName = s.getSeriesName();
+                    var seriesInfo = s.getSeriesInfo();
                     return s.getData().stream().flatMap(point -> {
                         var time = Optional.ofNullable((Instant) point.get(InfluxDefaults.Columns.TIME));
                         var value = Optional.ofNullable((Double) point.get(fieldName));
@@ -105,7 +107,7 @@ public abstract class MovingAverageInMemoryOps {
                             log.debug("Data point ignored (missing time or {})", fieldName);
                             return Stream.empty();
                         } else {
-                            return Stream.of(Tuple.of(time.get(), seriesName, value.get()));
+                            return Stream.of(Tuple.of(time.get(), seriesInfo, value.get()));
                         }
                     });
                 })
@@ -114,13 +116,13 @@ public abstract class MovingAverageInMemoryOps {
     }
 
     private static Set<String> getUniqueSeriesIds(
-            List<Tuple3<Instant, String, Double>> points
+            List<Tuple3<Instant, SeriesInfo, Double>> points
     ) {
-        return points.stream().map(Tuple3::_2).collect(Collectors.toSet());
+        return points.stream().map(Tuple3::_2).map(SeriesInfo::getId).collect(Collectors.toSet());
     }
 
     private static long getBucketNumber(
-            Tuple3<Instant, String, Double> point,
+            Tuple3<Instant, SeriesInfo, Double> point,
             Instant firstBucketStart,
             Duration bucketDuration
     ) {
@@ -140,14 +142,14 @@ public abstract class MovingAverageInMemoryOps {
     }
 
     private static Tuple2<Double, Double> getBucketAvgAndStd(
-            List<Tuple3<Instant, String, Double>> points,
+            List<Tuple3<Instant, SeriesInfo, Double>> points,
             boolean useWeightedAverage
     ) {
         return useWeightedAverage ? getBucketAvgAndStdWeighted(points) : getBucketAvgAndStdNonWeighted(points);
     }
 
     private static Tuple2<Double, Double> getBucketAvgAndStdWeighted(
-            List<Tuple3<Instant, String, Double>> points
+            List<Tuple3<Instant, SeriesInfo, Double>> points
     ) {
         var pointsSize = points.size();
         var weightsForSeries = points.stream()
@@ -177,7 +179,7 @@ public abstract class MovingAverageInMemoryOps {
     }
 
     private static Tuple2<Double, Double> getBucketAvgAndStdNonWeighted(
-            List<Tuple3<Instant, String, Double>> points
+            List<Tuple3<Instant, SeriesInfo, Double>> points
     ) {
         var pointsSize = points.size();
         var bucketAvg = points.stream()

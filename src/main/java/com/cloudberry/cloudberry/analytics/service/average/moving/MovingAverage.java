@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.analytics.service.average.moving;
 
 import com.cloudberry.cloudberry.analytics.api.MovingAverageApi;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.basic.SeriesInfo;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
 import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
@@ -37,7 +38,7 @@ public abstract class MovingAverage implements MovingAverageApi {
      */
     protected DataSeries queryTimeValueSeries(
             Flux query,
-            String seriesName,
+            SeriesInfo seriesName,
             String fieldName
     ) {
         return influxClient

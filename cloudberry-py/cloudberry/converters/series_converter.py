@@ -11,7 +11,7 @@ class SeriesConverter:
                                    y_field: str,
                                    y_err_field: str = None) -> PlotSeries:
         return PlotSeries(
-            name=ds.series_name,
+            series_info=ds.series_info,
             data=ds.as_data_frame,
             x_field=x_field,
             y_field=y_field,

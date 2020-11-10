@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.analytics.util;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.service.computations.ComputaionSeriesCreator;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
@@ -53,7 +54,7 @@ public final class FluxUtils {
                     .map(FluxRecord::getValues)
                     .collect(Collectors.toList());
             var computationId = (String) recordsHead.getValueByKey(InfluxDefaults.CommonTags.COMPUTATION_ID);
-            return Optional.of(new DataSeries(computationId, data));
+            return Optional.of(new DataSeries(ComputaionSeriesCreator.computationSeriesInfo(computationId), data));
         }
     }
 

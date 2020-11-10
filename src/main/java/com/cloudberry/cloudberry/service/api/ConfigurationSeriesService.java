@@ -57,7 +57,7 @@ public class ConfigurationSeriesService {
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         var bestN = getNBestConfigurations(n, fieldName, optimization, influxQueryFields, configurationIds);
-        var bestNAverageRenamed = bestN.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+        var bestNAverageRenamed = bestN.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return bestN.withAverageSeries(bestNAverageRenamed);
     }
@@ -88,7 +88,7 @@ public class ConfigurationSeriesService {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         var exceeding =
                 getConfigurationsExceedingThresholds(fieldName, thresholds, mode, influxQueryFields, configurationIds);
-        var exceedingAverageRenamed = exceeding.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+        var exceedingAverageRenamed = exceeding.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return exceeding.withAverageSeries(exceedingAverageRenamed);
     }
@@ -119,7 +119,7 @@ public class ConfigurationSeriesService {
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         var series = getConfigurations(fieldName, influxQueryFields, configurationIds);
-        var seriesAverageRenamed = series.getAverageSeries().map(s -> s.withSeriesName(experimentName));
+        var seriesAverageRenamed = series.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return series.withAverageSeries(seriesAverageRenamed);
     }

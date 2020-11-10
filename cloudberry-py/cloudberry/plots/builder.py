@@ -1,5 +1,6 @@
 from typing import Dict
 
+from cloudberry.api.model import SeriesInfo
 from .exceptions import DuplicatedSeriesName, InvalidPlotsConfiguration, DuplicatedTrendLine
 from .flavour_plotly import PlotlyFlavourPlot
 from .flavours import PlottingFlavour
@@ -35,11 +36,11 @@ class PlotBuilder:
             if a is not None:
                 self.add_avg_series(a)
 
-    def delete_series(self, name: str):
-        PlotBuilder.__delete_series(name, self.__series)
+    def delete_series(self, series_info: SeriesInfo):
+        PlotBuilder.__delete_series(series_info, self.__series)
 
-    def delete_avg_series(self, name: str):
-        PlotBuilder.__delete_series(name, self.__avg_series)
+    def delete_avg_series(self, series_info: SeriesInfo):
+        PlotBuilder.__delete_series(series_info, self.__avg_series)
 
     def delete_trend(self, name: str):
         if name in self.__trends:
@@ -68,15 +69,15 @@ class PlotBuilder:
             raise InvalidPlotsConfiguration(f"Plot builder not implemented for flavour: {flavour.name}")
 
     @staticmethod
-    def __delete_series(series_name: str, all_series: Dict[str, PlotSeries]):
-        if series_name in all_series:
-            del all_series[series_name]
+    def __delete_series(series_info: SeriesInfo, all_series: Dict[str, PlotSeries]):
+        if series_info in all_series:
+            del all_series[series_info.series_id]
 
     @staticmethod
     def __add_series(series: PlotSeries,
                      all_series: Dict[str, PlotSeries],
                      replace: bool):
-        if not replace and series.name in all_series:
-            raise DuplicatedSeriesName(f"{series.name} is already defined")
+        if not replace and series.series_info in all_series:
+            raise DuplicatedSeriesName(f"{series.series_info} is already defined")
         else:
-            all_series[series.name] = series
+            all_series[series.series_info.series_id] = series

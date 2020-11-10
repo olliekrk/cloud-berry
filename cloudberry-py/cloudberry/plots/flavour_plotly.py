@@ -22,10 +22,10 @@ class PlotlyTrendLineKind(Enum):
 
 class PlotlyTrendLine(TrendLine):
     def __init__(self,
-                 related_series_name: str,
+                 related_series_id: str,
                  kind: PlotlyTrendLineKind,
                  constant: float = None):
-        self.related_series_name = related_series_name
+        self.related_series_id = related_series_id
         self.kind = kind
         self.constant = constant
 
@@ -71,7 +71,7 @@ class PlotlyFlavourPlot:
             PlotSeriesKind.LINE: 'lines',
         }[self.properties.default_series_kind]
         trace = pgo.Scatter(
-            name=series.name,
+            name=series.series_info.series_name,
             mode=trace_mode,
             x=series.data[series.x_field],
             y=series.data[series.y_field],
@@ -79,7 +79,7 @@ class PlotlyFlavourPlot:
                 'type': 'data',
                 'visible': series.y_err_field is not None,
                 'array': series.data[series.y_err_field],
-                'color': 'red',
+                'color': PlotUtils.series_color_hex(series.series_info.series_id),
                 'thickness': 0.5,
                 'width': 1,
             },
@@ -87,7 +87,7 @@ class PlotlyFlavourPlot:
                 'symbol': 'circle',
             },
             line={
-                'color': PlotUtils.series_color_hex(series.name),
+                'color': PlotUtils.series_color_hex(series.series_info.series_id),
             }
         )
         fig.add_trace(trace)
@@ -141,10 +141,10 @@ class PlotlyFlavourPlot:
 
     def __add_ml_knn_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
         all_series = {**self.series, **self.averages}
-        if trend.related_series_name not in all_series:
-            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+        if trend.related_series_id not in all_series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_id}")
 
-        series = all_series[trend.related_series_name]
+        series = all_series[trend.related_series_id]
         xs_base = np.array(series.data[series.x_field])
         xs = xs_base.reshape(-1, 1)
         ys = np.array(series.data[series.y_field]).reshape(-1, 1)
@@ -169,10 +169,10 @@ class PlotlyFlavourPlot:
 
     def __add_ml_linear_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
         all_series = {**self.series, **self.averages}
-        if trend.related_series_name not in all_series:
-            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+        if trend.related_series_id not in all_series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_id}")
 
-        series = all_series[trend.related_series_name]
+        series = all_series[trend.related_series_id]
         xs = np.array(series.data[series.x_field]).reshape(-1, 1)
         ys = np.array(series.data[series.y_field]).reshape(-1, 1)
         model = LinearRegression()
@@ -196,12 +196,12 @@ class PlotlyFlavourPlot:
 
     def __add_const_trend_trace(self, trend_name: str, trend: PlotlyTrendLine, fig: pgo.Figure):
         all_series = {**self.series, **self.averages}
-        if trend.related_series_name not in all_series:
-            raise InvalidTrendLine(f"Missing related series: {trend.related_series_name}")
+        if trend.related_series_id not in all_series:
+            raise InvalidTrendLine(f"Missing related series: {trend.related_series_id}")
         if trend.constant is None:
             raise InvalidTrendLine(f"Constant must be specified to draw const trendline")
 
-        series = all_series[trend.related_series_name]
+        series = all_series[trend.related_series_id]
         xs_range = series.data[series.x_field]
         xs = np.linspace(xs_range.min(), xs_range.max(), 10)
         ys = np.full(10, trend.constant)
