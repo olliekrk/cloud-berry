@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {Topology, TopologyData, TopologyId} from "../../model";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable} from "rxjs";
 import {ActiveTopologyStoreService} from "../../service/active-topology-store.service";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
-import {map, switchMap, take} from "rxjs/operators";
+import {switchMap, take} from "rxjs/operators";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {notNull} from "../../util";
 
@@ -15,7 +15,7 @@ import {notNull} from "../../util";
 })
 export class TopologyDashboardComponent implements OnInit, OnDestroy {
 
-  selectedTopology$: BehaviorSubject<Topology | null> = new BehaviorSubject(null);
+  selectedTopologyId$: BehaviorSubject<TopologyId | null> = new BehaviorSubject(null);
   selectedTopologyData$: Observable<TopologyData>;
   availableTopologies: Topology[];
 
@@ -25,32 +25,33 @@ export class TopologyDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.topologyApiService.getAvailableTopologies()
-      .subscribe(topologies => this.availableTopologies = topologies);
-
-    this.activeTopologyStoreService.stateUpdates()
-      .pipe(take(1))
-      .subscribe(topology => this.selectedTopology$.next(topology));
-
-    this.selectedTopologyData$ = this.selectedTopology$.asObservable()
+    this.fetchAvailableTopologies();
+    this.selectedTopologyData$ = this.selectedTopologyId$.asObservable()
       .pipe(
         notNull(),
-        switchMap((topology: Topology) => this.topologyNodeApiService.getTopologyNodes(topology.id)
-          .pipe(
-            map(topologyNodes => ({topology, topologyNodes}))
-          )
-        )
+        switchMap((topologyId: TopologyId) => forkJoin({
+          topology: this.topologyApiService.getTopology(topologyId),
+          topologyNodes: this.topologyNodeApiService.getTopologyNodes(topologyId),
+        })),
       );
+
+    this.activeTopologyStoreService.stateIdUpdates()
+      .pipe(take(1))
+      .subscribe(topologyId => this.updateSelectedTopology(topologyId));
   }
 
   ngOnDestroy(): void {
-    this.selectedTopology$.complete();
-    this.selectedTopology$.unsubscribe();
+    this.selectedTopologyId$.complete();
+    this.selectedTopologyId$.unsubscribe();
   }
 
   updateSelectedTopology(topologyId: TopologyId): void {
-    const newTopology = this.availableTopologies?.find(topology => topology.id === topologyId);
-    this.selectedTopology$.next(newTopology);
+    this.selectedTopologyId$.next(topologyId);
+  }
+
+  fetchAvailableTopologies(): void {
+    this.topologyApiService.getAvailableTopologies()
+      .subscribe(topologies => this.availableTopologies = topologies);
   }
 
   reloadSelectedTopology(): void {

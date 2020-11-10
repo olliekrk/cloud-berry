@@ -2,13 +2,13 @@
   <button mat-raised-button (click)="openAddTopologyDialog()">Create new topology</button>
 </app-top-action-bar>
 
-<div *ngIf="activeTopology$ | async as activeTopology; else loading" class="cards-container">
+<div *ngIf="activeTopologyId$ | async as activeTopologyId; else loading" class="cards-container">
   <ng-container *ngIf="availableTopologies$ | async as availableTopologies; else loading">
     <mat-card class="topology-card" *ngFor="let topology of availableTopologies">
       <mat-card-header>
-        <mat-card-title [class.active]="activeTopology.id === topology.id"
+        <mat-card-title [class.active]="activeTopologyId === topology.id"
                         [class.invalid]="!topology.valid"
-                        [matTooltip]="activeTopology.id === topology.id ? 'Active topology'
+                        [matTooltip]="activeTopologyId === topology.id ? 'Active topology'
                         : !topology.valid ? 'This topology is invalid'
                         : ''">
           {{topology.name}}
@@ -22,13 +22,13 @@
       <mat-card-actions>
         <button mat-stroked-button
                 (click)="useTopology(topology.id)"
-                [disabled]="topology.id === activeTopology.id || !topology.valid"
+                [disabled]="!topology.valid"
                 [matTooltip]="'Sets this topology as active one'">
           USE
         </button>
         <button mat-stroked-button
                 (click)="deleteTopology(topology.id)"
-                [disabled]="topology.id === activeTopology.id || !topology.userDefined"
+                [disabled]="topology.id === activeTopologyId || !topology.userDefined"
                 [matTooltip]="'Deletes this topology'">
           DELETE
         </button>

@@ -1,5 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {TopologyNodeType} from "../../model";
 
 @Component({
   selector: "app-add-node-dialog",
@@ -7,12 +8,12 @@ import {FormBuilder, FormGroup} from "@angular/forms";
   styleUrls: ["./add-node-dialog.component.scss"]
 })
 export class AddNodeDialogComponent implements OnInit {
+  readonly TopologyNodeType = TopologyNodeType;
   form: FormGroup;
 
   constructor(formBuilder: FormBuilder) {
-    // todo: handle add existing node & create node
     this.form = formBuilder.group({
-      name: [],
+      nodeType: [TopologyNodeType.Root],
       json: [],
     });
   }

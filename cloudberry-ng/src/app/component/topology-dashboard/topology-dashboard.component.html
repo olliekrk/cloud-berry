@@ -1,7 +1,7 @@
 <app-top-action-bar>
   <mat-form-field class="topology-select" *ngIf="availableTopologies" appearance="fill">
     <mat-label>Selected topology</mat-label>
-    <mat-select [value]="selectedTopology$.value?.id" (valueChange)="updateSelectedTopology($event)">
+    <mat-select [value]="selectedTopologyId$.value" (valueChange)="updateSelectedTopology($event)">
       <mat-option *ngFor="let topology of availableTopologies" [value]="topology.id">
         {{topology.name}} - {{topology.id}}
       </mat-option>

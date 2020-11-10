@@ -2,11 +2,15 @@
 
 <mat-dialog-content [formGroup]="form">
   <mat-form-field>
-    <input matInput
-           placeholder="Enter node name"
-           formControlName="name">
+    <mat-label>Select node type</mat-label>
+    <mat-select formControlName="nodeType">
+      <mat-option *ngFor="let nodeType of TopologyNodeType | objectValues" [value]="nodeType">
+        {{nodeType}}
+      </mat-option>
+    </mat-select>
   </mat-form-field>
   <mat-form-field>
+    <mat-label>Enter node JSON</mat-label>
     <textarea matInput
               placeholder="Enter JSON"
               formControlName="json">

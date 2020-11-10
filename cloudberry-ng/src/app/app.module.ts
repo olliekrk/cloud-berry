@@ -35,6 +35,7 @@ import {TopActionBarComponent} from "./component/top-action-bar/top-action-bar.c
 import {MatOptionModule} from "@angular/material/core";
 import {MatSelectModule} from "@angular/material/select";
 import {AddNodeDialogComponent} from "./component/add-node-dialog/add-node-dialog.component";
+import {ObjectValuesPipe} from "./pipe/object-values.pipe";
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import {AddNodeDialogComponent} from "./component/add-node-dialog/add-node-dialo
     TopologyCreateDialogComponent,
     TopActionBarComponent,
     AddNodeDialogComponent,
+    ObjectValuesPipe,
   ],
     imports: [
         BrowserModule,

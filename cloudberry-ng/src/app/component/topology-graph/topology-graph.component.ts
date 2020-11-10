@@ -53,6 +53,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
+  openAddNodeDialog(): void {
+    this.dialog.open(AddNodeDialogComponent, null);
+  }
+
   private initializeCytoscape(): void {
     if (this.cyContainer) {
       this.cyCore = cytoscape({
@@ -175,22 +179,28 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       commands: [
         {
           content: "Add counter node",
-          select: edge => {
-            this.topologyNodeApiService.addCounterNode("nowy", "metryka").subscribe(newNode => {
-              const topologyId = this.topologyData.topology.id;
-              const sourceId = edge.source().id();
-              const targetId = edge.target().id();
-              this.topologyApiService
-                .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
-                .subscribe(() => {
-                  this.addNodeToGraphOnEdge(edge, newNode);
-                  this.topologyModified.emit();
-                });
-            });
-          }
+          select: edge => this.createMockCounterNode(edge), // fixme
+        },
+        {
+          content: "Delete this edge",
+          select: edge => this.deleteEdge(edge),
         }
       ],
       openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
+    };
+  }
+
+  private getEdgeHandlesConfig(): any {
+    return {
+      loopAllowed: () => false,
+      handleNodes: node => { // whether node can be start of an edge
+        return true;
+      },
+      snap: true,
+      complete: (source, target, added) => { // after an edge is added
+        this.cyCore.remove(`edge[id="${added.id()}"]`);
+        console.log("new edge: ", source.id(), target.id());
+      }
     };
   }
 
@@ -225,21 +235,23 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  private getEdgeHandlesConfig(): any {
-    return {
-      loopAllowed: () => false,
-      handleNodes: node => { // whether node can be start of an edge
-        return true;
-      },
-      snap: true,
-      complete: (source, target, added) => { // after an edge is added
-        this.cyCore.remove(`edge[id="${added.id()}"]`);
-        console.log("new edge: ", source.id(), target.id());
-      }
-    };
+  private createMockCounterNode(edge: any): void {
+    this.topologyNodeApiService
+      .addCounterNode("nowy", "metryka")
+      .subscribe(newNode => {
+        const topologyId = this.topologyData.topology.id;
+        const sourceId = edge.source().id();
+        const targetId = edge.target().id();
+        this.topologyApiService
+          .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
+          .subscribe(() => {
+            this.createMockCounterNodeOnGraph(edge, newNode);
+            this.topologyModified.emit();
+          });
+      });
   }
 
-  private addNodeToGraphOnEdge(edge: any, createdNode: TopologyNode): void {
+  private createMockCounterNodeOnGraph(edge: any, createdNode: TopologyNode): void {
     const sourceId = edge.source().id();
     const targetId = edge.target().id();
     const newNodeDefinition: cytoscape.NodeDefinition = {
@@ -263,11 +275,17 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       }
     };
 
-    this.cyCore.remove(`edge[id="${edge.id()}"]`);
+    this.deleteEdgeOnGraph(edge);
     this.cyCore.add([newNodeDefinition, sourceToNewEdgeDefinition, newToTargetEdgeDefinition]);
   }
 
-  openAddNodeDialog(): void {
-    this.dialog.open(AddNodeDialogComponent, null);
+  private deleteEdge(edge: any): void {
+    this.topologyApiService
+      .deleteEdge(this.topologyData.topology.id, edge.source().id(), edge.target().id())
+      .subscribe(() => this.deleteEdgeOnGraph(edge));
+  }
+
+  private deleteEdgeOnGraph(edge: any): void {
+    this.cyCore.remove(`edge[id="${edge.id()}"]`);
   }
 }

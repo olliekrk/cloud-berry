@@ -3,9 +3,14 @@ import {Store} from "rxjs-observable-store";
 import {Topology, TopologyId} from "../model";
 import {TopologyApiService} from "./topology-api.service";
 import {interval, Observable, Subject} from "rxjs";
-import {distinctUntilKeyChanged, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
+import {distinctUntilKeyChanged, pluck, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {notNull} from "../util";
 
+
+/**
+ * This service is only suitable for referring to constant properties of active topology - e.g. its `id` or `name`.
+ * i.e. using `edges` field may cause unexpected behavior as they are not always updated.
+ */
 @Injectable({
   providedIn: "root"
 })
@@ -37,6 +42,10 @@ export class ActiveTopologyStoreService extends Store<Topology | null> {
 
   stateUpdates(): Observable<Topology> {
     return this.state$.pipe(notNull(), shareReplay(1));
+  }
+
+  stateIdUpdates(): Observable<TopologyId> {
+    return this.stateUpdates().pipe(pluck("id"));
   }
 
 }

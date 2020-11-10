@@ -2,10 +2,12 @@ package com.cloudberry.cloudberry.topology.service;
 
 import com.cloudberry.cloudberry.topology.model.Topology;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TopologyModifyingService {
@@ -15,6 +17,8 @@ public class TopologyModifyingService {
     public Topology deleteEdge(ObjectId topologyId, ObjectId sourceNodeId, ObjectId targetNodeId) {
         val topology = topologyService.findByIdOrThrow(topologyId);
         topology.removeEdge(sourceNodeId, targetNodeId);
+        log.info("Deleted edge of topology: %s, source: %s, target: %s"
+                         .formatted(topologyId, sourceNodeId, targetNodeId));
         topologyService.save(topology);
         return topology;
     }

@@ -18,3 +18,11 @@ export interface TopologyData {
   topology: Topology;
   topologyNodes: TopologyNode[];
 }
+
+export enum TopologyNodeType {
+  Root = "Root",
+  Sink = "Sink",
+  Filter = "Filter",
+  Map = "Map",
+  Counter = "Counter"
+}

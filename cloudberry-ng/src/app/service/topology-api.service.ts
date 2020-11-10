@@ -16,6 +16,10 @@ export class TopologyApiService {
     return this.rest.getActiveTopology().pipe(share());
   }
 
+  getTopology(topologyId: TopologyId): Observable<Topology | null> {
+    return this.rest.getTopology(topologyId).pipe(share());
+  }
+
   getAvailableTopologies(): Observable<Topology[]> {
     return this.rest.getAvailableTopologies().pipe(share());
   }
@@ -28,17 +32,21 @@ export class TopologyApiService {
     return this.rest.deleteTopology(topologyId).pipe(share());
   }
 
-  createTopology(topologyName: string) {
+  createTopology(topologyName: string): Observable<void> {
     return this.rest.createTopology(topologyName).pipe(share());
   }
 
+  deleteEdge(topologyId: TopologyId, sourceId: TopologyNodeId, targetId: TopologyNodeId): Observable<void> {
+    return this.rest.deleteEdge(topologyId, sourceId, targetId).pipe(share());
+  }
+
   addEdgeToTopology(topologyId: TopologyId, sourceNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
-                    addVertexToTopologyIfNotAdded: boolean = true) {
+                    addVertexToTopologyIfNotAdded: boolean = true): Observable<void> {
     return this.rest.addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
   }
 
   addNodeBetweenNodes(topologyId: TopologyId, sourceNodeId: TopologyNodeId, insertedNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
-                      addVertexToTopologyIfNotAdded: boolean = true) {
+                      addVertexToTopologyIfNotAdded: boolean = true): Observable<void> {
     return this.rest.addNodeBetweenNodes(topologyId, sourceNodeId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
   }
 }

@@ -16,12 +16,12 @@ import {notNull} from "../../util";
 export class MainDashboardComponent implements OnInit {
 
   availableTopologies$: Observable<Topology[]>;
-  activeTopology$: Observable<Topology>;
+  activeTopologyId$: Observable<TopologyId>;
 
   constructor(private topologyApiService: TopologyApiService,
               private activeTopologyStoreService: ActiveTopologyStoreService,
               private dialog: MatDialog) {
-    this.activeTopology$ = activeTopologyStoreService.stateUpdates();
+    this.activeTopologyId$ = activeTopologyStoreService.stateIdUpdates();
     this.availableTopologies$ = this.fetchAvailableTopologies();
   }
 

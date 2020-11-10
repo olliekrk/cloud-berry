@@ -23,6 +23,10 @@ export class TopologyRestService {
     return this.httpClient.get<Topology[]>(this.baseUrl + "/all");
   }
 
+  getTopology(topologyId: TopologyId): Observable<Topology | null> {
+    return this.httpClient.get<Topology | null>(`${this.baseUrl}/id/${topologyId}`);
+  }
+
   useTopology(topologyId: TopologyId): Observable<void> {
     return this.httpClient.post<void>(`${this.baseUrl}/id/${topologyId}/use`, null);
   }
@@ -33,6 +37,11 @@ export class TopologyRestService {
 
   createTopology(topologyName: string): Observable<void> {
     return this.httpClient.post<void>(`${this.baseUrl}/create`, null, {params: {name: topologyName}});
+  }
+
+  deleteEdge(topologyId: TopologyId, sourceId: TopologyNodeId, targetId: TopologyNodeId): Observable<void> {
+    const params = {sourceNodeIdHex: sourceId, targetNodeIdHex: targetId};
+    return this.httpClient.delete<void>(`${this.baseUrl}/id/${topologyId}/deleteEdge`, {params});
   }
 
   addEdgeToTopology(topologyId: TopologyId, sourceNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
