@@ -18,6 +18,11 @@ public class SinkNode extends TopologyNode {
     }
 
     @Override
+    public String getNodeType() {
+        return TopologyNodeType.Sink.name();
+    }
+
+    @Override
     public void accept(TopologyNodeVisitor visitor) {
         visitor.visit(this);
     }

@@ -13,6 +13,10 @@ public abstract class SetSyntax {
         return Stream.concat(Stream.of(element), collection.stream()).collect(Collectors.toUnmodifiableSet());
     }
 
+    public static <T> Set<T> without(Collection<T> collection, T element) {
+        return collection.stream().filter(e -> !e.equals(element)).collect(Collectors.toSet());
+    }
+
     public static <T> Set<T> merge(Set<T> a, Set<T> b) {
         return Sets.newHashSet(Iterables.concat(a, b));
     }

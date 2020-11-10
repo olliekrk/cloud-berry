@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.properties.model.PropertyId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,5 +30,9 @@ public class ApiPropertiesService {
 
     public Optional<String> get(PropertyId id) {
         return apiPropertyRepository.findById(id.getId()).map(ApiProperty::getValue);
+    }
+
+    public List<ApiProperty> getAll() {
+        return apiPropertyRepository.findAll();
     }
 }

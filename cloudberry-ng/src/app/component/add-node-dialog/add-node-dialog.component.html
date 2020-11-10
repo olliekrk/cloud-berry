@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>Create node</h1>
+
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Select node type</mat-label>
+    <mat-select formControlName="nodeType">
+      <mat-option *ngFor="let nodeType of TopologyNodeType | objectValues" [value]="nodeType">
+        {{nodeType}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Enter node JSON</mat-label>
+    <textarea matInput
+              placeholder="Enter JSON"
+              formControlName="json">
+    </textarea>
+    <mat-hint>
+      Required JSON fields:
+      {{topologyNodeTypeRequiredFields[form.controls.nodeType.value] | quoted | commaSeparated}}</mat-hint>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-raised-button [disabled]="form.invalid" (click)="submitForm()">Create</button>
+</mat-dialog-actions>

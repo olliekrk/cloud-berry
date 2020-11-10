@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+}
+
+.cy-container {
+  flex: 1;
+}
+
+.add-node-button {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1;
+}

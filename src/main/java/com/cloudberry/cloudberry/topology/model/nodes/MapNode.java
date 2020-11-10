@@ -20,6 +20,11 @@ public class MapNode extends TopologyNode {
     }
 
     @Override
+    public String getNodeType() {
+        return TopologyNodeType.Map.name();
+    }
+
+    @Override
     public void accept(TopologyNodeVisitor visitor) {
         visitor.visit(this);
     }

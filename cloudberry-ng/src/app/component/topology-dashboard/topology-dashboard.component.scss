@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 104px);
+}
+
+app-topology-graph {
+  flex: 1;
+}
+
+.topology-select {
+  margin-right: 12px;
+  width: 30%;
+}

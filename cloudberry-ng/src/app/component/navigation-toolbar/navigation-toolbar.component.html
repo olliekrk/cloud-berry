@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row class="top-toolbar-row">
+    <button mat-icon-button (click)="goToDashboard()">
+      <mat-icon>api</mat-icon>
+    </button>
+    <h1>Cloudberry UI</h1>
+    <div class="top-toolbar-links">
+      <a mat-button [routerLink]="'/dashboard'">Dashboard</a>
+      <a mat-button [routerLink]="'/topology'">Topology</a>
+      <a mat-button [routerLink]="'/configuration'">Configuration</a>
+    </div>
+  </mat-toolbar-row>
+
+  <mat-toolbar-row class="small-toolbar-row">
+    <button mat-icon-button (click)="reloadActiveTopology()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+    <span>Currently running topology configuration is: {{(activeTopologyHeader$ | async) || '...'}}</span>
+  </mat-toolbar-row>
+</mat-toolbar>

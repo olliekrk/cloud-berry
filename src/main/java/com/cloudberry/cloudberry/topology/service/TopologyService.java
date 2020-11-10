@@ -52,4 +52,8 @@ public class TopologyService {
     public List<Topology> deleteAllByIds(List<ObjectId> ids) {
         return topologyRepository.deleteAllByIdIn(ids);
     }
+
+    public boolean isNodeUsedAnywhere(ObjectId nodeId) {
+        return topologyRepository.findAll().stream().anyMatch(topology -> topology.getEdges().containsKey(nodeId));
+    }
 }

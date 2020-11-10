@@ -88,7 +88,57 @@ public class TopologyRest {
                 .addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
     }
 
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/id/{id}/deleteEdge")
+    Topology deleteEdge(
+            @PathVariable("id") String topologyIdHex,
+            @RequestParam String sourceNodeIdHex,
+            @RequestParam String targetNodeIdHex
+    ) throws InvalidTopologyIdException, InvalidTopologyNodeIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        val sourceNodeId = TopologyIdDispatcher.getTopologyNodeId(sourceNodeIdHex);
+        val targetNodeId = TopologyIdDispatcher.getTopologyNodeId(targetNodeIdHex);
+        return topologyModifyingService.deleteEdge(topologyId, sourceNodeId, targetNodeId);
+    }
+
+    @PostMapping("/id/{id}/addNode")
+    void addNode(
+            @PathVariable("id") String topologyIdHex,
+            @RequestParam String nodeIdHex
+    ) throws InvalidTopologyIdException, InvalidTopologyNodeIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        val nodeId = TopologyIdDispatcher.getTopologyNodeId(nodeIdHex);
+        topologyModifyingService.addNodeToTopology(topologyId, nodeId);
+    }
+
+    @DeleteMapping("/id/{id}/deleteNode")
+    void deleteNode(
+            @PathVariable("id") String topologyIdHex,
+            @RequestParam String nodeIdHex
+    ) throws InvalidTopologyIdException, InvalidTopologyNodeIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        val nodeId = TopologyIdDispatcher.getTopologyNodeId(nodeIdHex);
+        topologyModifyingService.deleteNodeFromTopology(topologyId, nodeId);
+    }
+
+    @PutMapping("/id/{id}/addNodeBetweenNodes")
+    Topology addEdgeBetweenNodes(
+            @PathVariable("id") String topologyIdHex,
+            @RequestParam String sourceNodeIdHex,
+            @RequestParam String insertedNodeIdHex,
+            @RequestParam String targetNodeIdHex,
+            @RequestParam(defaultValue = "false") boolean addVertexToTopologyIfNotAdded
+    ) throws InvalidTopologyIdException, InvalidTopologyNodeIdException {
+        val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
+        val sourceNodeId = TopologyIdDispatcher.getTopologyNodeId(sourceNodeIdHex);
+        val insertedNodeId = TopologyIdDispatcher.getTopologyNodeId(insertedNodeIdHex);
+        val targetNodeId = TopologyIdDispatcher.getTopologyNodeId(targetNodeIdHex);
+
+        return topologyModifyingService.addNodeBetweenNodes(topologyId, sourceNodeId, insertedNodeId, targetNodeId,
+                                                            addVertexToTopologyIfNotAdded
+        );
+    }
+
+    @PostMapping("/id/{id}/delete")
     void deleteTopology(@PathVariable String id) throws InvalidTopologyIdException {
         val topologyId = TopologyIdDispatcher.getTopologyId(id);
         topologyService.deleteById(topologyId);
