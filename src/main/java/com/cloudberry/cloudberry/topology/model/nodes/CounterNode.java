@@ -18,6 +18,11 @@ public class CounterNode extends TopologyNode {
     }
 
     @Override
+    public String getNodeType() {
+        return TopologyNodeType.Counter.name();
+    }
+
+    @Override
     public void accept(TopologyNodeVisitor visitor) {
         visitor.visit(this);
     }

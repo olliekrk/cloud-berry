@@ -55,7 +55,7 @@ export class TopologyDashboardComponent implements OnInit, OnDestroy {
   }
 
   reloadSelectedTopology(): void {
-
+    this.selectedTopologyId$.next(this.selectedTopologyId$.value);
   }
 
 }

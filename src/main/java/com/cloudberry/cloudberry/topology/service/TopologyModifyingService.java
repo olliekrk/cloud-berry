@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.topology.service;
 
+import com.cloudberry.cloudberry.topology.exception.EdgeWouldInduceCycleException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,12 @@ public class TopologyModifyingService {
             ObjectId topologyId, ObjectId sourceNodeId, ObjectId targetNodeId, boolean addVertexToTopologyIfNotAdded
     ) {
         val topology = topologyService.findByIdOrThrow(topologyId);
+        val graph = topology.constructGraph();
+        try {
+            graph.addEdge(sourceNodeId, targetNodeId);
+        } catch (IllegalArgumentException e){
+            throw new EdgeWouldInduceCycleException(sourceNodeId, targetNodeId);
+        }
 
         val sourceNode = topologyNodeService.findByIdOrThrow(sourceNodeId);
         val targetNode = topologyNodeService.findByIdOrThrow(targetNodeId);
@@ -54,7 +61,7 @@ public class TopologyModifyingService {
         topology.removeNode(nodeId);
         log.info("Deleted node: %s of topology: %s".formatted(nodeId, topologyId));
         topologyService.save(topology);
-        if (!topologyService.isNodeUsedAnywhere(nodeId)){
+        if (!topologyService.isNodeUsedAnywhere(nodeId)) {
             log.info("Deleted node: %s completely".formatted(nodeId));
             topologyNodeService.deleteById(nodeId);
         }

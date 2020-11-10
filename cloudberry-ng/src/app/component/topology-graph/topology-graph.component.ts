@@ -1,5 +1,5 @@
-import {Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
-import {TopologyData, TopologyNode} from "../../model";
+import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
+import {TopologyData, TopologyNode, TopologyNodeType} from "../../model";
 import {TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
@@ -10,6 +10,7 @@ import edgehandles from "cytoscape-edgehandles";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {AddNodeDialogComponent} from "../add-node-dialog/add-node-dialog.component";
+import {cyStylesheets} from "./cytoscape-styles";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -49,7 +50,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   ngOnChanges({topologyData}: ComponentSimpleChanges): void {
     if (topologyData?.currentValue) {
-      this.fillWithData(topologyData.currentValue);
+      this.fillGraph(topologyData.currentValue);
     }
   }
 
@@ -65,74 +66,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
           nodes: [],
           edges: [],
         },
-        style: [
-          {
-            selector: "node",
-            style: {
-              label: "data(name)",
-              "text-valign": "center",
-              "text-halign": "center",
-              "font-size": "12px"
-            }
-          },
-          {
-            selector: "edge",
-            style: {
-              width: 1,
-              "line-color": "#ff0000",
-              "target-arrow-shape": "triangle",
-              "target-arrow-color": "#ff0000",
-              "curve-style": "unbundled-bezier"
-            }
-          },
-          {
-            selector: ".eh-handle",
-            style: {
-              "background-color": "#0800ff",
-              width: 12,
-              height: 12,
-              shape: "ellipse",
-              "overlay-opacity": 0,
-              "border-width": 12, // makes the handle easier to hit
-              "border-opacity": 0
-            }
-          },
-          {
-            selector: ".eh-hover",
-            style: {
-              "background-color": "#0800ff"
-            }
-          },
-          {
-            selector: ".eh-source",
-            style: {
-              "border-width": 2,
-              "border-color": "#0800ff"
-            }
-          },
-          {
-            selector: ".eh-target",
-            style: {
-              "border-width": 2,
-              "border-color": "#0800ff"
-            }
-          },
-
-          {
-            selector: ".eh-preview, .eh-ghost-edge",
-            style: {
-              "line-color": "#0800ff",
-              "target-arrow-color": "#0800ff",
-              "source-arrow-color": "#0800ff"
-            }
-          },
-          {
-            selector: ".eh-ghost-edge.eh-preview-active",
-            style: {
-              opacity: 0
-            }
-          }
-        ],
+        style: cyStylesheets,
         layout: this.layoutOptions
       });
       this.cyCore.cxtmenu(this.getCxtMenuNodeConfig());
@@ -143,7 +77,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private getCxtMenuNodeConfig(): any {
     return {
-      menuRadius: 80, // the radius of the circular menu in pixels
+      menuRadius: 80,
       selector: "node", // elements matching this Cytoscape.js selector will trigger cxtmenus
       commands: [
         {
@@ -153,12 +87,6 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
             if (topologyNode) {
               this.dialog.open(TopologyNodeDetailsInfoDialogComponent, {data: {topologyNode}});
             }
-          }
-        },
-        {
-          content: "Edit",
-          select: node => {
-            console.log("Edit:", node.id());
           }
         },
         {
@@ -172,12 +100,12 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private getCxtMenuEdgeConfig(): any {
     return {
-      menuRadius: 80, // the radius of the circular menu in pixels
+      menuRadius: 80,
       selector: "edge", // elements matching this Cytoscape.js selector will trigger cxtmenus
       commands: [
         {
           content: "Add counter node",
-          select: edge => this.createMockCounterNode(edge), // fixme
+          select: edge => this.createMockCounterNode(edge), // fixme?
         },
         {
           content: "Delete this edge",
@@ -191,18 +119,17 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   private getEdgeHandlesConfig(): any {
     return {
       loopAllowed: () => false,
-      handleNodes: node => { // whether node can be start of an edge
-        return true;
-      },
+      handleNodes: source => this.isEdgeSourceValid(source), // whether node can be start of an edge
+      edgeType: (source, target) => this.isEdgeValid(source, target) ? "flat" : null, // null = edge cannot be created
       snap: true,
       complete: (source, target, added) => { // after an edge is added
-        this.cyCore.remove(`edge[id="${added.id()}"]`);
-        console.log("new edge: ", source.id(), target.id());
+        this.cyCore.remove(`edge[id="${added.id()}"]`); // remove element added by cytoscape.js by default
+        this.addEdge(source, target);
       }
     };
   }
 
-  private fillWithData({topology, topologyNodes}: TopologyData): void {
+  private fillGraph({topology, topologyNodes}: TopologyData): void {
     const nodes: cytoscape.NodeDefinition[] = topologyNodes.map(node => ({
       data: {
         id: node.id,
@@ -229,7 +156,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       this.cyCore.add(nodes);
       this.cyCore.edges().remove();
       this.cyCore.add(edges);
-      this.cyCore.nodes().layout(this.layoutOptions).run();
+      this.resetGraphLayout();
     }
   }
 
@@ -242,10 +169,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         const targetId = edge.target().id();
         this.topologyApiService
           .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
-          .subscribe(() => {
-            this.createMockCounterNodeOnGraph(edge, newNode);
-            this.topologyModified.emit();
-          });
+          .subscribe(() => this.emitTopologyModified());
       });
   }
 
@@ -280,7 +204,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   private deleteEdge(edge: any): void {
     this.topologyApiService
       .deleteEdge(this.topologyData.topology.id, edge.source().id(), edge.target().id())
-      .subscribe(() => this.deleteEdgeOnGraph(edge));
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private deleteEdgeOnGraph(edge: any): void {
@@ -290,10 +214,55 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   private deleteNode(node: any): void {
     this.topologyApiService
       .deleteNodeFromTopology(this.topologyData.topology.id, node.id())
-      .subscribe(() => this.deleteNodeOnGraph(node));
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private deleteNodeOnGraph(node: any): void {
     this.cyCore.remove(`node[id="${node.id()}"]`);
+  }
+
+  private addEdge(source: any, target: any): void {
+    this.topologyApiService
+      .addEdgeToTopology(this.topologyData.topology.id, source.id(), target.id(), false)
+      .subscribe(() => this.emitTopologyModified());
+  }
+
+  private addEdgeOnGraph(source: any, target: any): void {
+    const edge: cytoscape.EdgeDefinition = {
+      data: {
+        id: `${source.id()}_${target.id()}`,
+        source: source.id(),
+        target: target.id(),
+      }
+    };
+    this.cyCore.add([edge]);
+  }
+
+  private isEdgeValid(source: any, target: any): boolean {
+    const targetId = target.id();
+    const nodes = this.topologyData.topologyNodes;
+    // root nodes cannot have incoming edges
+    return nodes.find(node => node.id === targetId)?.nodeType !== TopologyNodeType.Root;
+  }
+
+  private isEdgeSourceValid(source: any): boolean {
+    const sourceId = source.id();
+    const edges = this.topologyData.topology.edges;
+    const nodes = this.topologyData.topologyNodes;
+    // source already has outgoing edge
+    if (edges[sourceId].length > 0) {
+      return false;
+    }
+    // sink nodes cannot have outgoing edges
+    return nodes.find(node => node.id === sourceId)?.nodeType !== TopologyNodeType.Sink;
+  }
+
+  private emitTopologyModified(): void {
+    this.topologyModified.emit();
+  }
+
+  @HostListener("window:resize")
+  private resetGraphLayout(): void {
+    this.cyCore?.nodes().layout(this.layoutOptions).run();
   }
 }

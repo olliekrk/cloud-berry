@@ -11,6 +11,7 @@ export interface Topology {
 
 export interface TopologyNode {
   id: TopologyNodeId;
+  nodeType: TopologyNodeType;
   name: string;
 }
 

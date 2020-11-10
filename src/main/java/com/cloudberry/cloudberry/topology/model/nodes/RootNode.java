@@ -18,6 +18,11 @@ public class RootNode extends TopologyNode {
     }
 
     @Override
+    public String getNodeType() {
+        return TopologyNodeType.Root.name();
+    }
+
+    @Override
     public void accept(TopologyNodeVisitor visitor) {
         visitor.visit(this);
     }

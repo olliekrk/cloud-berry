@@ -1,7 +1,6 @@
 package com.cloudberry.cloudberry.topology.model.nodes;
 
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
-import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.service.visitor.TopologyNodeVisitor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +16,11 @@ public class FilterNode extends TopologyNode {
     public FilterNode(String name, FilterExpression expression) {
         super(ObjectId.get(), name);
         this.expression = expression;
+    }
+
+    @Override
+    public String getNodeType() {
+        return TopologyNodeType.Filter.name();
     }
 
     @Override
