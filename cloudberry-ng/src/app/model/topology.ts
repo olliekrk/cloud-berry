@@ -27,3 +27,11 @@ export enum TopologyNodeType {
   Map = "Map",
   Counter = "Counter"
 }
+
+export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> = {
+  [TopologyNodeType.Root]: ["name", "inputTopicName"],
+  [TopologyNodeType.Sink]: ["name", "outputBucketName"],
+  [TopologyNodeType.Filter]: ["name", "filterExpression"],
+  [TopologyNodeType.Map]: ["name", "mappingExpression"],
+  [TopologyNodeType.Counter]: ["name", "metricName"]
+};

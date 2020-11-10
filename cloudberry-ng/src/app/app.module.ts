@@ -36,6 +36,8 @@ import {MatOptionModule} from "@angular/material/core";
 import {MatSelectModule} from "@angular/material/select";
 import {AddNodeDialogComponent} from "./component/add-node-dialog/add-node-dialog.component";
 import {ObjectValuesPipe} from "./pipe/object-values.pipe";
+import {CommaSeparatedPipe} from "./pipe/comma-separated.pipe";
+import {QuotedPipe} from "./pipe/quoted.pipe";
 
 @NgModule({
   declarations: [
@@ -50,6 +52,8 @@ import {ObjectValuesPipe} from "./pipe/object-values.pipe";
     TopActionBarComponent,
     AddNodeDialogComponent,
     ObjectValuesPipe,
+    CommaSeparatedPipe,
+    QuotedPipe,
   ],
     imports: [
         BrowserModule,

@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
 import {TopologyData, TopologyNode, TopologyNodeType} from "../../model";
-import {TypedSimpleChange} from "../../util";
+import {notNull, TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
 import * as cytoscape from "cytoscape";
@@ -9,8 +9,9 @@ import dagre from "cytoscape-dagre";
 import edgehandles from "cytoscape-edgehandles";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
-import {AddNodeDialogComponent} from "../add-node-dialog/add-node-dialog.component";
+import {AddNodeDialogComponent, AddNodeDialogResult} from "../add-node-dialog/add-node-dialog.component";
 import {cyStylesheets} from "./cytoscape-styles";
+import {switchMap} from "rxjs/operators";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -55,7 +56,13 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
   }
 
   openAddNodeDialog(): void {
-    this.dialog.open(AddNodeDialogComponent, null);
+    this.dialog.open(AddNodeDialogComponent)
+      .afterClosed()
+      .pipe(
+        notNull(),
+        switchMap(({nodeType, json}: AddNodeDialogResult) => this.topologyApiService.addNode(this.topologyData.topology.id, nodeType, json))
+      )
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private initializeCytoscape(): void {
