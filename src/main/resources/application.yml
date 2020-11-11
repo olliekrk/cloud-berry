@@ -47,7 +47,7 @@ management:
       statsd:
         enabled: true
         flavor: telegraf
-        host: localhost
+        host: ${TELEGRAF_HOST:localhost}
         port: 8125
 ---
 
@@ -57,7 +57,9 @@ spring:
     bootstrap-servers: kafka-cb:29092
   data:
     mongodb:
-      host: cloudberry-cb
+      host: mongodb-cb
+  influx2:
+    url: http://influxdb-cb:9999/
 
 ---
 

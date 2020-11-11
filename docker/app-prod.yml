@@ -5,23 +5,24 @@ networks:
   monitoring:
 
 services:
-#  cloudberry-cb:
-#    networks:
-#      - cb-network
-#    container_name: cloudberry-cb
-#    build: ../
-#    ports:
-#      - 9000:9000
-#    environment:
-#      - _JAVA_OPTIONS=-Xmx512m -Xms256m
-#      - SPRING_PROFILES_ACTIVE=dev
-#    depends_on:
-#      - kafka-cb
+  cloudberry-cb:
+    networks:
+      - cb-network
+    container_name: cloudberry-cb
+    image: olliekrk/cloudberry:latest
+    ports:
+      - 9000:9000
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod
+      - TELEGRAF_HOST=telegraf-cb
+    depends_on:
+      - kafka-cb
   cloudberry-ng:
     networks:
       - cb-network
     container_name: cloudberry-ng
-    build: ../cloudberry-ng/
+    image: olliekrk/cloudberry-ng:latest
     ports:
       - 90:80
   kafka-cb:
