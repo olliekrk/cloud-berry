@@ -46,8 +46,4 @@ deploy:
   on:
     branch: master
 
-#notifications:
-#  email:
-#    - dbiszkopter@gmail.com
-#    - michalmagierra@gmail.com
 
