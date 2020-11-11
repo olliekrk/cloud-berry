@@ -1,7 +1,9 @@
 package com.cloudberry.cloudberry.topology.service;
 
+import com.cloudberry.cloudberry.service.api.BucketsService;
 import com.cloudberry.cloudberry.topology.exception.NodeNotFoundException;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
 import com.cloudberry.cloudberry.topology.repository.TopologyNodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class TopologyNodeService {
     private final TopologyService topologyService;
     private final TopologyNodeRepository topologyNodeRepository;
+    private final BucketsService bucketsService;
 
     public TopologyNode save(TopologyNode node) {
         return topologyNodeRepository.save(node);
@@ -24,6 +27,11 @@ public class TopologyNodeService {
 
     public List<TopologyNode> saveAll(Collection<TopologyNode> nodes) {
         return topologyNodeRepository.saveAll(nodes);
+    }
+
+    public TopologyNode saveSinkNode(SinkNode sinkNode) {
+        bucketsService.createBucketIfNotExists(sinkNode.getOutputBucketName());
+        return save(sinkNode);
     }
 
     public Optional<TopologyNode> getOpt(ObjectId id) {

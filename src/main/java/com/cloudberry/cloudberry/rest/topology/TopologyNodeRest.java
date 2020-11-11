@@ -44,7 +44,7 @@ public class TopologyNodeRest {
 
     @PostMapping("/sink")
     TopologyNode createSinkNode(@RequestParam String name, @RequestParam String outputBucketName) {
-        return topologyNodeService.save(new SinkNode(name, outputBucketName));
+        return topologyNodeService.saveSinkNode(new SinkNode(name, outputBucketName));
     }
 
     @PostMapping("/filter")
