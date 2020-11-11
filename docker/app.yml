@@ -13,7 +13,7 @@ services:
 #    ports:
 #      - 9000:9000
 #    environment:
-#      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+#      - _JAVA_OPTIONS=-Xmx512m -Xms256m --enable_preview
 #      - SPRING_PROFILES_ACTIVE=dev
 #    depends_on:
 #      - kafka-cb
