@@ -13,9 +13,9 @@ public class AddDifferentFields {
             List<? extends MappingArgument<EntryMapRecord>> arguments, ComputationEvent event
     ) {
         return arguments.stream().map(MappingArgument::getArgument)
-                .map(entryMapRecord -> switch (entryMapRecord.mapType()) {
-                    case FIELDS -> event.getFields().get(entryMapRecord.mapKey());
-                    case TAGS -> event.getTags().get(entryMapRecord.mapKey());
+                .map(entryMapRecord -> switch (entryMapRecord.getMapType()) {
+                    case FIELDS -> event.getFields().get(entryMapRecord.getMapKey());
+                    case TAGS -> event.getTags().get(entryMapRecord.getMapKey());
                 })
                 .flatMap(valueToAdd -> Try.of(() -> Stream.of(Double.valueOf(valueToAdd.toString())))
                         .getOrElse(Stream.empty()))

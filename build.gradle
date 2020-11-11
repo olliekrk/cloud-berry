@@ -87,22 +87,6 @@ dependencies {
     testImplementation group: 'com.github.fakemongo', name: 'fongo', version: '2.1.1'
 }
 
-compileJava {
-    options.compilerArgs += ['--enable-preview']
-}
-
-tasks.withType(JavaExec) {
-    jvmArgs += '--enable-preview'
-}
-
-tasks.withType(JavaCompile) {
-    options.compilerArgs += '--enable-preview'
-}
-
-tasks.withType(Test) {
-    jvmArgs += "--enable-preview"
-}
-
 pmd {
     ignoreFailures = true
     consoleOutput = true
@@ -127,7 +111,7 @@ jacocoTestCoverageVerification {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
+        xml.enabled = false
         html.enabled = true
     }
 }

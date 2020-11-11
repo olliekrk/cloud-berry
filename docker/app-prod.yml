@@ -13,7 +13,7 @@ services:
     ports:
       - 9000:9000
     environment:
-      - _JAVA_OPTIONS=-Xmx512m -Xms256m --enable-preview
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod
       - TELEGRAF_HOST=telegraf-cb
     depends_on:

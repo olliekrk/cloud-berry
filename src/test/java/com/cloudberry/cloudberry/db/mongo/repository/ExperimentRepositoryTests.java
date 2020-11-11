@@ -42,7 +42,6 @@ public class ExperimentRepositoryTests {
 
         assertNotNull(experiment.getId());
         assertNotNull(experimentNext.getId());
-//        assertEquals(experiment.getId() + 1, experimentNext.getId());
     }
 
     private Experiment newTestExperiment() {
