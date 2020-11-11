@@ -27,8 +27,56 @@
 
 ### Requirements
 
-- JRE 14
+- JRE 15
 - Docker and docker-compose
+
+### Konfiguracja aplikacji w trybie deweloperskim
+
+Celem uruchomienia projektu w trybie deweloperskim należy przygotować środowisko uruchomieniowe, według wytycznych opisanych w sekcji wymagań, a następnie postępować krok po kroku zgodnie ze schematem z punktu drugiego.
+
+#### Wymagania wstępne
+
+Przed pełnym uruchomieniem systemu, należy zainstalować poniższe oprogramowanie:
+* Java Development Kit 15
+* Docker i docker-compose
+* Node.js, w wersji co najmniej 15.1.0
+* Node Package Manager, w wersji co najmniej 7.0.8
+* Angular CLI, w wersji co najmniej 10.2.0
+* Python, w wersji co najmniej 3.8
+
+Należy również upewnić się, że następujące porty sieciowe są lokalnie dostępne:
+* 9000 TCP - dla aplikacji serwerowej cloudberry-cb
+* 4200 TCP - dla aplikacji internetowej cloudberry-ng
+* 9999 TCP - dla bazy danych InfluxDB
+* 27017 TCP - dla bazy danych MongoDB
+* 2181 TCP - dla usługi Zookeeper
+* 9092 TCP - dla usługi Kafka
+* 8125 UDP (opcjonalnie) - dla usługi Telegraf
+* 8888 TCP (opcjonalnie) - dla usługi Jupyter Notebook
+
+#### Uruchomienie systemu
+Aby uruchomić system z poziomu głównego katalogu projektu należy wykonać poniższe akcje:
+
+* Uruchomienie zewnętrznych serwisów, z których korzysta aplikacja cloud-berry należy wykonać przy użyciu polecenia
+ docker-compose -f <nazwa pliku> up -d . Polecenie należy wywołać wielokrotnie, z poziomu podkatalogu `docker`, w
+  miejscu argumentu `<nazwa pliku>` podając kolejno: kafka.yml, influxdb.yml, mongodb.yml oraz opcjonalnie monitoring.yml.
+* Należy następnie upewnić się, czy Docker uruchomił wszystkie kontenery.
+* Przy pierwszym uruchomieniu, w kontenerze `influxdb-cb` należy uruchomić polecenie ze skryptu `influx-setup.sh
+`, znajdujcego się w folderze `docker/scripts`, które odpowiednio zainicjuje bazę danych - utworzy domyślne konto oraz
+ tokeny dostępu.
+    Można to zrobić przy pomocy `docker exec -it influxdb-cb -- /bin/bash` i następnie uruchamiając w kontenerze komendę z powyższego pliku.
+* Celem weryfikacji, można sprawdzić czy interfejs bazy InfluxDB jest dostępny pod adresem `http://localhost:9999`. W domyślnej konfiguracji nazwa użytkownika to `root` a hasło `ziemniak`.
+    Logowanie powinno zakończyć się z powodzeniem.
+* Można następnie przystąpić do uruchomienia aplikacji serwerowej - `cloudberry-cb`. Należy uruchomić program z pliku `CloudberryApplication.java` z opcją `spring.profiles.active=dev`.
+* Aplikacja serwerowa powinna już w pełni działać. Można w tym momencie korzystać z REST API lub biblioteki `cloudberry-py` do wgrywania i analizowania danych. Dokumentacja REST API dostępna jest pod adresem `http://localhost:9000/swagger-ui`.
+* Aplikację internetową - `cloudberry-ng` należy uruchomić z poziomu folderu `cloudberry-ng`. Znajdując się w tym katalogu należy najpierw wykonać polecenie `npm install` a następnie uruchomić aplikację poleceniem `ng start`. Interfejs webowy dostępny jest pod adresem `http://localhost:4200`.
+
+### Konfiguracja aplikacji w trybie produkcyjnym
+todo:
+ - stworzyć app-prod.yml z podmienionymi hostname'ami usług
+ - utworzyć Dockerfile dla cloudberry-ng
+ - uruchomić cloudberry w Dockerze z profilem `prod`, dodać nadpisane hostname'y dla usług dla tego profilu w
+  application.yml
 
 ---
 
