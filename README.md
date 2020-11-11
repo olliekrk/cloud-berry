@@ -42,7 +42,7 @@ Przed pełnym uruchomieniem systemu, należy zainstalować poniższe oprogramowa
 * Node.js, w wersji co najmniej 15.1.0
 * Node Package Manager, w wersji co najmniej 7.0.8
 * Angular CLI, w wersji co najmniej 10.2.0
-* Python, w wersji co najmniej 3.8
+* Python, w wersji co najmniej 3.8, na potrzeby biblioteki `cloudberry-py`
 
 Należy również upewnić się, że następujące porty sieciowe są lokalnie dostępne:
 * 9000 TCP - dla aplikacji serwerowej cloudberry-cb
@@ -72,11 +72,32 @@ Aby uruchomić system z poziomu głównego katalogu projektu należy wykonać po
 * Aplikację internetową - `cloudberry-ng` należy uruchomić z poziomu folderu `cloudberry-ng`. Znajdując się w tym katalogu należy najpierw wykonać polecenie `npm install` a następnie uruchomić aplikację poleceniem `ng start`. Interfejs webowy dostępny jest pod adresem `http://localhost:4200`.
 
 ### Konfiguracja aplikacji w trybie produkcyjnym
-todo:
- - stworzyć app-prod.yml z podmienionymi hostname'ami usług
- - utworzyć Dockerfile dla cloudberry-ng
- - uruchomić cloudberry w Dockerze z profilem `prod`, dodać nadpisane hostname'y dla usług dla tego profilu w
-  application.yml
+
+#### Wymagania wstępne:
+Przed produkcyjnym uruchomieniem systemu, należy zainstalować poniższe oprogramowanie:
+* Docker i docker-compose
+* Python, w wersji co najmniej 3.8, na potrzeby biblioteki `cloudberry-py`
+
+Wymagana jest także dostępność identycznych portów jak w przypadku trybu deweloperskiego,
+z tą różnicą, że aplikacja internetowa działa na porcie 90/TCP, a nie 4200/TCP.
+
+#### Uruchomienie systemu:
+W przypadku instalacji produkcyjnej, uruchomienie systemu wymaga zaledwie kilku kroków.
+* Korzystamy z jednego pliku konfiguracyjnego `app-prod.yml`, i uruchamiamy go poleceniem 
+`docker-compose -f app-prod.yml up -d`.
+* Następnie należy powtórzyć krok z inicjalizacją bazy influx, wg zawartości skryptu z `scripts/influx_setup.sh
+` analogicznie jak opisano w konfiguracji deweloperskiej.
+
+Powyższe kroki powinny być wystarczające - poleceniem `docker ps -a` możemy zweryfikować czy wszystkie kontenery dzia
+łają.
+
+Po uruchomieniu, w domyślnej konfiguracji z pliku `app-prod.yml`, aplikacje będą dostępne pod adresami:
+* http://localhost:90/ - aplikacja internetowa `cloudberry-ng` (frontend)
+* http://localhost:9000/ - aplikacja serwerowa `cloudberry-cb` (backend)
+
+Dodatkowo
+* http://localhost:9999/ - interfejs graficzny bazy danych InfluxDB.
+* http://localhost:9000/swagger-ui - dokumentacja REST API aplikacji serwerowej
 
 ---
 
