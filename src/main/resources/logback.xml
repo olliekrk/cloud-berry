@@ -3,6 +3,6 @@
     <property name="PATTERN"
               value="%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n"/>
 
-    <include file="src/main/resources/logback/kafka.xml"/>
-    <include file="src/main/resources/logback/default.xml"/>
+    <include resource="logback/kafka.xml"/>
+    <include resource="logback/default.xml"/>
 </configuration>
