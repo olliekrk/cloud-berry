@@ -42,3 +42,22 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 #### Setup:
 1. run `npm install` in the main project directory
 2. for development use `ng start`
+
+#### Runnning on Docker:
+1. `docker build -t cloudberry-ng:latest .`
+2. `docker run --rm --name cloudberry-ng -d -p 90:80/tcp cloudberry-ng:latest`
+3. UI should be accessible via `http://localhost:90`
+
+#### Publishing new version to Docker Hub:
+1. `docker build -t cloudberry-ng:latest .`
+2. `docker login --username=DOCKERHUB_USERNAME`
+3. Enter Password if prompted
+4. docker tag <local-image|cloudberry-ng>:<tagname|latest> <dockerhub-repo|olliekrk/cloudberry-ng>:<tagname|latest>
+5. Full example: 
+```
+docker build -t cloudberry-ng:latest .
+docker login --username=olliekrk
+Password:
+docker tag cloudberry-ng:latest olliekrk/cloudberry-ng:latest
+docker push olliekrk/cloudberry-ng:latest
+```
