@@ -77,7 +77,7 @@ public class RawDataRest {
     public ExperimentComputation uploadAgeFile(
             @PathVariable String experimentName,
             @RequestPart MultipartFile file,
-            @RequestPart(required = false) Map<String, String> headersKeys,
+            @RequestPart Map<String, String> headersKeys,
             @RequestPart(required = false) Map<String, String> headersMeasurements,
             @RequestParam(required = false) String configurationName
     ) {

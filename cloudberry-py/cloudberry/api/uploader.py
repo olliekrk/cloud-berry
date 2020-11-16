@@ -25,9 +25,9 @@ class FileUploader(CloudberryApi):
 
 class AgeUploadDetails(UploadDetails):
     def __init__(self,
-                 headers_keys=None,
-                 headers_measurements=None,
-                 configuration_name=None) -> None:
+                 headers_keys: dict,
+                 headers_measurements: dict = None,
+                 configuration_name: str = None) -> None:
         self.headers_keys = headers_keys
         self.headers_measurements = headers_measurements
         self.configuration_name = configuration_name
