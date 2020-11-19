@@ -1,6 +1,8 @@
 package com.cloudberry.cloudberry.common.syntax;
 
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -10,8 +12,10 @@ import java.util.stream.IntStream;
 
 public abstract class MapSyntax {
     public static <K, V> Map<K, V> with(Map<K, V> map, K key, V value) {
-        map.put(key, value);
-        return map;
+        return ImmutableMap.<K, V>builder()
+                .putAll(map)
+                .put(key, value)
+                .build();
     }
 
     public static <K, V> Map<K, V> merged(Map<K, V>... maps) {

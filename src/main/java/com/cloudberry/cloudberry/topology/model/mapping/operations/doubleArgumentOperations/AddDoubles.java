@@ -1,16 +1,14 @@
-package com.cloudberry.cloudberry.topology.model.mapping.operations;
+package com.cloudberry.cloudberry.topology.model.mapping.operations.doubleArgumentOperations;
 
-import com.cloudberry.cloudberry.topology.model.mapping.arguments.DoubleArgument;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgument;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class AddDoubles {
+public final class AddDoubles {
     public static Object calculateNewValue(List<? extends MappingArgument<Double>> arguments, Object oldValue) {
 //        List<? extends MappingArgument<Double>> mappingArguments = toDoubleArguments(arguments);
-        return (Double) oldValue + arguments.stream().mapToDouble(MappingArgument::getArgument).sum();
+        return Double.parseDouble(oldValue.toString()) +
+                arguments.stream().mapToDouble(MappingArgument::getArgument).sum();
     }
 
 //    @NotNull

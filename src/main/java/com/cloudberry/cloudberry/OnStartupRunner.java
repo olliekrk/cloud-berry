@@ -25,6 +25,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import static com.cloudberry.cloudberry.topology.service.bootstrap.DefaultTopologyProvider.VALUE_TO_MAP_A_LOT;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -54,7 +56,7 @@ public class OnStartupRunner implements ApplicationRunner {
                             Instant.now().plusSeconds(i),
                             measurementName,
                             Map.of("attempt", 1, "eventNumber", i, "valueToMap", 3.0, "populationLeft", 5000,
-                                   "populationRight", 3000
+                                   "populationRight", 3000, VALUE_TO_MAP_A_LOT, 10
                             ),
                             Map.of()
                     );

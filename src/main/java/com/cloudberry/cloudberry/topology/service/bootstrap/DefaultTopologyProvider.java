@@ -52,6 +52,36 @@ public class DefaultTopologyProvider {
                     )
             ));
 
+    public static final String VALUE_TO_MAP_A_LOT = "valueToMapALot";
+    private static final MappingExpression HUGE_MAPPING_EXPRESSION_1 = new MappingExpression(
+            List.of(
+                    new MappingEvaluation<Double>(
+                            VALUE_TO_MAP_A_LOT,
+                            FIELDS,
+                            OperationEnum.ADD_DOUBLES,
+                            List.of(new DoubleArgument(8.0), new DoubleArgument(2.0))
+                    ),
+                    new MappingEvaluation<Double>(
+                            VALUE_TO_MAP_A_LOT,
+                            FIELDS,
+                            OperationEnum.SUBTRACT_DOUBLES,
+                            List.of(new DoubleArgument(5.0))
+                    ),
+                    new MappingEvaluation<Double>(
+                            VALUE_TO_MAP_A_LOT,
+                            FIELDS,
+                            OperationEnum.MULTIPLY_DOUBLES,
+                            List.of(new DoubleArgument(3.0))
+                    ),
+                    new MappingEvaluation<Double>(
+                            VALUE_TO_MAP_A_LOT,
+                            FIELDS,
+                            OperationEnum.DIVIDE_DOUBLES,
+                            List.of(new DoubleArgument(2.0))
+                    )
+            ));
+
+
     private static final MappingExpression MAPPING_EXPRESSION_2 = new MappingExpression(
             List.of(new MappingEvaluation<>(
                             "populationCombined",
@@ -70,16 +100,20 @@ public class DefaultTopologyProvider {
         var counterNode1 = new CounterNode("counterBeforeFilter", MetricsIndex.TEST_COUNTER_BEFORE_FILTER);
         var filterNode = new FilterNode("filter", FILTER_EXPRESSION);
         var mapNode = new MapNode("mapAddDoubles", MAPPING_EXPRESSION_1);
+        var mapNodeHuge = new MapNode("mapNodeHuge", HUGE_MAPPING_EXPRESSION_1);
         var mapNodeCombining = new MapNode("mapAddDifferentFields", MAPPING_EXPRESSION_2);
         var counterNode2 = new CounterNode("counterAfterFilter", MetricsIndex.TEST_COUNTER_AFTER_FILTER);
         var sinkNode = new SinkNode("sink", influxConfig.getDefaultStreamsBucketName());
 
-        val allNodes = List.of(rootNode, counterNode1, filterNode, mapNode, mapNodeCombining, counterNode2, sinkNode);
+        val allNodes = List.of(rootNode, counterNode1, filterNode, mapNode, mapNodeHuge, mapNodeCombining, counterNode2,
+                               sinkNode
+        );
 
         topology.addEdge(rootNode, counterNode1, true);
         topology.addEdge(counterNode1, filterNode, true);
         topology.addEdge(filterNode, mapNode, true);
-        topology.addEdge(mapNode, mapNodeCombining, true);
+        topology.addEdge(mapNode, mapNodeHuge, true);
+        topology.addEdge(mapNodeHuge, mapNodeCombining, true);
         topology.addEdge(mapNodeCombining, counterNode2, true);
         topology.addEdge(counterNode2, sinkNode, true);
 
