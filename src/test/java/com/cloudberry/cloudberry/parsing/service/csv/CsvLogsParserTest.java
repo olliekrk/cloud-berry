@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.service.csv;
 
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.util.FilesUtils;
 import com.cloudberry.cloudberry.util.PointTestUtils;
@@ -34,7 +35,9 @@ public class CsvLogsParserTest {
         var file = FilesUtils.getFileFromResources("/csv/csv_with_header_row.csv");
         var computationId = new ObjectId();
         var measurementName = "CsvLogsParserTest_Measurement";
-        var details = new CsvUploadDetails(csvTags, new ObjectId(), computationId, measurementName, null);
+        var details = new CsvUploadDetails(csvTags, new ObjectId(), computationId, measurementName, null,
+                                           FieldTypes.empty()
+        );
 
         var result = csvLogsParser.parseFile(file, details, "");
         var points = result.getPoints();
@@ -59,7 +62,9 @@ public class CsvLogsParserTest {
     @Test
     public void parseFileWhenNoHeadersInDetailsReadsFirstRowAsHeaders() throws IOException {
         var file = FilesUtils.getFileFromResources("/csv/csv_with_header_row.csv");
-        var details = new CsvUploadDetails(csvTags, new ObjectId(), new ObjectId(), "anything", null);
+        var details = new CsvUploadDetails(csvTags, new ObjectId(), new ObjectId(), "anything", null,
+                                           FieldTypes.empty()
+        );
         var result = csvLogsParser.parseFile(file, details, "anything");
         var points = result.getPoints();
         assertEquals(numberOfValueRows, points.size());
@@ -70,7 +75,9 @@ public class CsvLogsParserTest {
     @Test
     public void parseFileWhenHeadersProvidedInDetailsReadsFirstRowAsValues() throws IOException {
         var file = FilesUtils.getFileFromResources("/csv/csv_without_header_row.csv");
-        var details = new CsvUploadDetails(csvTags, new ObjectId(), new ObjectId(), "anything", csvHeaders);
+        var details = new CsvUploadDetails(csvTags, new ObjectId(), new ObjectId(), "anything", csvHeaders,
+                                           FieldTypes.empty()
+        );
         var result = csvLogsParser.parseFile(file, details, "anything");
         var points = result.getPoints();
         assertEquals(numberOfValueRows, points.size());
