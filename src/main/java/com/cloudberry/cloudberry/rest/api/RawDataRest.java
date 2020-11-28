@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.analytics.model.basic.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.model.csv.CsvUploadDetails;
 import com.cloudberry.cloudberry.rest.exceptions.RestException;
@@ -79,9 +80,16 @@ public class RawDataRest {
             @RequestPart MultipartFile file,
             @RequestPart Map<String, String> headersKeys,
             @RequestPart(required = false) Map<String, String> headersMeasurements,
+            @RequestPart(name = "raws", required = false) List<String> rawsParam,
             @RequestParam(required = false) String configurationName
     ) {
-        var uploadDetails = new AgeUploadDetails(headersKeys, headersMeasurements, configurationName);
+        var fieldTypes = rawsParam == null ? FieldTypes.empty() : FieldTypes.allStrings(rawsParam);
+        var uploadDetails = new AgeUploadDetails(
+                headersKeys,
+                headersMeasurements,
+                configurationName,
+                fieldTypes
+                );
         return rawDataService.uploadAgeFile(file, experimentName, uploadDetails);
     }
 
@@ -91,6 +99,7 @@ public class RawDataRest {
             @RequestPart MultipartFile file,
             @RequestPart(name = "tags", required = false) List<String> tagsParam,
             @RequestPart(name = "headers", required = false) List<String> headersParam,
+            @RequestPart(name = "raws", required = false) List<String> rawsParam,
             @RequestParam String configurationIdHex,
             @RequestParam(required = false) String computationId,
             @RequestParam(required = false) String measurementName,
@@ -103,13 +112,15 @@ public class RawDataRest {
             throw new InvalidComputationIdException(List.of(computationId));
         }
 
+        var fieldTypes = rawsParam == null ? FieldTypes.empty() : FieldTypes.allStrings(rawsParam);
         var firstRecordAsHeaders = hasHeaders.equals("true");
         var uploadDetails = new CsvUploadDetails(
                 tagsParam == null ? List.of() : tagsParam,
                 configurationId,
                 Optional.ofNullable(computationId).filter(ObjectId::isValid).map(ObjectId::new).orElse(null),
                 measurementName,
-                firstRecordAsHeaders || headersParam == null ? null : headersParam
+                firstRecordAsHeaders || headersParam == null ? null : headersParam,
+                fieldTypes
         );
         return rawDataService.uploadCsvFile(file, experimentName, uploadDetails);
     }

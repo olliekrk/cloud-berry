@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.model.age;
 
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import lombok.Value;
 import org.springframework.lang.Nullable;
@@ -40,13 +41,17 @@ public class AgeUploadDetails implements UploadDetails {
     @Nullable
     String configurationName;
 
+    FieldTypes fieldTypes;
+
     public AgeUploadDetails(
             @Nullable Map<String, String> headersKeys,
             @Nullable Map<String, String> headersMeasurements,
-            @Nullable String configurationName
+            @Nullable String configurationName,
+            FieldTypes fieldTypes
     ) {
         this.headersKeys = Optional.ofNullable(headersKeys).orElse(Map.of());
         this.headersMeasurements = Optional.ofNullable(headersMeasurements).orElse(Map.of());
         this.configurationName = configurationName;
+        this.fieldTypes = fieldTypes;
     }
 }

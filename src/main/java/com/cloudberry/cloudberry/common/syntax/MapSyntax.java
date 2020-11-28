@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,13 +33,10 @@ public abstract class MapSyntax {
         return overrideParams ? newParams : merged(prevParams, newParams);
     }
 
-    public static <K, V, R> Map<K, R> zippedArrays(K[] keys, V[] values, Function<V, R> valuesMapper) {
+    public static <K, V, R> Map<K, R> zippedArrays(K[] keys, V[] values, BiFunction<K, V, R> valuesMapper) {
         return IntStream.range(0, keys.length)
                 .boxed()
-                .collect(Collectors.toMap(i -> keys[i], i -> valuesMapper.apply(values[i])));
+                .collect(Collectors.toMap(i -> keys[i], i -> valuesMapper.apply(keys[i], values[i])));
     }
 
-    public static <K, V> Map<K, V> zippedArrays(K[] keys, V[] values) {
-        return zippedArrays(keys, values, Function.identity());
-    }
 }

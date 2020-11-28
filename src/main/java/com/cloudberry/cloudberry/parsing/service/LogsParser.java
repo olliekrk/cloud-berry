@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.service;
 
+import com.cloudberry.cloudberry.parsing.model.FieldType;
 import com.cloudberry.cloudberry.parsing.model.ParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import io.vavr.control.Try;
@@ -25,7 +26,11 @@ public interface LogsParser<D extends UploadDetails> {
         ).getOrElse(() -> Instant.EPOCH);
     }
 
-    default Object parseField(String value) {
-        return Try.of(() -> (Object) Double.parseDouble(value)).getOrElse(value);
+    default Object parseField(String rawValue, FieldType fieldType) {
+        Object parsed = rawValue;
+        if (fieldType.equals(FieldType.NUMBER)) {
+            parsed = Try.of(() -> (Object) Double.parseDouble(rawValue)).getOrElse(rawValue);
+        }
+        return parsed;
     }
 }

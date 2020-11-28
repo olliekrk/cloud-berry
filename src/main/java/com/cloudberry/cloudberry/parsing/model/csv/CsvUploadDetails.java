@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.model.csv;
 
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.UploadDetails;
 import lombok.Value;
 import org.apache.commons.csv.CSVFormat;
@@ -43,6 +44,8 @@ public class CsvUploadDetails implements UploadDetails {
      */
     @Nullable
     List<String> headers;
+
+    FieldTypes fieldTypes;
 
     public CSVFormat determineCsvFormat() {
         if (headers == null) {

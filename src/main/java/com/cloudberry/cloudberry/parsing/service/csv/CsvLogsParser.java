@@ -74,7 +74,12 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return values.entrySet()
                 .stream()
                 .filter(entry -> !excluded.contains(entry.getKey()))
-                .map(entry -> Pair.of(entry.getKey(), parseField(entry.getValue())))
+                .map(entry -> {
+                    var field = entry.getKey();
+                    var fieldType = details.getFieldTypes().getOrDefault(field);
+                    var rawValue = entry.getValue();
+                    return Pair.of(field, parseField(rawValue, fieldType));
+                })
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
