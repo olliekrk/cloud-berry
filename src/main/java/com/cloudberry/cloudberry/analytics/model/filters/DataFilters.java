@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.db.influx.model;
+package com.cloudberry.cloudberry.analytics.model.filters;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,5 +23,9 @@ public class DataFilters {
         this.fieldFilters = Optional.ofNullable(fieldFilters).orElse(Map.of());
         this.tagFilters = Optional.ofNullable(tagFilters).orElse(Map.of());
         this.tagPresence = Optional.ofNullable(tagPresence).orElse(Set.of());
+    }
+
+    public static DataFilters empty(){
+        return new DataFilters(Map.of(), Map.of(), Set.of());
     }
 }

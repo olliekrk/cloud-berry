@@ -4,12 +4,11 @@ import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.api.ThresholdsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
 import com.cloudberry.cloudberry.analytics.util.FluxUtils;
-import com.cloudberry.cloudberry.analytics.util.computation.ComputationsRestrictionsFactory;
-import com.cloudberry.cloudberry.common.syntax.CollectionSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.Columns;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
@@ -45,13 +44,10 @@ public class ThresholdsSupplier implements ThresholdsApi {
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
-            InfluxQueryFields influxQueryFields
+            InfluxQueryFields influxQueryFields,
+            DataFilters dataFilters
     ) {
-        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
-                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
-                Optional.of(fieldName).map(RestrictionsFactory::hasField)
-        )));
-
+        var restrictions = RestrictionsFactory.combine(fieldName, dataFilters, influxQueryFields);
         return thresholdExceedingSeriesWithRestrictions(fieldName, thresholds, mode, influxQueryFields, restrictions);
     }
 
@@ -61,14 +57,10 @@ public class ThresholdsSupplier implements ThresholdsApi {
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> computationIds
+            List<ObjectId> computationIds,
+            DataFilters dataFilters
     ) {
-        var restrictions = RestrictionsFactory.everyRestriction(CollectionSyntax.flatten(List.of(
-                influxQueryFields.getMeasurementNameOptional().map(RestrictionsFactory::measurement),
-                Optional.of(fieldName).map(RestrictionsFactory::hasField),
-                Optional.of(computationIds).map(ComputationsRestrictionsFactory::computationIdIn)
-        )));
-
+        var restrictions = RestrictionsFactory.combine(fieldName, dataFilters, influxQueryFields, computationIds);
         return thresholdExceedingSeriesWithRestrictions(fieldName, thresholds, mode, influxQueryFields, restrictions);
     }
 

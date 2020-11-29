@@ -1,8 +1,8 @@
 package com.cloudberry.cloudberry.db.influx.service;
 
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
-import com.cloudberry.cloudberry.db.influx.model.DataFilters;
 import com.cloudberry.cloudberry.db.influx.util.FluxQueryUtil;
 import com.cloudberry.cloudberry.db.influx.util.RestrictionsFactory;
 import com.influxdb.client.InfluxDBClient;

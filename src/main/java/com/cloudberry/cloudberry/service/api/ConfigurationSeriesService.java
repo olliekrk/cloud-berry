@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
 import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
@@ -32,12 +33,13 @@ public class ConfigurationSeriesService {
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> configurationIds
+            List<ObjectId> configurationIds,
+            DataFilters dataFilters
     ) {
         var allSeries = configurationIds
                 .stream()
                 .flatMap(id -> configurationSeriesCreator
-                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id, dataFilters)
                         .stream()
                 )
                 .collect(Collectors.toList());
@@ -53,10 +55,11 @@ public class ConfigurationSeriesService {
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
-            String experimentName
+            String experimentName,
+            DataFilters dataFilters
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        var bestN = getNBestConfigurations(n, fieldName, optimization, influxQueryFields, configurationIds);
+        var bestN = getNBestConfigurations(n, fieldName, optimization, influxQueryFields, configurationIds, dataFilters);
         var bestNAverageRenamed = bestN.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return bestN.withAverageSeries(bestNAverageRenamed);
@@ -67,9 +70,10 @@ public class ConfigurationSeriesService {
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> configurationIds
+            List<ObjectId> configurationIds,
+            DataFilters dataFilters
     ) {
-        var configurationSeries = getConfigurationsSeries(fieldName, influxQueryFields, configurationIds);
+        var configurationSeries = getConfigurationsSeries(fieldName, influxQueryFields, configurationIds, dataFilters);
 
         var exceeding = analyticsApi.getThresholdsApi()
                 .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, configurationSeries);
@@ -83,11 +87,12 @@ public class ConfigurationSeriesService {
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            String experimentName
+            String experimentName,
+            DataFilters dataFilters
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
         var exceeding =
-                getConfigurationsExceedingThresholds(fieldName, thresholds, mode, influxQueryFields, configurationIds);
+                getConfigurationsExceedingThresholds(fieldName, thresholds, mode, influxQueryFields, configurationIds, dataFilters);
         var exceedingAverageRenamed = exceeding.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return exceeding.withAverageSeries(exceedingAverageRenamed);
@@ -97,11 +102,12 @@ public class ConfigurationSeriesService {
     public SeriesPack getConfigurations(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> configurationIds
+            List<ObjectId> configurationIds,
+            DataFilters dataFilters
     ) {
         var series = configurationIds.stream()
                 .flatMap(id -> configurationSeriesCreator
-                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id, dataFilters)
                         .stream()
                 )
                 .collect(Collectors.toList());
@@ -115,10 +121,11 @@ public class ConfigurationSeriesService {
     public SeriesPack getConfigurationsForExperiment(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            String experimentName
+            String experimentName,
+            DataFilters dataFilters
     ) {
         var configurationIds = metadataService.findAllConfigurationIdsForExperiment(experimentName);
-        var series = getConfigurations(fieldName, influxQueryFields, configurationIds);
+        var series = getConfigurations(fieldName, influxQueryFields, configurationIds, dataFilters);
         var seriesAverageRenamed = series.getAverageSeries().map(s -> s.renamed(experimentName));
 
         return series.withAverageSeries(seriesAverageRenamed);
@@ -127,11 +134,12 @@ public class ConfigurationSeriesService {
     private Map<ObjectId, DataSeries> getConfigurationsSeries(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> configurationsIds
+            List<ObjectId> configurationsIds,
+            DataFilters dataFilters
     ) {
         return configurationsIds.stream()
                 .flatMap(id -> configurationSeriesCreator
-                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id)
+                        .movingAverageConfigurationSeries(fieldName, influxQueryFields, id, dataFilters)
                         .map(configurationSeries -> Tuple.of(id, configurationSeries))
                         .stream()
                 )

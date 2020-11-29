@@ -2,7 +2,7 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.basic.DataPoint;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
-import com.cloudberry.cloudberry.db.influx.model.DataFilters;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.db.mongo.data.metadata.ExperimentComputation;
 import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;

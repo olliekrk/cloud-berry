@@ -3,6 +3,7 @@ import requests
 from .backend import CloudberryApi, CloudberryConfig
 from .backend.exceptions import *
 from .constants import *
+from .data import DataFilters
 from .json_util import JSONUtil
 from .model import OptimizationGoal, OptimizationKind, CriteriaMode, Thresholds, ThresholdsType, DataSeriesPack
 from .model.metadata import *
@@ -17,13 +18,20 @@ class ComputationSeries(CloudberryApi):
     def for_computations(self,
                          computations: List[ExperimentComputation],
                          field_name: str,
-                         api_params: SeriesApiParams = None) -> DataSeriesPack:
+                         api_params: SeriesApiParams = None,
+                         data_filters: DataFilters = None) -> DataSeriesPack:
         url = f'{self.base_url}/comparison'
         params = AnalyticsUtil.with_api_params({
             'fieldName': field_name
         }, api_params)
+        ids = get_ids_for_computations(computations)
+        json = {
+            'ids': ids,
+        }
+        if data_filters is not None:
+            json['filters'] = data_filters.make_dto()
         return AnalyticsUtil.unpack(
-            lambda: requests.post(url=url, params=params, json=get_ids_for_computations(computations))
+            lambda: requests.post(url=url, params=params, json=json)
         )
 
     def for_configuration(self,

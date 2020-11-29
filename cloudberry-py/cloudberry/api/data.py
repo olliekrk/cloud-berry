@@ -18,7 +18,16 @@ class DataFilters:
         self.tags_presence = tags_presence
         self.fields = fields
         if computation is not None:
+            if tags is None:
+                self.tags = {}
             tags['computationId'] = computation.computation_id_hex
+
+    def make_dto(self) -> dict:
+        return {
+            'tagFilters': self.tags,
+            'tagPresence': self.tags_presence,
+            'fieldFilters': self.fields,
+        }
 
 
 class Data(CloudberryApi):
@@ -46,7 +55,7 @@ class Data(CloudberryApi):
         url = f'{self.base_url}/find'
         params = Data.build_params(measurement_name, bucket_name)
 
-        response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
+        response = requests.post(url, params=params, json=filters.make_dto())
         return DataSeries.from_json(response.json())
 
     def delete_data(self,
@@ -56,7 +65,7 @@ class Data(CloudberryApi):
         url = f'{self.base_url}/delete'
         params = Data.build_params(measurement_name, bucket_name)
 
-        response = requests.post(url, params=params, json=Data._build_filters_dto(filters))
+        response = requests.post(url, params=params, json=filters.make_dto())
         return response.ok
 
     @staticmethod
@@ -68,11 +77,3 @@ class Data(CloudberryApi):
         if bucket_name is not None:
             params['bucketName'] = bucket_name
         return params
-
-    @staticmethod
-    def _build_filters_dto(filters: DataFilters) -> dict:
-        return {
-            'tagFilters': filters.tags,
-            'tagPresence': filters.tags_presence,
-            'fieldFilters': filters.fields,
-        }

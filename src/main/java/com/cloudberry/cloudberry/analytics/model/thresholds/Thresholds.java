@@ -39,4 +39,9 @@ public class Thresholds {
             return upper == null || lower == null || lower <= upper; // lower threshold must be <= than upper
         }
     }
+
+    // returns invalid empty thresholds
+    public static Thresholds empty() {
+        return new Thresholds(null, null);
+    }
 }
