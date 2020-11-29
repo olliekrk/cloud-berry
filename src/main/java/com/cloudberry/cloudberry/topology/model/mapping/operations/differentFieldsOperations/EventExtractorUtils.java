@@ -1,4 +1,4 @@
-package com.cloudberry.cloudberry.topology.model.mapping.operations;
+package com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations;
 
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
@@ -9,9 +9,10 @@ import lombok.val;
 import java.util.List;
 import java.util.stream.Stream;
 
-public final class AddDifferentFields {
-    public static Object calculateNewValue(
-            List<? extends MappingArgument<EntryMapRecord>> arguments, ComputationEvent event
+public final class EventExtractorUtils {
+    public static Stream<Double> getStreamOfDoubles(
+            List<? extends MappingArgument<EntryMapRecord>> arguments,
+            ComputationEvent event
     ) {
         return arguments.stream().map(MappingArgument::getArgument)
                 .map(entryMapRecord -> {
@@ -22,8 +23,6 @@ public final class AddDifferentFields {
                     };
                 })
                 .flatMap(valueToAdd -> Try.of(() -> Stream.of(Double.valueOf(valueToAdd.toString())))
-                        .getOrElse(Stream.empty()))
-                .mapToDouble(d -> d)
-                .sum();
+                        .getOrElse(Stream.empty()));
     }
 }

@@ -4,7 +4,10 @@ import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgument;
-import com.cloudberry.cloudberry.topology.model.mapping.operations.AddDifferentFields;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations.AddDifferentFields;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations.DivideDifferentFields;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations.MultiplyDifferentFields;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations.SubtractDifferentFields;
 import com.cloudberry.cloudberry.topology.model.mapping.operations.doubleArgumentOperations.AddDoubles;
 import com.cloudberry.cloudberry.topology.model.mapping.operations.doubleArgumentOperations.DivideDoubles;
 import com.cloudberry.cloudberry.topology.model.mapping.operations.doubleArgumentOperations.MultiplyDoubles;
@@ -44,6 +47,18 @@ public class Mapper {
                         oldValue
                 );
                 case ADD_DIFFERENT_FIELDS -> AddDifferentFields.calculateNewValue(
+                        (List<? extends MappingArgument<EntryMapRecord>>) arguments,
+                        event
+                );
+                case SUBTRACT_DIFFERENT_FIELDS -> SubtractDifferentFields.calculateNewValue(
+                        (List<? extends MappingArgument<EntryMapRecord>>) arguments,
+                        event
+                );
+                case MULTIPLY_DIFFERENT_FIELDS -> MultiplyDifferentFields.calculateNewValue(
+                        (List<? extends MappingArgument<EntryMapRecord>>) arguments,
+                        event
+                );
+                case DIVIDE_DIFFERENT_FIELDS -> DivideDifferentFields.calculateNewValue(
                         (List<? extends MappingArgument<EntryMapRecord>>) arguments,
                         event
                 );
