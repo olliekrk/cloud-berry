@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class BootstrappingContext {
@@ -21,9 +20,9 @@ public class BootstrappingContext {
     private DirectedAcyclicGraph<ObjectId, TopologyEdge> topologyGraph;
 
     /**
-     * Node ID -> Node output KStream
+     * Node output (id, edge name) -> Node output KStream
      */
-    private Map<ObjectId, KStream<String, ComputationEvent>> streams;
+    private Map<OutgoingEdge, KStream<String, ComputationEvent>> streams;
 
     public BootstrappingContext(Topology topology) {
         this.topology = topology;
@@ -31,29 +30,29 @@ public class BootstrappingContext {
         this.streams = new HashMap<>();
     }
 
+    public void putStream(ObjectId nodeId, String edgeName, KStream<String, ComputationEvent> stream) {
+        streams.put(new OutgoingEdge(nodeId, edgeName), stream);
+    }
+
     public void putStream(ObjectId nodeId, KStream<String, ComputationEvent> stream) {
-        streams.put(nodeId, stream);
+        streams.put(new OutgoingEdge(nodeId, TopologyEdge.DEFAULT_NAME), stream);
     }
 
-    public Optional<KStream<String, ComputationEvent>> getStream(ObjectId nodeId) {
-        return Optional.ofNullable(streams.get(nodeId));
+    public Optional<KStream<String, ComputationEvent>> getStream(ObjectId nodeId, String edgeName) {
+        return Optional.ofNullable(streams.get(new OutgoingEdge(nodeId, edgeName)));
     }
 
-    public KStream<String, ComputationEvent> getStreamOrThrow(ObjectId nodeId) {
-        return getStream(nodeId).orElseThrow(() -> new MissingStreamException(nodeId));
+    public KStream<String, ComputationEvent> getStreamOrThrow(ObjectId nodeId, String edgeName) {
+        return getStream(nodeId, edgeName).orElseThrow(() -> new MissingStreamException(nodeId));
     }
 
-    public void removeStream(ObjectId nodeId) {
-        streams.remove(nodeId);
+    public void removeStream(ObjectId nodeId, String edgeName) {
+        streams.remove(new OutgoingEdge(nodeId, edgeName));
     }
 
-    public Set<ObjectId> getPredecessorNodesIds(ObjectId nodeId) {
+    public Set<TopologyEdge> getIncomingEdges(ObjectId nodeId) {
         var graph = topologyGraph;
-        return graph
-                .incomingEdgesOf(nodeId)
-                .stream()
-                .map(graph::getEdgeSource)
-                .collect(Collectors.toSet());
+        return graph.incomingEdgesOf(nodeId);
     }
 
 }

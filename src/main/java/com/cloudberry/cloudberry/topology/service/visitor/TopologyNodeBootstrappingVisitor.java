@@ -37,27 +37,27 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
 
     @Override
     public void visit(SinkNode node) {
-        var mergedStream = mergePredecessors(node);
+        var mergedStream = mergeIncomingEdges(node);
         mergedStream.foreach((key, event) -> sinkProcessor.process(event, node.getOutputBucketName()));
     }
 
     @Override
     public void visit(CounterNode node) {
-        var mergedStream = mergePredecessors(node);
+        var mergedStream = mergeIncomingEdges(node);
         var peekedStream = mergedStream.peek((key, event) -> metricsRegistry.incrementCounter(node.getMetricName()));
         context.putStream(node.getId(), peekedStream);
     }
 
     @Override
     public void visit(FilterNode node) {
-        var mergedStream = mergePredecessors(node);
+        var mergedStream = mergeIncomingEdges(node);
         var filteredStream = mergedStream.filter((key, event) -> ExpressionChecker.check(event, node.getExpression()));
         context.putStream(node.getId(), filteredStream);
     }
 
     @Override
     public void visit(MapNode node) {
-        var mergedStream = mergePredecessors(node);
+        var mergedStream = mergeIncomingEdges(node);
         var mappedStream = mergedStream.map(((key, event) -> KeyValue.pair(
                 key,
                 Mapper.calculateNewComputationEvent(
@@ -70,18 +70,19 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
 
     @Override
     public void visit(MergeNode node) {
-        var mergedStream = mergePredecessors(node);
+        var mergedStream = mergeIncomingEdges(node);
         context.putStream(node.getId(), mergedStream);
     }
 
-    private KStream<String, ComputationEvent> mergePredecessors(TopologyNode node) {
-        var predecessorsIds = context.getPredecessorNodesIds(node.getId());
-        var mergedStreamOpt = predecessorsIds
+    private KStream<String, ComputationEvent> mergeIncomingEdges(TopologyNode node) {
+        var incomingEdges = context.getIncomingEdges(node.getId());
+
+        var mergedStreamOpt = incomingEdges
                 .stream()
-                .map(context::getStreamOrThrow)
+                .map(edge -> context.getStreamOrThrow(edge.getSource(), edge.getName()))
                 .reduce(KStream::merge);
 
-        predecessorsIds.forEach(context::removeStream);
+        incomingEdges.forEach(edge -> context.removeStream(edge.getSource(), edge.getName()));
         return mergedStreamOpt.orElseThrow(() -> new BootstrappingException("Missing stream!") {}); // should not happen
     }
 
