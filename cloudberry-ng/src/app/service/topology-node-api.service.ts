@@ -35,6 +35,8 @@ export class TopologyNodeApiService {
         return this.rest.createSinkNode(json.name, json.outputBucketName).pipe(share());
       case TopologyNodeType.Merge:
         return this.rest.createMergeNode(json.name).pipe(share());
+      case TopologyNodeType.Branch:
+        return this.rest.createBranchNode(json.name, json.filterExpression).pipe(share());
       default:
         return EMPTY;
     }

@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.topology.service.visitor;
 
+import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
@@ -20,4 +21,6 @@ public interface TopologyNodeVisitor {
     void visit(MapNode node);
 
     void visit(MergeNode node);
+
+    void visit(BranchNode branchNode);
 }

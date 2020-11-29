@@ -5,8 +5,10 @@ import com.cloudberry.cloudberry.kafka.processing.processor.ComputationEventProc
 import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
+import com.cloudberry.cloudberry.topology.model.branching.BranchOutput;
 import com.cloudberry.cloudberry.topology.model.filtering.ExpressionChecker;
 import com.cloudberry.cloudberry.topology.model.mapping.Mapper;
+import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
@@ -72,6 +74,19 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
     public void visit(MergeNode node) {
         var mergedStream = mergeIncomingEdges(node);
         context.putStream(node.getId(), mergedStream);
+    }
+
+    @Override
+    public void visit(BranchNode node) {
+        var mergedStream = mergeIncomingEdges(node);
+        @SuppressWarnings("unchecked")
+        var branchedStreams = mergedStream.branch(
+                (key, event) -> ExpressionChecker.check(event, node.getExpression()), // first stream
+                (key, event) -> true // second stream (matches all the rest)
+        );
+
+        context.putStream(node.getId(), BranchOutput.MATCHED.name(), branchedStreams[0]);
+        context.putStream(node.getId(), BranchOutput.UNMATCHED.name(), branchedStreams[1]);
     }
 
     private KStream<String, ComputationEvent> mergeIncomingEdges(TopologyNode node) {

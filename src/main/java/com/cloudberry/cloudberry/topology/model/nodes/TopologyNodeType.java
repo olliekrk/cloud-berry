@@ -7,4 +7,5 @@ public enum TopologyNodeType {
     Map,
     Filter,
     Merge,
+    Branch,
 }

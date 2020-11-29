@@ -48,4 +48,8 @@ export class TopologyNodeRestService {
     return this.httpClient.post<TopologyNode>(`${this.baseUrl}/merge`, null, {params});
   }
 
+  createBranchNode(name: string, filterExpression: FilterExpression): Observable<TopologyNode> {
+    const params = {name};
+    return this.httpClient.post<TopologyNode>(`${this.baseUrl}/branch`, filterExpression, {params});
+  }
 }

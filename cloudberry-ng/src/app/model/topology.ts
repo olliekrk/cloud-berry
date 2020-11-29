@@ -33,6 +33,7 @@ export enum TopologyNodeType {
   Map = "Map",
   Counter = "Counter",
   Merge = "Merge",
+  Branch = "Branch",
 }
 
 export type FilterExpression = object;
@@ -45,4 +46,5 @@ export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> 
   [TopologyNodeType.Map]: ["name", "mappingExpression"],
   [TopologyNodeType.Counter]: ["name", "metricName"],
   [TopologyNodeType.Merge]: ["name"],
+  [TopologyNodeType.Branch]: ["name", "filterExpression"],
 };

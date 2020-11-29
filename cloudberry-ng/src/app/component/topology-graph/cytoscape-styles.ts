@@ -8,7 +8,8 @@ export const nodesColors: Partial<Record<TopologyNodeType, string>> = {
   [TopologyNodeType.Map]: "#fef",
   [TopologyNodeType.Merge]: "#ac3",
   [TopologyNodeType.Root]: "#8ef",
-  [TopologyNodeType.Sink]: "#cf4",
+  [TopologyNodeType.Sink]: "#488",
+  [TopologyNodeType.Branch]: "#ff0",
 };
 
 export const cyStylesheets: cytoscape.Stylesheet[] = [

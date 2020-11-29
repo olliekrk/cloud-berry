@@ -5,6 +5,7 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeI
 import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
 import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
+import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
@@ -61,6 +62,11 @@ public class TopologyNodeRest {
     @PostMapping("/merge")
     TopologyNode createMergeNode(@RequestParam String name) {
         return topologyNodeService.save(new MergeNode(name));
+    }
+
+    @PostMapping("/branch")
+    TopologyNode createBranchNode(@RequestParam String name, @RequestBody FilterExpression filterExpression) {
+        return topologyNodeService.save(new BranchNode(name, filterExpression));
     }
 
     @GetMapping("/all")
