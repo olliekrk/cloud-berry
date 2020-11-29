@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="cloudberry-py",
+    name="cloudberrypy",
     version="0.0.1",
     author="Olgierd Królik & Michał Magiera",
     author_email="dbiszkopter@gmail.com",
