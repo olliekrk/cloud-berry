@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
-import {TopologyData, TopologyNodeType} from "../../model";
+import {TopologyData, TopologyNode, TopologyNodeId, TopologyNodeType} from "../../model";
 import {notNull, TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
@@ -57,8 +57,8 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  openAddNodeDialog(): void {
-    this.dialog.open(AddNodeDialogComponent)
+  openAddNodeDialog(copiedNode?: TopologyNode): void {
+    this.dialog.open(AddNodeDialogComponent, {data: {copiedNode}})
       .afterClosed()
       .pipe(
         notNull(),
@@ -96,7 +96,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         {
           content: "Show details",
           select: node => {
-            const topologyNode = this.topologyData?.topologyNodes.find(tn => tn.id === node.id());
+            const topologyNode = this.findNodeById(node.id());
             if (topologyNode) {
               this.dialog.open(TopologyNodeDetailsInfoDialogComponent, {data: {topologyNode}});
             }
@@ -105,6 +105,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         {
           content: "Delete",
           select: node => this.deleteNode(node),
+        },
+        {
+          content: "Copy",
+          select: node => this.copyNode(node),
         },
       ],
       openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
@@ -203,6 +207,11 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       .subscribe(() => this.emitTopologyModified());
   }
 
+  private copyNode(node: any): void {
+    const topologyNode = this.findNodeById(node.id());
+    this.openAddNodeDialog(topologyNode);
+  }
+
   private addEdge(source: any, target: any): void {
     this.topologyApiService
       .addEdgeToTopology(this.topologyData.topology.id, source.id(), target.id(), false)
@@ -236,6 +245,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private emitTopologyModified(): void {
     this.topologyModified.emit();
+  }
+
+  private findNodeById(nodeId: TopologyNodeId): TopologyNode | undefined {
+    return this.topologyData?.topologyNodes.find(tn => tn.id === nodeId);
   }
 
   @HostListener("window:resize")
