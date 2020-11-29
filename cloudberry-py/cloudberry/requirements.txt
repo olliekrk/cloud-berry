@@ -1,0 +1,9 @@
+requests~=2.23.0
+pandas~=1.0.3
+colorhash~=1.0.2
+matplotlib==3.2.2
+plotly==4.11.0
+psutil==5.7.2 # plots export
+kaleido==0.0.3 # plots export
+numpy==1.19.2
+scikit-learn==0.23.2

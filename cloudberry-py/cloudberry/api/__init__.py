@@ -7,7 +7,6 @@ from .data import *
 from .deletion import Deletion
 from .metadata_api import Metadata
 from .model import *
-from .plots import DataSeriesPlots  # fixme: deprecated in favour of cloudberry.plots
 from .properties import ApiPropertiesIndex
 from .query import Query
 from .uploader import *
