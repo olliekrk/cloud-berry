@@ -156,12 +156,13 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }));
 
     const edgesArrays: cytoscape.EdgeDefinition[][] = Object.entries(topology.edges)
-      .map(([source, targets]) => targets
-        .map(target => ({
+      .map(([source, topologyEdges]) => topologyEdges
+        .map(edge => ({
           data: {
-            id: `${source}_${target}`,
-            source,
-            target
+            id: `${edge.source}_${edge.target}_${edge.name}`,
+            source: edge.source,
+            target: edge.target,
+            name: edge.name,
           },
           classes: "cy-edge",
         }))

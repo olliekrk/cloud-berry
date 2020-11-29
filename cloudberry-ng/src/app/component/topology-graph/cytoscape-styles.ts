@@ -26,6 +26,8 @@ export const cyStylesheets: cytoscape.Stylesheet[] = [
     selector: "edge",
     style: {
       width: 1,
+      content: "data(name)",
+      "font-size": 8,
       "line-color": "#ff0000",
       "target-arrow-shape": "triangle",
       "target-arrow-color": "#ff0000",

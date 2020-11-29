@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -42,7 +41,7 @@ public class Topology {
      * Directed edges representing the topology.
      * keys == vertices
      */
-    private Map<ObjectId, Set<ObjectId>> edges;
+    private Map<ObjectId, Set<TopologyEdge>> edges;
 
 
     /**
@@ -53,10 +52,6 @@ public class Topology {
         return graph.vertexSet().stream()
                 .filter(vertex -> graph.inDegreeOf(vertex) == 0) // root vertices have 0 incoming edges
                 .collect(Collectors.toSet());
-    }
-
-    public Set<ObjectId> findAdjacentVertices(TopologyNode node) {
-        return edges.getOrDefault(node.getId(), Set.of());
     }
 
     /**
@@ -72,18 +67,28 @@ public class Topology {
 
     public void addEdge(TopologyNode source, TopologyNode target, boolean addVertexToTopologyIfNotAdded) {
         Stream.of(source, target).forEach(node -> validateNodeExistsInTopology(node, addVertexToTopologyIfNotAdded));
-        edges.merge(source.getId(), Set.of(target.getId()), SetSyntax::merge);
+        edges.merge(source.getId(), Set.of(TopologyEdge.defaultEdge(source.getId(), target.getId())), SetSyntax::merge);
     }
 
     public void removeEdge(ObjectId source, ObjectId target) {
-        edges.merge(source, Set.of(), (a, b) -> SetSyntax.without(SetSyntax.merge(a, b), target));
+        edges.merge(
+                source,
+                Set.of(),
+                (a, b) -> SetSyntax.without(SetSyntax.merge(a, b), TopologyEdge.defaultEdge(source, target))
+        );
     }
 
     public void removeNode(ObjectId nodeId) {
         edges.remove(nodeId);
         edges = edges.entrySet()
                 .stream()
-                .map(entry -> Map.entry(entry.getKey(), SetSyntax.without(entry.getValue(), nodeId)))
+                .map(entry -> {
+                    var source = entry.getKey();
+                    var edgesUpdated = entry.getValue().stream()
+                            .filter(edge -> !edge.getTarget().equals(nodeId))
+                            .collect(Collectors.toSet());
+                    return Map.entry(source, edgesUpdated);
+                })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -99,11 +104,12 @@ public class Topology {
         return edges.keySet();
     }
 
-    public DirectedAcyclicGraph<ObjectId, DefaultEdge> constructGraph() {
+    public DirectedAcyclicGraph<ObjectId, TopologyEdge> constructGraph() {
         try {
-            var graphBuilder = DirectedAcyclicGraph.<ObjectId, DefaultEdge>createBuilder(DefaultEdge.class);
+            var graphBuilder = DirectedAcyclicGraph.<ObjectId, TopologyEdge>createBuilder(TopologyEdge.class);
             edges.keySet().forEach(graphBuilder::addVertex);
-            edges.forEach((source, targets) -> targets.forEach(target -> graphBuilder.addEdge(source, target)));
+            edges.forEach((source, edges) -> edges
+                    .forEach(edge -> graphBuilder.addEdge(edge.getSource(), edge.getTarget(), edge)));
             return graphBuilder.build();
         } catch (IllegalArgumentException e) { // thrown when DAG cannot be built
             log.warn("Topology is not an directed acyclic graph!", e);

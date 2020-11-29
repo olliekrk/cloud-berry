@@ -3,10 +3,10 @@ package com.cloudberry.cloudberry.topology.model.bootstrap;
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.MissingStreamException;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.TopologyEdge;
 import lombok.Data;
 import org.apache.kafka.streams.kstream.KStream;
 import org.bson.types.ObjectId;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Data
 public class BootstrappingContext {
     private Topology topology;
-    private DirectedAcyclicGraph<ObjectId, DefaultEdge> topologyGraph;
+    private DirectedAcyclicGraph<ObjectId, TopologyEdge> topologyGraph;
 
     /**
      * Node ID -> Node output KStream

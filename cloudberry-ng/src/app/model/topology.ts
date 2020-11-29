@@ -6,7 +6,13 @@ export interface Topology {
   name: string;
   userDefined: boolean;
   valid: boolean;
-  edges: { [source: string]: TopologyNodeId[] };
+  edges: { [source: string]: TopologyEdge[] };
+}
+
+export interface TopologyEdge {
+  source: TopologyNodeId;
+  target: TopologyNodeId;
+  name: string;
 }
 
 export interface TopologyNode {
