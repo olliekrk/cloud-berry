@@ -8,6 +8,7 @@ import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
+import com.cloudberry.cloudberry.topology.model.nodes.MergeNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
@@ -55,6 +56,11 @@ public class TopologyNodeRest {
     @PostMapping("/map")
     TopologyNode createMappingNode(@RequestParam String name, @RequestBody MappingExpression mappingExpression) {
         return topologyNodeService.save(new MapNode(name, mappingExpression));
+    }
+
+    @PostMapping("/merge")
+    TopologyNode createMergeNode(@RequestParam String name) {
+        return topologyNodeService.save(new MergeNode(name));
     }
 
     @GetMapping("/all")

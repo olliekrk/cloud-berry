@@ -10,6 +10,7 @@ import com.cloudberry.cloudberry.topology.model.mapping.Mapper;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
+import com.cloudberry.cloudberry.topology.model.nodes.MergeNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
@@ -65,6 +66,12 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
                 )
         )));
         context.putStream(node.getId(), mappedStream);
+    }
+
+    @Override
+    public void visit(MergeNode node) {
+        var mergedStream = mergePredecessors(node);
+        context.putStream(node.getId(), mergedStream);
     }
 
     private KStream<String, ComputationEvent> mergePredecessors(TopologyNode node) {

@@ -25,7 +25,8 @@ export enum TopologyNodeType {
   Sink = "Sink",
   Filter = "Filter",
   Map = "Map",
-  Counter = "Counter"
+  Counter = "Counter",
+  Merge = "Merge",
 }
 
 export type FilterExpression = object;
@@ -36,5 +37,6 @@ export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> 
   [TopologyNodeType.Sink]: ["name", "outputBucketName"],
   [TopologyNodeType.Filter]: ["name", "filterExpression"],
   [TopologyNodeType.Map]: ["name", "mappingExpression"],
-  [TopologyNodeType.Counter]: ["name", "metricName"]
+  [TopologyNodeType.Counter]: ["name", "metricName"],
+  [TopologyNodeType.Merge]: ["name"],
 };

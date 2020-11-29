@@ -10,7 +10,7 @@ import edgehandles from "cytoscape-edgehandles";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {AddNodeDialogComponent, AddNodeDialogResult} from "../add-node-dialog/add-node-dialog.component";
-import {cyStylesheets} from "./cytoscape-styles";
+import {cyStylesheets, nodeDefaultColor, nodesColors} from "./cytoscape-styles";
 import {switchMap} from "rxjs/operators";
 
 cytoscape.use(edgehandles);
@@ -37,7 +37,8 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   readonly layoutOptions = {
     name: "dagre",
-    rankDir: "LR"
+    rankDir: "LR",
+    animate: true,
   };
 
   constructor(private dialog: MatDialog,
@@ -145,6 +146,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       data: {
         id: node.id,
         name: node.name,
+        bgColor: nodesColors[node.nodeType] || nodeDefaultColor,
       }
     }));
 

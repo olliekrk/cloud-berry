@@ -5,5 +5,6 @@ public enum TopologyNodeType {
     Sink,
     Counter,
     Map,
-    Filter
+    Filter,
+    Merge,
 }
