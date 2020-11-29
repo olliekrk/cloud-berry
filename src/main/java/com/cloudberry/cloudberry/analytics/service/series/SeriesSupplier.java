@@ -51,7 +51,9 @@ public class SeriesSupplier implements SeriesApi {
                         Set.of(Columns.FIELD),
                         Columns.VALUE
                 )
-                .drop(InfluxDefaults.EXCLUDED_COLUMNS);
+                .drop(InfluxDefaults.EXCLUDED_COLUMNS)
+                .groupBy(List.of(CommonTags.COMPUTATION_ID))
+                .sort(List.of(Columns.TIME));
 
         return influxClient
                 .getQueryApi()

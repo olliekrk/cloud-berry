@@ -120,7 +120,9 @@ public class BestSeriesSupplier implements BestSeriesApi {
                         Set.of(CommonTags.COMPUTATION_ID, InfluxDefaults.Columns.TIME),
                         Set.of(InfluxDefaults.Columns.FIELD),
                         InfluxDefaults.Columns.VALUE
-                );
+                )
+                .groupBy(List.of(CommonTags.COMPUTATION_ID))
+                .sort(List.of(InfluxDefaults.Columns.TIME));
 
         return influxClient
                 .getQueryApi()

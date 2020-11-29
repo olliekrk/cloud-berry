@@ -29,6 +29,9 @@ public abstract class MovingAverageInMemoryOps {
             List<DataSeries> series,
             String fieldName
     ) {
+        if (series.size() == 1) {
+            return Optional.of(singleAverageSeries(series.get(0), fieldName));
+        }
         return movingAverageSeries(series, fieldName, true, true, true);
     }
 
@@ -45,6 +48,9 @@ public abstract class MovingAverageInMemoryOps {
             boolean skipIncompletePoints,
             boolean useWeightedAverage
     ) {
+        if (series.size() == 1) {
+            return Optional.of(singleAverageSeries(series.get(0), fieldName));
+        }
         if (useTimeShift) {
             series = TimeShiftOps.timeShiftIfPossible(series);
         }
@@ -85,9 +91,26 @@ public abstract class MovingAverageInMemoryOps {
                             STDDEV_KEY, bucketAvgStd._2
                     ));
                 })
+                .sorted(Comparator.comparing(m -> (Instant) m.get(InfluxDefaults.Columns.TIME)))
                 .collect(Collectors.toList());
 
         return Optional.of(new DataSeries(new SeriesInfo(AVERAGE_SERIES_NAME), averageSeriesData));
+    }
+
+    public static DataSeries singleAverageSeries(
+            DataSeries series,
+            String fieldName
+    ) {
+        var seriesData = series
+                .getFieldValueByTime(fieldName)
+                .stream()
+                .map(tuple -> Map.<String, Object>of(
+                        InfluxDefaults.Columns.TIME, tuple._1,
+                        fieldName, tuple._2,
+                        STDDEV_KEY, 0
+                ))
+                .collect(Collectors.toList());
+        return new DataSeries(new SeriesInfo(AVERAGE_SERIES_NAME), seriesData);
     }
 
     /**
