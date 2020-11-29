@@ -1,5 +1,6 @@
 package com.cloudberry.cloudberry.parsing.service.age;
 
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.util.FilesUtils;
@@ -59,7 +60,7 @@ class AgeLogsParserTest {
         return Try.of(() ->
                               ageLogsParser.parseFile(
                                       FilesUtils.getFileFromResources(TEST_FILE),
-                                      new AgeUploadDetails(TEST_FILE_KEYS, null, configurationName),
+                                      new AgeUploadDetails(TEST_FILE_KEYS, null, configurationName, FieldTypes.empty()),
                                       ""
                               )
         ).get();

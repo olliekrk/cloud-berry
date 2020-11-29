@@ -1,13 +1,20 @@
 package com.cloudberry.cloudberry.db.influx.util;
 
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
+import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
+import com.cloudberry.cloudberry.common.syntax.ListSyntax;
+import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import io.vavr.collection.Stream;
+import org.bson.types.ObjectId;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class RestrictionsFactory {
 
@@ -71,6 +78,43 @@ public abstract class RestrictionsFactory {
 
     public static Restrictions anyRestriction(Iterable<Restrictions> restrictions) {
         return Restrictions.or(Stream.ofAll(restrictions).toJavaArray(Restrictions[]::new));
+    }
+
+    public static Restrictions combine(
+            String fieldName,
+            DataFilters dataFilters,
+            InfluxQueryFields influxQueryFields
+    ) {
+        var measurementNameOpt = influxQueryFields.getMeasurementNameOptional();
+
+        var tagPresenceRestrictions = RestrictionsFactory.hasEveryTag(dataFilters.getTagPresence());
+        var tagRestrictions = RestrictionsFactory.everyTagEquals(dataFilters.getTagFilters());
+        var fieldRestrictions = RestrictionsFactory.anyFieldEquals(dataFilters.getFieldFilters());
+        var measurementRestriction = measurementNameOpt.map(RestrictionsFactory::measurement);
+        var comparedFieldRestriction = RestrictionsFactory.hasField(fieldName);
+
+        return RestrictionsFactory.everyRestriction(
+                java.util.stream.Stream.of(
+                        tagPresenceRestrictions,
+                        tagRestrictions,
+                        fieldRestrictions,
+                        measurementRestriction,
+                        Optional.of(comparedFieldRestriction)
+                ).flatMap(Optional::stream).collect(Collectors.toList())
+        );
+    }
+
+
+    public static Restrictions combine(
+            String fieldName,
+            DataFilters dataFilters,
+            InfluxQueryFields influxQueryFields,
+            List<ObjectId> computationIds
+    ) {
+        var computationsIdsHex = ListSyntax.mapped(computationIds, ObjectId::toHexString);
+        var combinedRestrictions = combine(fieldName, dataFilters, influxQueryFields);
+        var computationIdRestriction = RestrictionsFactory.tagIn(InfluxDefaults.CommonTags.COMPUTATION_ID, computationsIdsHex);
+        return Restrictions.and(combinedRestrictions, computationIdRestriction);
     }
 
     private static <T> Restrictions[] restrictionsFromMap(

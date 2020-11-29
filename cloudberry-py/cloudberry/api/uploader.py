@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 import requests
@@ -27,10 +26,12 @@ class AgeUploadDetails(UploadDetails):
     def __init__(self,
                  headers_keys: dict,
                  headers_measurements: dict = None,
-                 configuration_name: str = None) -> None:
+                 configuration_name: str = None,
+                 raw_fields: List[str] = None) -> None:
         self.headers_keys = headers_keys
         self.headers_measurements = headers_measurements
         self.configuration_name = configuration_name
+        self.raw_fields = raw_fields
 
 
 class AgeFileUploader(FileUploader):
@@ -45,8 +46,9 @@ class AgeFileUploader(FileUploader):
                 url,
                 files={
                     'file': file,
-                    'headersKeys': (None, json.dumps(details.headers_keys), 'application/json'),
-                    'headersMeasurements': (None, json.dumps(details.headers_measurements), 'application/json')
+                    'headersKeys': JSONUtil.multipart_payload(details.headers_keys),
+                    'headersMeasurements': JSONUtil.multipart_payload(details.headers_measurements),
+                    'rawFields': JSONUtil.multipart_payload(details.raw_fields),
                 },
                 params=params
             )
@@ -59,11 +61,13 @@ class CsvUploadDetails(UploadDetails):
                  tags_names,
                  configuration: ExperimentConfiguration,
                  computation: ExperimentComputation = None,
-                 measurement_name=None) -> None:
+                 measurement_name: str = None,
+                 raw_fields: List[str] = None) -> None:
         self.tags_names = tags_names
         self.configuration = configuration
         self.computation = computation
         self.measurement_name = measurement_name
+        self.raw_fields = raw_fields
 
 
 class CsvFileUploader(FileUploader):
@@ -74,8 +78,9 @@ class CsvFileUploader(FileUploader):
                                     details: CsvUploadDetails,
                                     headers: List[str]) -> ExperimentComputation:
         payload = {
-            'tags': CsvFileUploader.__payload_json(details.tags_names),
-            'headers': CsvFileUploader.__payload_json(headers),
+            'tags': JSONUtil.multipart_payload(details.tags_names),
+            'headers': JSONUtil.multipart_payload(headers),
+            'raws': JSONUtil.multipart_payload(details.raw_fields),
         }
         params = {
             'hasHeaders': 'false',
@@ -87,7 +92,8 @@ class CsvFileUploader(FileUploader):
                     experiment_name: str,
                     details: CsvUploadDetails) -> ExperimentComputation:
         payload = {
-            'tags': CsvFileUploader.__payload_json(details.tags_names),
+            'tags': JSONUtil.multipart_payload(details.tags_names),
+            'raws': JSONUtil.multipart_payload(details.raw_fields),
         }
         params = {
             'hasHeaders': 'true',
@@ -116,7 +122,3 @@ class CsvFileUploader(FileUploader):
         if details.measurement_name is not None:
             params['measurementName'] = details.measurement_name
         return params
-
-    @staticmethod
-    def __payload_json(payload):
-        return JSONUtil.multipart_payload(payload)

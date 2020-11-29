@@ -3,6 +3,7 @@ package com.cloudberry.cloudberry.service.api;
 import com.cloudberry.cloudberry.analytics.AnalyticsApi;
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
@@ -29,9 +30,11 @@ public class ComputationSeriesService {
     public SeriesPack getComputations(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> computationIds
+            List<ObjectId> computationIds,
+            DataFilters dataFilters
     ) {
-        var series = analytics.getSeriesApi().computationsSeries(fieldName, computationIds, influxQueryFields);
+        var series =
+                analytics.getSeriesApi().computationsSeries(fieldName, computationIds, influxQueryFields, dataFilters);
         var average = MovingAverageInMemoryOps.movingAverageSeries(series, fieldName);
 
         return new SeriesPack(series, average);
@@ -40,10 +43,11 @@ public class ComputationSeriesService {
     public SeriesPack getComputations(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId
+            ObjectId configurationId,
+            DataFilters dataFilters
     ) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        var pack = getComputations(fieldName, influxQueryFields, computationIds);
+        var pack = getComputations(fieldName, influxQueryFields, computationIds, dataFilters);
         var packAverageRenamed = pack
                 .getAverageSeries()
                 .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
@@ -55,9 +59,11 @@ public class ComputationSeriesService {
             int n,
             String fieldName,
             Optimization optimization,
-            InfluxQueryFields influxQueryFields
+            InfluxQueryFields influxQueryFields,
+            DataFilters dataFilters
     ) {
-        var bestN = analytics.getBestSeriesApi().nBestSeries(n, fieldName, optimization, influxQueryFields);
+        var bestN =
+                analytics.getBestSeriesApi().nBestSeries(n, fieldName, optimization, influxQueryFields, dataFilters);
         var bestNAverage = MovingAverageInMemoryOps.movingAverageSeries(bestN, fieldName);
 
         return new SeriesPack(bestN, bestNAverage);
@@ -68,11 +74,12 @@ public class ComputationSeriesService {
             String fieldName,
             Optimization optimization,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId
+            ObjectId configurationId,
+            DataFilters dataFilters
     ) {
         var computationsIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
         var bestN = analytics.getBestSeriesApi()
-                .nBestSeriesFrom(n, fieldName, optimization, influxQueryFields, computationsIds);
+                .nBestSeriesFrom(n, fieldName, optimization, influxQueryFields, computationsIds, dataFilters);
         var bestNAverage = MovingAverageInMemoryOps.movingAverageSeries(bestN, fieldName)
                 .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
 
@@ -83,10 +90,11 @@ public class ComputationSeriesService {
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
-            InfluxQueryFields influxQueryFields
+            InfluxQueryFields influxQueryFields,
+            DataFilters dataFilters
     ) {
         var exceeding = analytics.getThresholdsApi()
-                .thresholdsExceedingSeries(fieldName, thresholds, mode, influxQueryFields);
+                .thresholdsExceedingSeries(fieldName, thresholds, mode, influxQueryFields, dataFilters);
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName);
 
         return new SeriesPack(exceeding, exceedingAverage);
@@ -97,14 +105,22 @@ public class ComputationSeriesService {
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId
+            ObjectId configurationId,
+            DataFilters dataFilters
     ) {
         var computationIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
         if (computationIds.isEmpty()) {
             return SeriesPack.EMPTY;
         }
         var exceeding = analytics.getThresholdsApi()
-                .thresholdsExceedingSeriesFrom(fieldName, thresholds, mode, influxQueryFields, computationIds);
+                .thresholdsExceedingSeriesFrom(
+                        fieldName,
+                        thresholds,
+                        mode,
+                        influxQueryFields,
+                        computationIds,
+                        dataFilters
+                );
         var exceedingAverage = MovingAverageInMemoryOps.movingAverageSeries(exceeding, fieldName)
                 .map(s -> s.withSeriesInfo(configurationSeriesNameResolver.configurationSeriesInfo(configurationId)));
         return new SeriesPack(exceeding, exceedingAverage);
@@ -116,9 +132,10 @@ public class ComputationSeriesService {
             ThresholdsType thresholdsType,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId
+            ObjectId configurationId,
+            DataFilters dataFilters
     ) {
-        var series = getComputations(fieldName, influxQueryFields, configurationId);
+        var series = getComputations(fieldName, influxQueryFields, configurationId, dataFilters);
         if (series.getSeries().isEmpty() || series.getAverageSeries().isEmpty()) {
             return SeriesPack.EMPTY;
         }

@@ -22,6 +22,12 @@ public final class IdDispatcher {
         return configurationIds;
     }
 
+    public static List<ObjectId> requireConfigurationIds(List<ObjectId> configurationIds)
+            throws InvalidConfigurationIdException {
+        if (configurationIds.isEmpty()) { throw InvalidConfigurationIdException.empty(configurationIds); }
+        return configurationIds;
+    }
+
     public static ObjectId getExperimentId(String experimentIdHex)
             throws InvalidExperimentIdException {
         return RestParametersUtil.getValidId(experimentIdHex)
@@ -43,7 +49,13 @@ public final class IdDispatcher {
     public static List<ObjectId> getComputationIds(List<String> computationIdsHex)
             throws InvalidComputationIdException {
         var computationIds = RestParametersUtil.getValidIds(computationIdsHex);
-        if (computationIds.isEmpty()) { throw new InvalidComputationIdException(computationIdsHex); }
+        return requireComputationIds(computationIds);
+    }
+
+    public static List<ObjectId> requireComputationIds(List<ObjectId> computationIds)
+            throws InvalidComputationIdException {
+        if (computationIds.isEmpty()) { throw InvalidComputationIdException.empty(computationIds); }
         return computationIds;
     }
+
 }

@@ -17,13 +17,13 @@ services:
 #      - SPRING_PROFILES_ACTIVE=dev
 #    depends_on:
 #      - kafka-cb
-  cloudberry-ng:
-    networks:
-      - cb-network
-    container_name: cloudberry-ng
-    build: ../cloudberry-ng/
-    ports:
-      - 90:80
+#  cloudberry-ng:
+#    networks:
+#      - cb-network
+#    container_name: cloudberry-ng
+#    build: ../cloudberry-ng/
+#    ports:
+#      - 90:80
   kafka-cb:
     networks:
       - cb-network

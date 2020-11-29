@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.service.configurations;
 
 import com.cloudberry.cloudberry.analytics.api.SeriesApi;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.service.average.moving.MovingAverageInMemoryOps;
 import com.cloudberry.cloudberry.db.mongo.service.MetadataService;
@@ -21,10 +22,16 @@ public class ConfigurationSeriesCreator {
     public Optional<DataSeries> movingAverageConfigurationSeries(
             String fieldName,
             InfluxQueryFields influxQueryFields,
-            ObjectId configurationId
+            ObjectId configurationId,
+            DataFilters dataFilters
     ) {
         var computationsIds = metadataService.findAllComputationIdsForConfiguration(configurationId);
-        var computationsSeries = seriesApi.computationsSeries(fieldName, computationsIds, influxQueryFields);
+        var computationsSeries = seriesApi.computationsSeries(
+                fieldName,
+                computationsIds,
+                influxQueryFields,
+                dataFilters
+        );
 
         return MovingAverageInMemoryOps
                 .movingAverageSeries(computationsSeries, fieldName)

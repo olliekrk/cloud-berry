@@ -2,10 +2,12 @@ package com.cloudberry.cloudberry.rest.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.dto.SeriesPack;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFiltersWithIds;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFiltersWithThresholds;
 import com.cloudberry.cloudberry.analytics.model.optimization.Optimization;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationGoal;
 import com.cloudberry.cloudberry.analytics.model.optimization.OptimizationKind;
-import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsType;
 import com.cloudberry.cloudberry.rest.exceptions.InvalidThresholdsException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
@@ -20,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("series/computations")
@@ -34,12 +34,13 @@ public class ComputationSeriesRest {
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestBody List<String> computationIdsHex
+            @RequestBody DataFiltersWithIds payload
     ) throws InvalidComputationIdException {
         return computationSeriesService.getComputations(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                IdDispatcher.getComputationIds(computationIdsHex)
+                IdDispatcher.requireComputationIds(payload.getIds()),
+                payload.getFilters()
         );
     }
 
@@ -48,12 +49,14 @@ public class ComputationSeriesRest {
             @RequestParam String fieldName,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestParam String configurationIdHex
+            @RequestParam String configurationIdHex,
+            @RequestBody DataFilters dataFilters
     ) throws InvalidConfigurationIdException {
         return computationSeriesService.getComputations(
                 fieldName,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                IdDispatcher.getConfigurationId(configurationIdHex)
+                IdDispatcher.getConfigurationId(configurationIdHex),
+                dataFilters
         );
     }
 
@@ -64,13 +67,15 @@ public class ComputationSeriesRest {
             @RequestParam OptimizationGoal optimizationGoal,
             @RequestParam OptimizationKind optimizationKind,
             @RequestParam(required = false) String measurementName,
-            @RequestParam(required = false) String bucketName
+            @RequestParam(required = false) String bucketName,
+            @RequestBody DataFilters filters
     ) {
         return computationSeriesService.getNBestComputations(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
-                influxQueryFieldsResolver.get(measurementName, bucketName)
+                influxQueryFieldsResolver.get(measurementName, bucketName),
+                filters
         );
     }
 
@@ -82,14 +87,16 @@ public class ComputationSeriesRest {
             @RequestParam OptimizationKind optimizationKind,
             @RequestParam String configurationIdHex,
             @RequestParam(required = false) String measurementName,
-            @RequestParam(required = false) String bucketName
+            @RequestParam(required = false) String bucketName,
+            @RequestBody DataFilters filters
     ) throws InvalidConfigurationIdException {
         return computationSeriesService.getNBestComputationsForConfiguration(
                 n,
                 fieldName,
                 new Optimization(optimizationGoal, optimizationKind),
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                IdDispatcher.getConfigurationId(configurationIdHex)
+                IdDispatcher.getConfigurationId(configurationIdHex),
+                filters
         );
     }
 
@@ -99,13 +106,14 @@ public class ComputationSeriesRest {
             @RequestParam CriteriaMode mode,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestBody Thresholds thresholds
+            @RequestBody DataFiltersWithThresholds payload
     ) throws InvalidThresholdsException {
         return computationSeriesService.getComputationsExceedingThresholds(
                 fieldName,
-                thresholds.requireValid(),
+                payload.getThresholds(),
                 mode,
-                influxQueryFieldsResolver.get(measurementName, bucketName)
+                influxQueryFieldsResolver.get(measurementName, bucketName),
+                payload.getFilters()
         );
     }
 
@@ -116,14 +124,15 @@ public class ComputationSeriesRest {
             @RequestParam String configurationIdHex,
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
-            @RequestBody Thresholds thresholds
+            @RequestBody DataFiltersWithThresholds payload
     ) throws InvalidThresholdsException, InvalidConfigurationIdException {
         return computationSeriesService.getComputationsExceedingThresholdsForConfiguration(
                 fieldName,
-                thresholds.requireValid(),
+                payload.getThresholds(),
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                IdDispatcher.getConfigurationId(configurationIdHex)
+                IdDispatcher.getConfigurationId(configurationIdHex),
+                payload.getFilters()
         );
     }
 
@@ -135,15 +144,16 @@ public class ComputationSeriesRest {
             @RequestParam(required = false) String measurementName,
             @RequestParam(required = false) String bucketName,
             @RequestParam ThresholdsType thresholdsType,
-            @RequestBody Thresholds thresholds
+            @RequestBody DataFiltersWithThresholds payload
     ) throws InvalidThresholdsException, InvalidConfigurationIdException {
         return computationSeriesService.getComputationsExceedingThresholdsRelatively(
                 fieldName,
-                thresholds.requireValid(),
+                payload.getThresholds(),
                 thresholdsType,
                 mode,
                 influxQueryFieldsResolver.get(measurementName, bucketName),
-                IdDispatcher.getConfigurationId(configurationIdHex)
+                IdDispatcher.getConfigurationId(configurationIdHex),
+                payload.getFilters()
         );
     }
 

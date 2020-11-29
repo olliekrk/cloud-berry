@@ -3,6 +3,8 @@ package com.cloudberry.cloudberry.parsing.service.age;
 import com.cloudberry.cloudberry.common.syntax.ArraySyntax;
 import com.cloudberry.cloudberry.common.syntax.MapSyntax;
 import com.cloudberry.cloudberry.db.influx.InfluxDefaults;
+import com.cloudberry.cloudberry.parsing.model.FieldType;
+import com.cloudberry.cloudberry.parsing.model.FieldTypes;
 import com.cloudberry.cloudberry.parsing.model.age.AgeParsedLogs;
 import com.cloudberry.cloudberry.parsing.model.age.AgeUploadDetails;
 import com.cloudberry.cloudberry.parsing.service.LogsParser;
@@ -62,7 +64,8 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                     var point = getMeasurementPoint(
                             logParametersOrder.get(lineKey),
                             logParameters,
-                            logMeasurement
+                            logMeasurement,
+                            uploadDetails.getFieldTypes()
                     );
                     dataPoints.add(point);
                 } else if (line.startsWith("<")) {
@@ -96,7 +99,7 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                 .collect(
                         Collectors.toMap(
                                 log -> log[0].trim(),
-                                log -> parseField(log[1].trim())
+                                log -> parseField(log[1].trim(), FieldType.NUMBER)
                         )
                 );
     }
@@ -104,7 +107,8 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
     private Point getMeasurementPoint(
             String[] parametersNames,
             String[] parametersValuesRaw,
-            String measurementName
+            String measurementName,
+            FieldTypes fieldTypes
     ) {
         var parametersNamesList = ArraySyntax.linkedList(parametersNames);
         var parametersValues = ArraySyntax.linkedList(parametersValuesRaw);
@@ -127,7 +131,7 @@ public class AgeLogsParser implements LogsParser<AgeUploadDetails> {
                 .addFields(MapSyntax.zippedArrays(
                         parametersNamesFiltered,
                         parametersValuesFiltered,
-                        this::parseField
+                        (field, rawValue) -> parseField(rawValue, fieldTypes.getOrDefault(field))
                 ));
     }
 }

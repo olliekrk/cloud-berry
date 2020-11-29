@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.analytics.api;
 
 import com.cloudberry.cloudberry.analytics.model.CriteriaMode;
 import com.cloudberry.cloudberry.analytics.model.basic.DataSeries;
+import com.cloudberry.cloudberry.analytics.model.filters.DataFilters;
 import com.cloudberry.cloudberry.analytics.model.query.InfluxQueryFields;
 import com.cloudberry.cloudberry.analytics.model.thresholds.Thresholds;
 import com.cloudberry.cloudberry.analytics.model.thresholds.ThresholdsInfo;
@@ -17,7 +18,8 @@ public interface ThresholdsApi {
             String fieldName,
             Thresholds thresholds,
             CriteriaMode mode,
-            InfluxQueryFields influxQueryFields
+            InfluxQueryFields influxQueryFields,
+            DataFilters dataFilters
     );
 
     List<DataSeries> thresholdsExceedingSeriesFrom(
@@ -25,7 +27,8 @@ public interface ThresholdsApi {
             Thresholds thresholds,
             CriteriaMode mode,
             InfluxQueryFields influxQueryFields,
-            List<ObjectId> computationIds
+            List<ObjectId> computationIds,
+            DataFilters dataFilters
     );
 
     List<DataSeries> thresholdsExceedingSeriesFrom(

@@ -11,5 +11,6 @@ public class CloudberryJacksonModule extends SimpleModule {
 
     private void addCustomSerializers() {
         this.addSerializer(ObjectId.class, new ObjectIdSerializer());
+        this.addDeserializer(ObjectId.class, new ObjectIdDeserializer());
     }
 }

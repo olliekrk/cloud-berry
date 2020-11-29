@@ -35,7 +35,13 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return Try.withResources(() -> new BufferedReader(new FileReader(file)))
                 .of(reader -> Try.withResources(() -> details.determineCsvFormat().parse(reader))
                         .of(parser -> {
+                            var headersSize = parser.getHeaderNames().size();
                             var points = ListSyntax.mapped(parser.getRecords(), record -> {
+                                var recordSize = record.size();
+                                if (headersSize != recordSize) {
+                                    log.warn(
+                                            "Headers size: {} different then record size: {}", headersSize, recordSize);
+                                }
                                 var recordMap = record.toMap();
                                 var recordTime = parseTime(recordMap.get(TIME_COLUMN_NAME));
                                 var recordTags = getTags(details, recordMap);
@@ -74,7 +80,12 @@ public class CsvLogsParser implements LogsParser<CsvUploadDetails> {
         return values.entrySet()
                 .stream()
                 .filter(entry -> !excluded.contains(entry.getKey()))
-                .map(entry -> Pair.of(entry.getKey(), parseField(entry.getValue())))
+                .map(entry -> {
+                    var field = entry.getKey();
+                    var fieldType = details.getFieldTypes().getOrDefault(field);
+                    var rawValue = entry.getValue();
+                    return Pair.of(field, parseField(rawValue, fieldType));
+                })
                 .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
     }
 
