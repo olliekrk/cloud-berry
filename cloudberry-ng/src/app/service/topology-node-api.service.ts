@@ -17,6 +17,7 @@ export class TopologyNodeApiService {
   }
 
   addCounterNode(nodeName: string, metricName: string): Observable<TopologyNode> {
+    console.log(nodeName, metricName);
     return this.rest.createCounterNode(nodeName, metricName).pipe(share());
   }
 

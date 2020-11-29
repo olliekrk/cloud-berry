@@ -11,7 +11,8 @@ import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {AddNodeDialogComponent, AddNodeDialogResult} from "../add-node-dialog/add-node-dialog.component";
 import {cyStylesheets, nodeDefaultColor, nodesColors} from "./cytoscape-styles";
-import {switchMap} from "rxjs/operators";
+import {mapTo, switchMap} from "rxjs/operators";
+import {AddCounterNodeDialogComponent, AddCounterNodeDialogResult} from "../add-counter-node-dialog/add-counter-node-dialog.component";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -117,7 +118,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       commands: [
         {
           content: "Add counter node",
-          select: edge => this.createMockCounterNode(edge), // fixme?
+          select: edge => this.addCounterNode(edge),
         },
         {
           content: "Delete this edge",
@@ -173,17 +174,27 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  private createMockCounterNode(edge: any): void {
-    this.topologyNodeApiService
-      .addCounterNode("nowy", "metryka")
-      .subscribe(newNode => {
-        const topologyId = this.topologyData.topology.id;
-        const sourceId = edge.source().id();
-        const targetId = edge.target().id();
-        this.topologyApiService
-          .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
-          .subscribe(() => this.emitTopologyModified());
-      });
+  private addCounterNode(edge: any): void {
+    this.dialog.open(AddCounterNodeDialogComponent)
+      .afterClosed()
+      .pipe(
+        notNull(),
+        switchMap(({name, metricName}: AddCounterNodeDialogResult) =>
+          this.topologyNodeApiService
+            .addCounterNode(name, metricName)
+            .pipe(
+              switchMap(node => this.topologyApiService.addNode(this.topologyData.topology.id, node.id).pipe(mapTo(node.id))),
+              switchMap(nodeId => {
+                  const topologyId = this.topologyData.topology.id;
+                  const sourceId = edge.source().id();
+                  const targetId = edge.target().id();
+                  return this.topologyApiService
+                    .addNodeBetweenNodes(topologyId, sourceId, nodeId, targetId, true);
+                }
+              ))
+        )
+      )
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private deleteNode(node: any): void {
