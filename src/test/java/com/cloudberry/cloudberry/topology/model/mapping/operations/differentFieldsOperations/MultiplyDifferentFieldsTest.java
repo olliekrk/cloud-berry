@@ -3,8 +3,10 @@ package com.cloudberry.cloudberry.topology.model.mapping.operations.differentFie
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapArgument;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.ComputationMetaParameterExtractor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,6 +16,13 @@ import static com.cloudberry.cloudberry.topology.model.ComputationEventMapType.F
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MultiplyDifferentFieldsTest {
+
+    @Mock
+    ComputationMetaParameterExtractor computationMetaParameterExtractor;
+
+    private final MultiplyDifferentFields multiplyDifferentFields =
+            new MultiplyDifferentFields(new EventExtractorUtils(computationMetaParameterExtractor));
+
 
     @Test
     void properMultiplyLotOfValues() {
@@ -36,7 +45,7 @@ class MultiplyDifferentFieldsTest {
                 Map.of()
         );
 
-        val calculatedDistance = MultiplyDifferentFields.calculateNewValue(arguments, event);
+        val calculatedDistance = multiplyDifferentFields.calculateNewValue(arguments, event);
 
         val expectedDistance = velocity * time * repetitions;
         assertEquals(expectedDistance, calculatedDistance);
@@ -61,7 +70,7 @@ class MultiplyDifferentFieldsTest {
                 Map.of()
         );
 
-        val calculatedDistance = MultiplyDifferentFields.calculateNewValue(arguments, event);
+        val calculatedDistance = multiplyDifferentFields.calculateNewValue(arguments, event);
 
         assertEquals(velocity, calculatedDistance);
     }

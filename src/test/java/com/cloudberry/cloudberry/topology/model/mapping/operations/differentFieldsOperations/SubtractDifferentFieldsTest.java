@@ -3,8 +3,10 @@ package com.cloudberry.cloudberry.topology.model.mapping.operations.differentFie
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapArgument;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.ComputationMetaParameterExtractor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,6 +16,13 @@ import static com.cloudberry.cloudberry.topology.model.ComputationEventMapType.F
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SubtractDifferentFieldsTest {
+
+    @Mock
+    ComputationMetaParameterExtractor computationMetaParameterExtractor;
+
+    private final SubtractDifferentFields subtractDifferentFields =
+            new SubtractDifferentFields(new EventExtractorUtils(computationMetaParameterExtractor));
+
 
     @Test
     void properSubtractLotOfValues() {
@@ -36,7 +45,7 @@ class SubtractDifferentFieldsTest {
                 Map.of()
         );
 
-        val calculatedDistance = SubtractDifferentFields.calculateNewValue(arguments, event);
+        val calculatedDistance = subtractDifferentFields.calculateNewValue(arguments, event);
 
         val expectedDistance = (double) salary - zus - dochodowy;
         assertEquals(expectedDistance, calculatedDistance);

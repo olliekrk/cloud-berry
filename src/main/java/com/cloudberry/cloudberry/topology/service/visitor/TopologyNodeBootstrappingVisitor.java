@@ -7,7 +7,7 @@ import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingExcep
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
 import com.cloudberry.cloudberry.topology.model.branching.BranchOutput;
 import com.cloudberry.cloudberry.topology.model.filtering.ExpressionChecker;
-import com.cloudberry.cloudberry.topology.model.mapping.Mapper;
+import com.cloudberry.cloudberry.topology.model.mapping.MappingNodeEvaluator;
 import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
@@ -16,6 +16,7 @@ import com.cloudberry.cloudberry.topology.model.nodes.MergeNode;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.model.nodes.SinkNode;
 import com.cloudberry.cloudberry.topology.model.nodes.TopologyNode;
+import io.vavr.control.Try;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.kafka.streams.KeyValue;
@@ -29,6 +30,7 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
     private final StreamsBuilder streamsBuilder;
     private final ComputationEventProcessor sinkProcessor;
     private final MetricsRegistry metricsRegistry;
+    private final MappingNodeEvaluator mappingNodeEvaluator;
 
     @Override
     public void visit(RootNode node) {
@@ -62,10 +64,10 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
         var mergedStream = mergeIncomingEdges(node);
         var mappedStream = mergedStream.map(((key, event) -> KeyValue.pair(
                 key,
-                Mapper.calculateNewComputationEvent(
+                Try.of(() -> mappingNodeEvaluator.calculateNewComputationEvent(
                         event,
                         node.getMappingExpression()
-                )
+                )).get()
         )));
         context.putStream(node.getId(), mappedStream);
     }

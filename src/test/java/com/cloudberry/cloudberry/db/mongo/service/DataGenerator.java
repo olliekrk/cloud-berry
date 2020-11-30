@@ -43,9 +43,12 @@ public final class DataGenerator {
     public static final String CONFIGURATION_NAME_2_A = "config_2_A";
     public static final String CONFIGURATION_NAME_2_B = "config_2_B";
 
+    public static final int CONFIGURATION_1_A_PRICE_VALUE = 3000;
+    public static final String CONFIGURATION_1_A_PRICE_KEY = "price";
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_A =
             new ExperimentConfiguration(CONFIGURATION_ID_1_A, EXPERIMENT_ID_1, CONFIGURATION_NAME_1_A,
-                                        Map.of("price", 3000), ofEpochSecond(10)
+                                        Map.of(CONFIGURATION_1_A_PRICE_KEY, CONFIGURATION_1_A_PRICE_VALUE),
+                                        ofEpochSecond(10)
             );
     public static final ExperimentConfiguration TEST_CONFIGURATION_1_B =
             new ExperimentConfiguration(CONFIGURATION_ID_1_B, EXPERIMENT_ID_1, CONFIGURATION_NAME_1_B,

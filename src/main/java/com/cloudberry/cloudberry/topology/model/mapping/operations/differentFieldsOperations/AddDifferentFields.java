@@ -3,14 +3,18 @@ package com.cloudberry.cloudberry.topology.model.mapping.operations.differentFie
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgument;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public final class AddDifferentFields {
-    public static double calculateNewValue(
+    private final EventExtractorUtils eventExtractorUtils;
+
+    public double calculateNewValue(
             List<? extends MappingArgument<EntryMapRecord>> arguments, ComputationEvent event
     ) {
-        return EventExtractorUtils.getStreamOfDoubles(arguments, event)
+        return eventExtractorUtils.getStreamOfDoubles(arguments, event)
                 .reduce(Double::sum)
                 .orElseThrow();
     }

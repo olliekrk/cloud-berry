@@ -1,11 +1,14 @@
 package com.cloudberry.cloudberry.topology.model.mapping.operations.differentFieldsOperations;
 
 import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
+import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidComputationIdException;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapArgument;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
 import com.cloudberry.cloudberry.topology.model.mapping.operations.DivisionByZeroException;
+import com.cloudberry.cloudberry.topology.model.mapping.operations.ComputationMetaParameterExtractor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,8 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DivideDifferentFieldsTest {
 
+    @Mock
+    ComputationMetaParameterExtractor computationMetaParameterExtractor;
+
+    private final DivideDifferentFields divideDifferentFields =
+            new DivideDifferentFields(new EventExtractorUtils(computationMetaParameterExtractor));
+
     @Test
-    void calculateNewValueWhenFieldsExist() {
+    void calculateNewValueWhenFieldsExist() throws InvalidComputationIdException {
         final String distanceKey = "distance";
         final String timeKey = "time";
         final int speed = 300;
@@ -36,7 +45,7 @@ class DivideDifferentFieldsTest {
                 Map.of()
         );
 
-        val calculatedSpeed = DivideDifferentFields.calculateNewValue(arguments, event);
+        val calculatedSpeed = divideDifferentFields.calculateNewValue(arguments, event);
 
         val expectedSpeed = (double) speed / time;
         assertEquals(expectedSpeed, calculatedSpeed);
@@ -60,6 +69,6 @@ class DivideDifferentFieldsTest {
                 Map.of()
         );
 
-        assertThrows(DivisionByZeroException.class, () -> DivideDifferentFields.calculateNewValue(arguments, event));
+        assertThrows(DivisionByZeroException.class, () -> divideDifferentFields.calculateNewValue(arguments, event));
     }
 }

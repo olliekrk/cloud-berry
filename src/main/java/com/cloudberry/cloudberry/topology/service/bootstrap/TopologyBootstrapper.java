@@ -7,6 +7,7 @@ import com.cloudberry.cloudberry.topology.exception.MissingRootNodeException;
 import com.cloudberry.cloudberry.topology.exception.TopologyException;
 import com.cloudberry.cloudberry.topology.model.Topology;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
+import com.cloudberry.cloudberry.topology.model.mapping.MappingNodeEvaluator;
 import com.cloudberry.cloudberry.topology.model.nodes.RootNode;
 import com.cloudberry.cloudberry.topology.service.TopologyNodeService;
 import com.cloudberry.cloudberry.topology.service.visitor.TopologyNodeBootstrappingVisitor;
@@ -30,6 +31,7 @@ public class TopologyBootstrapper {
 
     private final KafkaStreamsConfiguration kStreamsConfiguration;
     private final MetricsRegistry metricsRegistry;
+    private final MappingNodeEvaluator mappingNodeEvaluator;
 
     public KafkaStreams bootstrapStreams(@NotNull Topology topology) throws TopologyException {
         var kStreamsBuilder = new StreamsBuilder();
@@ -60,7 +62,8 @@ public class TopologyBootstrapper {
                 new BootstrappingContext(topology),
                 kStreamsBuilder,
                 computationEventProcessor,
-                metricsRegistry
+                metricsRegistry,
+                mappingNodeEvaluator
         );
         var graph = topology.constructGraph();
         graph.iterator().forEachRemaining(nodeId -> topologyNodeService.findByIdOrThrow(nodeId).accept(visitor));

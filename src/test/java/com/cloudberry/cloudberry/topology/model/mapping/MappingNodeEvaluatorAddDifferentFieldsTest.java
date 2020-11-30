@@ -17,7 +17,8 @@ import java.util.stream.Stream;
 import static com.cloudberry.cloudberry.topology.model.ComputationEventMapType.FIELDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MapperAddDifferentFieldsTest {
+
+class MappingNodeEvaluatorAddDifferentFieldsTest extends MappingNodeEvaluatorTestBase {
 
     private static final String POPULATION_COMBINED_KEY = "populationCombined";
     private static final String POPULATION_LEFT_KEY = "populationLeft";
@@ -46,11 +47,6 @@ class MapperAddDifferentFieldsTest {
                                 POPULATION_LEFT_KEY, POPULATION_LEFT_VALUE,
                                 POPULATION_COMBINED_KEY, (double) POPULATION_LEFT_VALUE
                         )
-                ),
-                // none of required to sum fields exist
-                Arguments.of(
-                        Map.of(),
-                        Map.of(POPULATION_COMBINED_KEY, 0d)
                 )
         );
     }
@@ -66,7 +62,7 @@ class MapperAddDifferentFieldsTest {
                 Map.of()
         );
 
-        val newEvent = Mapper.calculateNewComputationEvent(incomingEvent, new MappingExpression(
+        val newEvent = mappingNodeEvaluator.calculateNewComputationEvent(incomingEvent, new MappingExpression(
                 List.of(new MappingEvaluation<>(
                                 POPULATION_COMBINED_KEY,
                                 FIELDS,
