@@ -65,10 +65,26 @@ public class Topology {
         addEdge(source, target, false);
     }
 
-    public void addEdge(TopologyNode source, TopologyNode target, boolean addVertexToTopologyIfNotAdded) {
+    public void addEdge(
+            TopologyNode source,
+            TopologyNode target,
+            boolean addVertexToTopologyIfNotAdded
+    ) {
         Stream.of(source, target).forEach(node -> validateNodeExistsInTopology(node, addVertexToTopologyIfNotAdded));
         edges.merge(source.getId(), Set.of(TopologyEdge.defaultEdge(source.getId(), target.getId())), SetSyntax::merge);
     }
+
+    public void addEdge(
+            TopologyNode source,
+            TopologyNode target,
+            boolean addVertexToTopologyIfNotAdded,
+            String edgeName
+    ) {
+        Stream.of(source, target).forEach(node -> validateNodeExistsInTopology(node, addVertexToTopologyIfNotAdded));
+        edges.merge(
+                source.getId(), Set.of(new TopologyEdge(edgeName, source.getId(), target.getId())), SetSyntax::merge);
+    }
+
 
     public void removeEdge(ObjectId source, ObjectId target) {
         edges.merge(

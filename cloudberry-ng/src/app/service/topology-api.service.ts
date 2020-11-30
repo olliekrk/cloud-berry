@@ -40,9 +40,12 @@ export class TopologyApiService {
     return this.rest.deleteEdge(topologyId, sourceId, targetId).pipe(share());
   }
 
-  addEdgeToTopology(topologyId: TopologyId, sourceNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
-                    addVertexToTopologyIfNotAdded: boolean = true): Observable<void> {
-    return this.rest.addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
+  addEdgeToTopology(topologyId: TopologyId,
+                    sourceNodeId: TopologyNodeId,
+                    targetNodeId: TopologyNodeId,
+                    addVertexToTopologyIfNotAdded: boolean = true,
+                    edgeName?: string): Observable<void> {
+    return this.rest.addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded, edgeName);
   }
 
   addNodeBetweenNodes(topologyId: TopologyId, sourceNodeId: TopologyNodeId, insertedNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,

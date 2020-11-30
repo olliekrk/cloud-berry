@@ -39,6 +39,7 @@ import {ObjectValuesPipe} from "./pipe/object-values.pipe";
 import {CommaSeparatedPipe} from "./pipe/comma-separated.pipe";
 import {QuotedPipe} from "./pipe/quoted.pipe";
 import {AddCounterNodeDialogComponent} from "./component/add-counter-node-dialog/add-counter-node-dialog.component";
+import {SelectEdgeDialogComponent} from "./component/select-edge-dialog/select-edge-dialog.component";
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import {AddCounterNodeDialogComponent} from "./component/add-counter-node-dialog
     CommaSeparatedPipe,
     QuotedPipe,
     AddCounterNodeDialogComponent,
+    SelectEdgeDialogComponent,
   ],
   imports: [
     BrowserModule,

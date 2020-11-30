@@ -4,6 +4,7 @@ import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyIdExc
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeIdException;
 import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.TopologyEdge;
 import com.cloudberry.cloudberry.topology.service.TopologyModifyingService;
 import com.cloudberry.cloudberry.topology.service.TopologyService;
 import com.cloudberry.cloudberry.topology.service.reconfiguration.TopologyReconfigurationService;
@@ -78,14 +79,20 @@ public class TopologyRest {
             @PathVariable("id") String topologyIdHex,
             @RequestParam String sourceNodeIdHex,
             @RequestParam String targetNodeIdHex,
+            @RequestParam(required = false) String edgeName,
             @RequestParam(defaultValue = "false") boolean addVertexToTopologyIfNotAdded
     ) throws InvalidTopologyNodeIdException, InvalidTopologyIdException {
         val topologyId = TopologyIdDispatcher.getTopologyId(topologyIdHex);
         val sourceNodeId = TopologyIdDispatcher.getTopologyNodeId(sourceNodeIdHex);
         val targetNodeId = TopologyIdDispatcher.getTopologyNodeId(targetNodeIdHex);
-
-        return topologyModifyingService
-                .addEdgeToTopology(topologyId, sourceNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
+        edgeName = Optional.ofNullable(edgeName).orElse(TopologyEdge.DEFAULT_NAME);
+        return topologyModifyingService.addEdgeToTopology(
+                topologyId,
+                sourceNodeId,
+                targetNodeId,
+                addVertexToTopologyIfNotAdded,
+                edgeName
+        );
     }
 
     @DeleteMapping("/id/{id}/deleteEdge")

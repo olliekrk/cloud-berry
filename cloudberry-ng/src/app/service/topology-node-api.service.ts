@@ -26,7 +26,7 @@ export class TopologyNodeApiService {
       case TopologyNodeType.Counter:
         return this.rest.createCounterNode(json.name, json.metricName).pipe(share());
       case TopologyNodeType.Filter:
-        return this.rest.createFilterNode(json.name, json.filterExpression).pipe(share());
+        return this.rest.createFilterNode(json.name, json.expression).pipe(share());
       case TopologyNodeType.Map:
         return this.rest.createMapNode(json.name, json.mappingExpression).pipe(share());
       case TopologyNodeType.Root:
@@ -36,7 +36,7 @@ export class TopologyNodeApiService {
       case TopologyNodeType.Merge:
         return this.rest.createMergeNode(json.name).pipe(share());
       case TopologyNodeType.Branch:
-        return this.rest.createBranchNode(json.name, json.filterExpression).pipe(share());
+        return this.rest.createBranchNode(json.name, json.expression).pipe(share());
       default:
         return EMPTY;
     }

@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Select Edge</h1>
+
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Select edge</mat-label>
+    <mat-select formControlName="edgeName">
+      <mat-option *ngFor="let edge of availableEdges" [value]="edge">{{edge}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-raised-button [mat-dialog-close]="null">Cancel</button>
+  <button mat-raised-button [disabled]="form.invalid" [mat-dialog-close]="form.value">Create</button>
+</mat-dialog-actions>

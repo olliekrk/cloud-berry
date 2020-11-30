@@ -42,9 +42,9 @@ export type MappingExpression = object;
 export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> = {
   [TopologyNodeType.Root]: ["name", "inputTopicName"],
   [TopologyNodeType.Sink]: ["name", "outputBucketName"],
-  [TopologyNodeType.Filter]: ["name", "filterExpression"],
+  [TopologyNodeType.Filter]: ["name", "expression"],
   [TopologyNodeType.Map]: ["name", "mappingExpression"],
   [TopologyNodeType.Counter]: ["name", "metricName"],
   [TopologyNodeType.Merge]: ["name"],
-  [TopologyNodeType.Branch]: ["name", "filterExpression"],
+  [TopologyNodeType.Branch]: ["name", "expression"],
 };
