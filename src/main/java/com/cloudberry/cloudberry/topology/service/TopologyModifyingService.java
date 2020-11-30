@@ -2,6 +2,7 @@ package com.cloudberry.cloudberry.topology.service;
 
 import com.cloudberry.cloudberry.topology.exception.EdgeWouldInduceCycleException;
 import com.cloudberry.cloudberry.topology.model.Topology;
+import com.cloudberry.cloudberry.topology.model.TopologyEdge;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -37,21 +38,24 @@ public class TopologyModifyingService {
     }
 
     public Topology addEdgeToTopology(
-            ObjectId topologyId, ObjectId sourceNodeId, ObjectId targetNodeId, boolean addVertexToTopologyIfNotAdded
+            ObjectId topologyId,
+            ObjectId sourceNodeId,
+            ObjectId targetNodeId,
+            boolean addVertexToTopologyIfNotAdded,
+            String edgeName
     ) {
         val topology = topologyService.findByIdOrThrow(topologyId);
+        var topologyEdge = new TopologyEdge(edgeName, sourceNodeId, targetNodeId);
         val graph = topology.constructGraph();
         try {
-            graph.addEdge(sourceNodeId, targetNodeId);
+            graph.addEdge(sourceNodeId, targetNodeId, topologyEdge);
         } catch (IllegalArgumentException e){
             throw new EdgeWouldInduceCycleException(sourceNodeId, targetNodeId);
         }
 
         val sourceNode = topologyNodeService.findByIdOrThrow(sourceNodeId);
         val targetNode = topologyNodeService.findByIdOrThrow(targetNodeId);
-
-        topology.addEdge(sourceNode, targetNode, addVertexToTopologyIfNotAdded);
-
+        topology.addEdge(sourceNode, targetNode, addVertexToTopologyIfNotAdded, edgeName);
         topologyService.save(topology);
         return topology;
     }
@@ -71,8 +75,8 @@ public class TopologyModifyingService {
             ObjectId topologyId, ObjectId sourceNodeId, ObjectId insertedNodeId, ObjectId targetNodeId,
             boolean addVertexToTopologyIfNotAdded
     ) {
-        addEdgeToTopology(topologyId, sourceNodeId, insertedNodeId, addVertexToTopologyIfNotAdded);
-        addEdgeToTopology(topologyId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded);
+        addEdgeToTopology(topologyId, sourceNodeId, insertedNodeId, addVertexToTopologyIfNotAdded, TopologyEdge.DEFAULT_NAME);
+        addEdgeToTopology(topologyId, insertedNodeId, targetNodeId, addVertexToTopologyIfNotAdded, TopologyEdge.DEFAULT_NAME);
         return deleteEdge(topologyId, sourceNodeId, targetNodeId);
     }
 

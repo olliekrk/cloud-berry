@@ -1,11 +1,15 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Inject, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ValidatorFn, Validators} from "@angular/forms";
-import {TopologyNodeType, topologyNodeTypeRequiredFields} from "../../model";
-import {MatDialogRef} from "@angular/material/dialog";
+import {TopologyNode, TopologyNodeType, topologyNodeTypeRequiredFields} from "../../model";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 
 export interface AddNodeDialogResult {
   nodeType: TopologyNodeType;
   json: Record<string, any>;
+}
+
+export interface AddNodeDialogData {
+  copiedNode?: TopologyNode;
 }
 
 type AddNodeDialogForm = FormGroup & {
@@ -25,11 +29,12 @@ export class AddNodeDialogComponent implements OnInit {
   readonly topologyNodeTypeRequiredFields = topologyNodeTypeRequiredFields;
   form: AddNodeDialogForm;
 
-  constructor(public dialogRef: MatDialogRef<AddNodeDialogComponent>,
+  constructor(@Inject(MAT_DIALOG_DATA) public data: AddNodeDialogData,
+              public dialogRef: MatDialogRef<AddNodeDialogComponent>,
               formBuilder: FormBuilder) {
     this.form = formBuilder.group({
-      nodeType: [TopologyNodeType.Root],
-      json: [undefined, [Validators.required, this.validateJson()]],
+      nodeType: [data.copiedNode?.nodeType || TopologyNodeType.Root],
+      json: [data.copiedNode ? JSON.stringify(data.copiedNode, null, "\t") : undefined, [Validators.required, this.validateJson()]],
     }) as AddNodeDialogForm;
   }
 

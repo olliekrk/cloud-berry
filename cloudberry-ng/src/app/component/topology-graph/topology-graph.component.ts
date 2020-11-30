@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
-import {TopologyData, TopologyNodeType} from "../../model";
+import {BranchOutput, TopologyData, TopologyNode, TopologyNodeId, TopologyNodeType} from "../../model";
 import {notNull, TypedSimpleChange} from "../../util";
 import {MatDialog} from "@angular/material/dialog";
 import {TopologyNodeDetailsInfoDialogComponent} from "../node-info-dialog/topology-node-details-info-dialog.component";
@@ -10,8 +10,11 @@ import edgehandles from "cytoscape-edgehandles";
 import {TopologyNodeApiService} from "../../service/topology-node-api.service";
 import {TopologyApiService} from "../../service/topology-api.service";
 import {AddNodeDialogComponent, AddNodeDialogResult} from "../add-node-dialog/add-node-dialog.component";
-import {cyStylesheets} from "./cytoscape-styles";
-import {switchMap} from "rxjs/operators";
+import {cyStylesheets, nodeDefaultColor, nodesColors} from "./cytoscape-styles";
+import {mapTo, pluck, switchMap} from "rxjs/operators";
+import {AddCounterNodeDialogComponent, AddCounterNodeDialogResult} from "../add-counter-node-dialog/add-counter-node-dialog.component";
+import {SelectEdgeDialogComponent} from "../select-edge-dialog/select-edge-dialog.component";
+import {EMPTY, Observable, of} from "rxjs";
 
 cytoscape.use(edgehandles);
 cytoscape.use(dagre);
@@ -37,7 +40,8 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   readonly layoutOptions = {
     name: "dagre",
-    rankDir: "LR"
+    rankDir: "LR",
+    animate: true,
   };
 
   constructor(private dialog: MatDialog,
@@ -55,8 +59,8 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  openAddNodeDialog(): void {
-    this.dialog.open(AddNodeDialogComponent)
+  openAddNodeDialog(copiedNode?: TopologyNode): void {
+    this.dialog.open(AddNodeDialogComponent, {data: {copiedNode}})
       .afterClosed()
       .pipe(
         notNull(),
@@ -94,7 +98,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         {
           content: "Show details",
           select: node => {
-            const topologyNode = this.topologyData?.topologyNodes.find(tn => tn.id === node.id());
+            const topologyNode = this.findNodeById(node.id());
             if (topologyNode) {
               this.dialog.open(TopologyNodeDetailsInfoDialogComponent, {data: {topologyNode}});
             }
@@ -103,6 +107,10 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
         {
           content: "Delete",
           select: node => this.deleteNode(node),
+        },
+        {
+          content: "Copy",
+          select: node => this.copyNode(node),
         },
       ],
       openMenuEvents: "cxttap", // cytoscape events that will open the menu (space separated)
@@ -116,7 +124,7 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       commands: [
         {
           content: "Add counter node",
-          select: edge => this.createMockCounterNode(edge), // fixme?
+          select: edge => this.addCounterNode(edge),
         },
         {
           content: "Delete this edge",
@@ -145,16 +153,18 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       data: {
         id: node.id,
         name: node.name,
+        bgColor: nodesColors[node.nodeType] || nodeDefaultColor,
       }
     }));
 
     const edgesArrays: cytoscape.EdgeDefinition[][] = Object.entries(topology.edges)
-      .map(([source, targets]) => targets
-        .map(target => ({
+      .map(([source, topologyEdges]) => topologyEdges
+        .map(edge => ({
           data: {
-            id: `${source}_${target}`,
-            source,
-            target
+            id: `${edge.source}_${edge.target}_${edge.name}`,
+            source: edge.source,
+            target: edge.target,
+            name: edge.name,
           },
           classes: "cy-edge",
         }))
@@ -171,17 +181,27 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
     }
   }
 
-  private createMockCounterNode(edge: any): void {
-    this.topologyNodeApiService
-      .addCounterNode("nowy", "metryka")
-      .subscribe(newNode => {
-        const topologyId = this.topologyData.topology.id;
-        const sourceId = edge.source().id();
-        const targetId = edge.target().id();
-        this.topologyApiService
-          .addNodeBetweenNodes(topologyId, sourceId, newNode.id, targetId, true)
-          .subscribe(() => this.emitTopologyModified());
-      });
+  private addCounterNode(edge: any): void {
+    this.dialog.open(AddCounterNodeDialogComponent)
+      .afterClosed()
+      .pipe(
+        notNull(),
+        switchMap(({name, metricName}: AddCounterNodeDialogResult) =>
+          this.topologyNodeApiService
+            .addCounterNode(name, metricName)
+            .pipe(
+              switchMap(node => this.topologyApiService.addNode(this.topologyData.topology.id, node.id).pipe(mapTo(node.id))),
+              switchMap(nodeId => {
+                  const topologyId = this.topologyData.topology.id;
+                  const sourceId = edge.source().id();
+                  const targetId = edge.target().id();
+                  return this.topologyApiService
+                    .addNodeBetweenNodes(topologyId, sourceId, nodeId, targetId, true);
+                }
+              ))
+        )
+      )
+      .subscribe(() => this.emitTopologyModified());
   }
 
   private deleteNode(node: any): void {
@@ -190,10 +210,33 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
       .subscribe(() => this.emitTopologyModified());
   }
 
+  private copyNode(node: any): void {
+    const topologyNode = this.findNodeById(node.id());
+    this.openAddNodeDialog(topologyNode);
+  }
+
   private addEdge(source: any, target: any): void {
-    this.topologyApiService
-      .addEdgeToTopology(this.topologyData.topology.id, source.id(), target.id(), false)
-      .subscribe(() => this.emitTopologyModified());
+    const sourceNode = this.findNodeById(source.id());
+    const sourceNodeEdges = this.topologyData.topology.edges[source.id()];
+    if (sourceNode.nodeType === TopologyNodeType.Branch) {
+      let edgeName$: Observable<string> = EMPTY;
+      if (sourceNodeEdges.length === 0) {
+        edgeName$ = this.dialog.open(SelectEdgeDialogComponent, {data: Object.values(BranchOutput)})
+          .afterClosed()
+          .pipe(notNull(), pluck("edgeName"));
+      } else if (sourceNodeEdges.length === 1) {
+        edgeName$ = of(sourceNodeEdges[0].name === BranchOutput.MATCHED && BranchOutput.UNMATCHED || BranchOutput.MATCHED);
+      }
+
+      edgeName$
+        .pipe(switchMap(edgeName => this.topologyApiService
+          .addEdgeToTopology(this.topologyData.topology.id, source.id(), target.id(), false, edgeName)))
+        .subscribe(() => this.emitTopologyModified());
+    } else {
+      this.topologyApiService
+        .addEdgeToTopology(this.topologyData.topology.id, source.id(), target.id(), false)
+        .subscribe(() => this.emitTopologyModified());
+    }
   }
 
   private deleteEdge(edge: any): void {
@@ -211,18 +254,25 @@ export class TopologyGraphComponent implements OnInit, OnChanges {
 
   private isEdgeSourceValid(source: any): boolean {
     const sourceId = source.id();
-    const edges = this.topologyData.topology.edges;
-    const nodes = this.topologyData.topologyNodes;
-    // source already has outgoing edge
-    if (edges[sourceId].length > 0) {
-      return false;
+    const sourceNode = this.findNodeById(sourceId);
+    const sourceOutDegree = this.topologyData.topology.edges[sourceId].length;
+
+    switch (sourceNode.nodeType) {
+      case TopologyNodeType.Sink: // sink nodes cannot have outgoing edges
+        return false;
+      case TopologyNodeType.Branch:  // branch node can have 2 outgoing edges
+        return sourceOutDegree < 2;
+      default: // other nodes can have only 1 outgoing edge
+        return sourceOutDegree < 1;
     }
-    // sink nodes cannot have outgoing edges
-    return nodes.find(node => node.id === sourceId)?.nodeType !== TopologyNodeType.Sink;
   }
 
   private emitTopologyModified(): void {
     this.topologyModified.emit();
+  }
+
+  private findNodeById(nodeId: TopologyNodeId): TopologyNode | undefined {
+    return this.topologyData?.topologyNodes.find(tn => tn.id === nodeId);
   }
 
   @HostListener("window:resize")

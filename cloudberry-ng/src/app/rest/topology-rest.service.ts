@@ -44,12 +44,18 @@ export class TopologyRestService {
     return this.httpClient.delete<void>(`${this.baseUrl}/id/${topologyId}/deleteEdge`, {params});
   }
 
-  addEdgeToTopology(topologyId: TopologyId, sourceNodeId: TopologyNodeId, targetNodeId: TopologyNodeId,
-                    addVertexToTopologyIfNotAdded: boolean): Observable<void> {
-    const params = new HttpParams()
+  addEdgeToTopology(topologyId: TopologyId,
+                    sourceNodeId: TopologyNodeId,
+                    targetNodeId: TopologyNodeId,
+                    addVertexToTopologyIfNotAdded: boolean,
+                    edgeName?: string): Observable<void> {
+    let params = new HttpParams()
       .set("sourceNodeIdHex", sourceNodeId)
       .set("targetNodeIdHex", targetNodeId)
       .set("addVertexToTopologyIfNotAdded", addVertexToTopologyIfNotAdded.toString());
+    if (edgeName) {
+      params = params.set("edgeName", edgeName);
+    }
     return this.httpClient.put<void>(`${this.baseUrl}/id/${topologyId}/addEdge`, null, {params});
   }
 

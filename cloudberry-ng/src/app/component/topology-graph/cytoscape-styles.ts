@@ -1,4 +1,16 @@
 import * as cytoscape from "cytoscape";
+import {TopologyNodeType} from "../../model";
+
+export const nodeDefaultColor = "#666";
+export const nodesColors: Partial<Record<TopologyNodeType, string>> = {
+  [TopologyNodeType.Counter]: "#88c",
+  [TopologyNodeType.Filter]: "#f71",
+  [TopologyNodeType.Map]: "#fef",
+  [TopologyNodeType.Merge]: "#ac3",
+  [TopologyNodeType.Root]: "#8ef",
+  [TopologyNodeType.Sink]: "#488",
+  [TopologyNodeType.Branch]: "#ff0",
+};
 
 export const cyStylesheets: cytoscape.Stylesheet[] = [
   {
@@ -7,13 +19,16 @@ export const cyStylesheets: cytoscape.Stylesheet[] = [
       label: "data(name)",
       "text-valign": "center",
       "text-halign": "center",
-      "font-size": "12px"
+      "font-size": "12px",
+      "background-color": "data(bgColor)",
     }
   },
   {
     selector: "edge",
     style: {
       width: 1,
+      content: "data(name)",
+      "font-size": 8,
       "line-color": "#ff0000",
       "target-arrow-shape": "triangle",
       "target-arrow-color": "#ff0000",

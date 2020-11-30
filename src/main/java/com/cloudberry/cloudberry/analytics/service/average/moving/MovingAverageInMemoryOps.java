@@ -107,7 +107,7 @@ public abstract class MovingAverageInMemoryOps {
                 .map(tuple -> Map.<String, Object>of(
                         InfluxDefaults.Columns.TIME, tuple._1,
                         fieldName, tuple._2,
-                        STDDEV_KEY, 0
+                        STDDEV_KEY, 0.
                 ))
                 .collect(Collectors.toList());
         return new DataSeries(new SeriesInfo(AVERAGE_SERIES_NAME), seriesData);

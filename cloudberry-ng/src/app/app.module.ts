@@ -38,6 +38,8 @@ import {AddNodeDialogComponent} from "./component/add-node-dialog/add-node-dialo
 import {ObjectValuesPipe} from "./pipe/object-values.pipe";
 import {CommaSeparatedPipe} from "./pipe/comma-separated.pipe";
 import {QuotedPipe} from "./pipe/quoted.pipe";
+import {AddCounterNodeDialogComponent} from "./component/add-counter-node-dialog/add-counter-node-dialog.component";
+import {SelectEdgeDialogComponent} from "./component/select-edge-dialog/select-edge-dialog.component";
 
 @NgModule({
   declarations: [
@@ -54,33 +56,35 @@ import {QuotedPipe} from "./pipe/quoted.pipe";
     ObjectValuesPipe,
     CommaSeparatedPipe,
     QuotedPipe,
+    AddCounterNodeDialogComponent,
+    SelectEdgeDialogComponent,
   ],
-    imports: [
-        BrowserModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        RouterModule,
-        LayoutModule,
-        MatToolbarModule,
-        MatButtonModule,
-        MatSidenavModule,
-        MatIconModule,
-        MatListModule,
-        MatGridListModule,
-        MatCardModule,
-        MatMenuModule,
-        LoggerModule,
-        HttpClientModule,
-        MatTooltipModule,
-        MatSelectModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FlexLayoutModule,
-        MatProgressSpinnerModule,
-        ReactiveFormsModule,
-        MatOptionModule
-    ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    RouterModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatGridListModule,
+    MatCardModule,
+    MatMenuModule,
+    LoggerModule,
+    HttpClientModule,
+    MatTooltipModule,
+    MatSelectModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FlexLayoutModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
+    MatOptionModule
+  ],
   providers: [
     LoggerConfig,
     {

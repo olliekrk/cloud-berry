@@ -17,6 +17,7 @@ export class TopologyNodeApiService {
   }
 
   addCounterNode(nodeName: string, metricName: string): Observable<TopologyNode> {
+    console.log(nodeName, metricName);
     return this.rest.createCounterNode(nodeName, metricName).pipe(share());
   }
 
@@ -25,13 +26,17 @@ export class TopologyNodeApiService {
       case TopologyNodeType.Counter:
         return this.rest.createCounterNode(json.name, json.metricName).pipe(share());
       case TopologyNodeType.Filter:
-        return this.rest.createFilterNode(json.name, json.filterExpression).pipe(share());
+        return this.rest.createFilterNode(json.name, json.expression).pipe(share());
       case TopologyNodeType.Map:
         return this.rest.createMapNode(json.name, json.mappingExpression).pipe(share());
       case TopologyNodeType.Root:
         return this.rest.createRootNode(json.name, json.inputTopicName).pipe(share());
       case TopologyNodeType.Sink:
         return this.rest.createSinkNode(json.name, json.outputBucketName).pipe(share());
+      case TopologyNodeType.Merge:
+        return this.rest.createMergeNode(json.name).pipe(share());
+      case TopologyNodeType.Branch:
+        return this.rest.createBranchNode(json.name, json.expression).pipe(share());
       default:
         return EMPTY;
     }

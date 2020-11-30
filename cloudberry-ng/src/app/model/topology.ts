@@ -6,7 +6,13 @@ export interface Topology {
   name: string;
   userDefined: boolean;
   valid: boolean;
-  edges: { [source: string]: TopologyNodeId[] };
+  edges: { [source: string]: TopologyEdge[] };
+}
+
+export interface TopologyEdge {
+  source: TopologyNodeId;
+  target: TopologyNodeId;
+  name: string;
 }
 
 export interface TopologyNode {
@@ -25,7 +31,9 @@ export enum TopologyNodeType {
   Sink = "Sink",
   Filter = "Filter",
   Map = "Map",
-  Counter = "Counter"
+  Counter = "Counter",
+  Merge = "Merge",
+  Branch = "Branch",
 }
 
 export type FilterExpression = object;
@@ -34,7 +42,9 @@ export type MappingExpression = object;
 export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> = {
   [TopologyNodeType.Root]: ["name", "inputTopicName"],
   [TopologyNodeType.Sink]: ["name", "outputBucketName"],
-  [TopologyNodeType.Filter]: ["name", "filterExpression"],
+  [TopologyNodeType.Filter]: ["name", "expression"],
   [TopologyNodeType.Map]: ["name", "mappingExpression"],
-  [TopologyNodeType.Counter]: ["name", "metricName"]
+  [TopologyNodeType.Counter]: ["name", "metricName"],
+  [TopologyNodeType.Merge]: ["name"],
+  [TopologyNodeType.Branch]: ["name", "expression"],
 };
