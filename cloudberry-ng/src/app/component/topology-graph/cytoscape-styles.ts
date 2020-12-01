@@ -10,6 +10,7 @@ export const nodesColors: Partial<Record<TopologyNodeType, string>> = {
   [TopologyNodeType.Root]: "#8ef",
   [TopologyNodeType.Sink]: "#488",
   [TopologyNodeType.Branch]: "#ff0",
+  [TopologyNodeType.Deletion]: "#ff00b7",
 };
 
 export const cyStylesheets: cytoscape.Stylesheet[] = [

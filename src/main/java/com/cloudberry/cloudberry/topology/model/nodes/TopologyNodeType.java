@@ -8,4 +8,5 @@ public enum TopologyNodeType {
     Filter,
     Merge,
     Branch,
+    Deletion,
 }

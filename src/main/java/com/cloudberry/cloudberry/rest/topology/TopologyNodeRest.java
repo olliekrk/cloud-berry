@@ -3,10 +3,12 @@ package com.cloudberry.cloudberry.rest.topology;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyIdException;
 import com.cloudberry.cloudberry.rest.exceptions.invalid.id.InvalidTopologyNodeIdException;
 import com.cloudberry.cloudberry.rest.util.TopologyIdDispatcher;
+import com.cloudberry.cloudberry.topology.model.deletion.DeletionExpression;
 import com.cloudberry.cloudberry.topology.model.filtering.FilterExpression;
 import com.cloudberry.cloudberry.topology.model.mapping.MappingExpression;
 import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
+import com.cloudberry.cloudberry.topology.model.nodes.DeletionNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MergeNode;
@@ -52,6 +54,11 @@ public class TopologyNodeRest {
     @PostMapping("/filter")
     TopologyNode createFilterNode(@RequestParam String name, @RequestBody FilterExpression filterExpression) {
         return topologyNodeService.save(new FilterNode(name, filterExpression));
+    }
+
+    @PostMapping("/deletion")
+    TopologyNode createDeletionNode(@RequestParam String name, @RequestBody DeletionExpression deletionExpression) {
+        return topologyNodeService.save(new DeletionNode(name, deletionExpression));
     }
 
     @PostMapping("/map")

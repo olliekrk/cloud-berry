@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {FilterExpression, MappingExpression, TopologyId, TopologyNode} from "../model";
+import {DeletionExpression, FilterExpression, MappingExpression, TopologyId, TopologyNode} from "../model";
 
 @Injectable({
   providedIn: "root"
@@ -51,5 +51,10 @@ export class TopologyNodeRestService {
   createBranchNode(name: string, filterExpression: FilterExpression): Observable<TopologyNode> {
     const params = {name};
     return this.httpClient.post<TopologyNode>(`${this.baseUrl}/branch`, filterExpression, {params});
+  }
+
+  createDeletionNode(name: string, deletionExpression: DeletionExpression): Observable<TopologyNode> {
+    const params = {name};
+    return this.httpClient.post<TopologyNode>(`${this.baseUrl}/deletion`, deletionExpression, {params});
   }
 }

@@ -34,10 +34,12 @@ export enum TopologyNodeType {
   Counter = "Counter",
   Merge = "Merge",
   Branch = "Branch",
+  Deletion = "Deletion",
 }
 
 export type FilterExpression = object;
 export type MappingExpression = object;
+export type DeletionExpression = object;
 
 export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> = {
   [TopologyNodeType.Root]: ["name", "inputTopicName"],
@@ -47,4 +49,5 @@ export const topologyNodeTypeRequiredFields: Record<TopologyNodeType, string[]> 
   [TopologyNodeType.Counter]: ["name", "metricName"],
   [TopologyNodeType.Merge]: ["name"],
   [TopologyNodeType.Branch]: ["name", "expression"],
+  [TopologyNodeType.Deletion]: ["name", "deletionExpression"],
 };

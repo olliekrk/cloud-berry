@@ -37,6 +37,8 @@ export class TopologyNodeApiService {
         return this.rest.createMergeNode(json.name).pipe(share());
       case TopologyNodeType.Branch:
         return this.rest.createBranchNode(json.name, json.expression).pipe(share());
+      case TopologyNodeType.Deletion:
+        return this.rest.createDeletionNode(json.name, json.deletionExpression).pipe(share());
       default:
         return EMPTY;
     }

@@ -6,10 +6,12 @@ import com.cloudberry.cloudberry.metrics.MetricsRegistry;
 import com.cloudberry.cloudberry.topology.exception.bootstrap.BootstrappingException;
 import com.cloudberry.cloudberry.topology.model.bootstrap.BootstrappingContext;
 import com.cloudberry.cloudberry.topology.model.branching.BranchOutput;
+import com.cloudberry.cloudberry.topology.model.deletion.DeletionEvaluator;
 import com.cloudberry.cloudberry.topology.model.filtering.ExpressionChecker;
 import com.cloudberry.cloudberry.topology.model.mapping.MappingNodeEvaluator;
 import com.cloudberry.cloudberry.topology.model.nodes.BranchNode;
 import com.cloudberry.cloudberry.topology.model.nodes.CounterNode;
+import com.cloudberry.cloudberry.topology.model.nodes.DeletionNode;
 import com.cloudberry.cloudberry.topology.model.nodes.FilterNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MapNode;
 import com.cloudberry.cloudberry.topology.model.nodes.MergeNode;
@@ -89,6 +91,16 @@ public class TopologyNodeBootstrappingVisitor implements TopologyNodeVisitor {
 
         context.putStream(node.getId(), BranchOutput.MATCHED.name(), branchedStreams[0]);
         context.putStream(node.getId(), BranchOutput.UNMATCHED.name(), branchedStreams[1]);
+    }
+
+    @Override
+    public void visit(DeletionNode deletionNode) {
+        var mergedStream = mergeIncomingEdges(deletionNode);
+        var mappedStream = mergedStream.map(((key, event) -> KeyValue.pair(
+                key,
+                DeletionEvaluator.calculateNewComputationEvent(event, deletionNode.getDeletionExpression())
+        )));
+        context.putStream(deletionNode.getId(), mappedStream);
     }
 
     private KStream<String, ComputationEvent> mergeIncomingEdges(TopologyNode node) {
