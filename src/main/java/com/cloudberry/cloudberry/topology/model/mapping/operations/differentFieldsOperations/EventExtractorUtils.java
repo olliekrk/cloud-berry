@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.types.ObjectId;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import static com.cloudberry.cloudberry.db.influx.InfluxDefaults.CommonTags.COMP
 import static java.lang.String.format;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public final class EventExtractorUtils {
     private final ComputationMetaParameterExtractor computationMetaParameterExtractor;

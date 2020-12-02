@@ -6,10 +6,12 @@ import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgumen
 import com.cloudberry.cloudberry.topology.model.mapping.operations.DivisionByZeroException;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 @RequiredArgsConstructor
 public final class DivideDifferentFields {
     private final EventExtractorUtils eventExtractorUtils;

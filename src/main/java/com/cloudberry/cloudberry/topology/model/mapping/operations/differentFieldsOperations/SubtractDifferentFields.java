@@ -5,10 +5,12 @@ import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgument;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 @RequiredArgsConstructor
 public final class SubtractDifferentFields {
     private final EventExtractorUtils eventExtractorUtils;

@@ -4,9 +4,11 @@ import com.cloudberry.cloudberry.kafka.event.generic.ComputationEvent;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.EntryMapRecord;
 import com.cloudberry.cloudberry.topology.model.mapping.arguments.MappingArgument;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 @RequiredArgsConstructor
 public final class MultiplyDifferentFields {
     private final EventExtractorUtils eventExtractorUtils;
